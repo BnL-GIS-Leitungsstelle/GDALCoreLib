@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LayerComparerConsole": {
+      "commandName": "Project",
+      "commandLineArgs": "/file1=G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Auengebiete\\Auengebiete.gdb /layer1=N2017_Revision_Auengebiete_Anhang2_20171101 /file2=G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Auengebiete\\vonBIOPzurValidierung20210219\\AU.gdb /layer2=au_Anhang2_20171101"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="OGCGeometryValidatorGUI.ShellViewModel">
+    <Position X="0.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAIQCAgAAAwgCgAACAAREACAAAAQANmAAA1IAAIA=</HashCode>
+      <FileName>ShellViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.Models.OGCGeometryValidatorModel">
+    <Position X="3.75" Y="4.5" Width="3" />
+    <AssociationLine Name="AppInfo" Type="OGCGeometryValidatorGUI.Models.AppInfoModel" FixedFromPoint="true">
+      <Path>
+        <Point X="6.75" Y="5.125" />
+        <Point X="7.75" Y="5.125" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAECAAAAAAAgABAAAAAAAAEAAAAAIAAAAAAAAACAA=</HashCode>
+      <FileName>Models\OGCGeometryValidatorModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="AppInfo" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.App" Collapsed="true">
+    <Position X="3.25" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.Models.ProgressModel">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Models\ProgressModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.Models.MessagesModel">
+    <Position X="7.5" Y="2.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Models\MessagesModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.Models.AppInfoModel">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQCAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Models\AppInfoModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.Infrastructure.MVVM.DelegatingCommand" Collapsed="true">
+    <Position X="3.25" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACACAAQAAEAACAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Infrastructure\MVVM\DelegatingCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="OGCGeometryValidatorGUI.Behaviour.TextBoxBehaviour" Collapsed="true">
+    <Position X="3.25" Y="1.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAgAAAAAAAAAAAAAAAAgAAAAAEAChAAAAAAAA=</HashCode>
+      <FileName>Behaviour\TextBoxBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

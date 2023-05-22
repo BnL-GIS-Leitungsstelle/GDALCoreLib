@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="OGCToolsNetCoreLib.Geometry.LayerValidationResult">
+    <Position X="3.5" Y="0.5" Width="2.25" />
+    <AssociationLine Name="ValidationResultType" Type="OGCToolsNetCoreLib.Layer.ELayerValidationType">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.713" Y="0.883" Height="0.182" Width="1.652" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAABAEAEAAgAAAAAAAAAABAAAgAEAABAAEA=</HashCode>
+      <FileName>Geometry\LayerValidationResult.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ValidationResultType" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Property Name="InvalidFeatures" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Geometry.GeometryValidationResult">
+    <Position X="3.5" Y="3.5" Width="2.25" />
+    <AssociationLine Name="ValidationResultType" Type="OGCToolsNetCoreLib.Geometry.EGeometryValidationType">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.848" Y="1.435" Height="0.182" Width="1.443" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAMAAAAABQAAAAACAAAAAAEBAAAAAA=</HashCode>
+      <FileName>Geometry\GeometryValidationResult.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ValidationResultType" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Models.OgctLayer">
+    <Position X="0.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>CYQgbUCIAiggAhoAAEAKAAcIAAQQBABFoAICAWACgEA=</HashCode>
+      <FileName>Models\OgctLayerSelfOverlapValidationPart.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Enum Name="OGCToolsNetCoreLib.Geometry.EGeometryValidationType">
+    <Position X="6.25" Y="3.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAIAQAAAAAAAggAAAAAAIAAABAAQAEgAAAAII=</HashCode>
+      <FileName>Geometry\EGeometryValidationType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="OGCToolsNetCoreLib.Layer.ELayerValidationType">
+    <Position X="6.75" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAICAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Layer\ELayerValidationType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

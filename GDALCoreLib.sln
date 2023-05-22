@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalCoreTest", "GdalCoreTest\GdalCoreTest.csproj", "{AC09786C-D8F6-4F1A-852F-7B7E08542822}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OGCToolsNetCoreLib", "OGCToolsNetCoreLib\OGCToolsNetCoreLib.csproj", "{8582D8B6-5428-4011-A372-4C8FA87AEF1E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerfulDiLogSettingsConsoleTemplate", "PowerfulDiLogSettingsConsoleTemplate\PowerfulDiLogSettingsConsoleTemplate.csproj", "{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC09786C-D8F6-4F1A-852F-7B7E08542822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC09786C-D8F6-4F1A-852F-7B7E08542822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC09786C-D8F6-4F1A-852F-7B7E08542822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC09786C-D8F6-4F1A-852F-7B7E08542822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8582D8B6-5428-4011-A372-4C8FA87AEF1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8582D8B6-5428-4011-A372-4C8FA87AEF1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8582D8B6-5428-4011-A372-4C8FA87AEF1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8582D8B6-5428-4011-A372-4C8FA87AEF1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {30DCD39C-2628-4D8B-91F1-AEF85502FA04}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,84 @@
+﻿<Window x:Class="OGCGeometryValidatorGUI.Shell"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OGCGeometryValidatorGUI.Behaviour" 
+        xmlns:ogcgeometryvalidatorgui="clr-namespace:OGCGeometryValidatorGUI" 
+        xmlns:custom="clr-namespace:LoadingSpinnerControl;assembly=LoadingSpinnerControl"
+        d:DataContext="{d:DesignInstance Type=ogcgeometryvalidatorgui:ShellViewModel}"
+        mc:Ignorable="d"
+        Title="OGC Geometry Validator" 
+        Height="435" 
+        Width="1100"
+        Background="LightGray">
+    <DockPanel Background="LightSteelBlue"  LastChildFill="False" Margin="10 0 10 5" >
+      
+        <StackPanel Margin="5" DockPanel.Dock="Top" Height="40" Background="LightGray"    >
+            <TextBlock Margin="10 5" FontSize="13" FontStyle="Italic" TextWrapping="Wrap" >
+                Performs geometry validity check on vector geometries found in supported types of data sources: SHP, FGDB, GPKG
+                 Follows OGR/GDAL-based defintions on OGC simple geometries (https://www.opengeospatial.org/standards/sfa).
+            </TextBlock>
+        </StackPanel>
+
+        <Grid Margin="5" DockPanel.Dock="Top" Height="Auto"  >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="70"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0">Input: data path</Label>
+            <TextBox Grid.Column="1" Text="{Binding StartPath}" VerticalAlignment="Center" Height="20"/>
+            <Button Margin="10 5" Grid.Column="2" Command="{Binding ScanCommand}" Content="Browse"  />
+        </Grid>
+
+        <StackPanel Margin="5" DockPanel.Dock="Top" Height="Auto">
+            <Label>Messages:</Label>
+            <TextBox local:TextBoxBehaviour.ScrollOnTextChanged="True" VerticalScrollBarVisibility="Auto"  TextWrapping="Wrap" Height="200" Text="{Binding Messages}" />
+        </StackPanel>
+
+        <Grid Margin="5" DockPanel.Dock="Top" Height="Auto" Background="White"  >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="1" >
+                <custom:LoadingSpinner  Diameter="30" Thickness="5" Color="Blue" IsLoading="{Binding IsBusy}" HorizontalAlignment="Left" />
+                <ProgressBar Width="200" Height="20" Background="White" Value="{Binding ProgressPercentageInt}"></ProgressBar>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"  Width="40" Text="{Binding ProgressPercentage}" />
+            </Grid>
+
+
+
+            <Grid Grid.Column="2" VerticalAlignment="Center" >
+                <TextBlock>Found </TextBlock>
+                <TextBlock Margin="42 0 0 0" Text="{Binding GeodatafilesCounter}" />
+                <TextBlock Margin="58 0 0 0" > data sources</TextBlock>
+            </Grid>
+
+            <Button Grid.Column="3" Margin="10 5" Command="{Binding CancelCommand}" Content="Cancel"/>
+            <Button Grid.Column="4" Margin="10 5"  Command="{Binding RunCommand}" IsEnabled="{Binding IsRunEnabled}"  Content="Validate"/>
+        </Grid>
+
+        <Border DockPanel.Dock="Top" BorderBrush="LightGray" BorderThickness="2">
+            <Grid Height="25" Background="LightGray" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="320"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Label Content="{Binding AppInfo}" />
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+
+    </DockPanel>
+</Window>

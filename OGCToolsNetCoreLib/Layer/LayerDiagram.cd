@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="OGCToolsNetCoreLib.Layer.FieldDefnInfo">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>ABQAEAAAAAAAAAAEgAAAAEQIAAAAABAAAQAAAAAAcAA=</HashCode>
+      <FileName>Layer\FieldDefnInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Layer.LayerDetails">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAESKEAAAAAAQkAAAAAAAAIAAAAAAQEAA=</HashCode>
+      <FileName>Layer\LayerDetails.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Layer.LayerSchema">
+    <Position X="2.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>gAAAAgAAgAAAIAAAAQAIIAgCAABAAAAAAABAAAAAUgA=</HashCode>
+      <FileName>Layer\LayerSchema.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Layer.LayerExtent" Collapsed="true">
+    <Position X="6.25" Y="6.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>MAAAAAAwAAAAAAAAAQAAAgAAAEAAAAAAAABAAAAAAgA=</HashCode>
+      <FileName>Layer\LayerExtent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Layer.LayerSpatialRef" Collapsed="true">
+    <Position X="6.25" Y="2.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAAAQAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Layer\LayerSpatialRef.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Feature.FeatureRow">
+    <Position X="6.25" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Feature\FeatureRow.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Items" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Feature.FeatureRowItem" Collapsed="true">
+    <Position X="6.25" Y="9" Width="2" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>CEAAIAAAIAAARAAkAAACBAAAAAAAAAAAAABgAAAAIAA=</HashCode>
+      <FileName>Feature\FeatureRowItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Layer.LayerComparisonResult">
+    <Position X="6.25" Y="9.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAACAAACAAAIAAAEAAQAgAAE=</HashCode>
+      <FileName>Layer\LayerComparisonResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Layer.LayerDetailComparer">
+    <Position X="0.75" Y="12" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAABIAAAAAAAQAAAAAAAAAAAAAAAAAAACAAAAAI=</HashCode>
+      <FileName>Layer\LayerDetailComparer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="OGCToolsNetCoreLib.Models.OgctLayer">
+    <Position X="3.25" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>CYQgbUCIAiggAhoAAEAKAAcIAAQQBABFoAICAWACgEA=</HashCode>
+      <FileName>Models\OgctLayer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="OGCToolsNetCoreLib.Models.IOgctLayer">
+    <Position X="0.5" Y="4.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AQAgZUAIAgAgAggAAAAIAAQIAAQABAABIAIAAUACgEA=</HashCode>
+      <FileName>Models\IOgctLayer.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="OGCToolsNetCoreLib.Layer.ELayerType">
+    <Position X="6.25" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAASQAAAAAAAAAAAAIAAAAAAACA=</HashCode>
+      <FileName>Layer\ELayerType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="OGCToolsNetCoreLib.Common.ESpatialRefWKT">
+    <Position X="6.25" Y="3.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AJAAAAAAAwAAAQAAAAAAAAAABAAAAAAgAAAABAUAAAA=</HashCode>
+      <FileName>Common\ESpatialRefWKT.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,151 @@
+﻿// this is a comment line
+// Format: {GDB Name} ; {Year} ; {SQL Select Query}
+//
+#gpkg_Name;Modele_geodonnees_export_V1_0
+
+// 1. layer
+#layer;SourcesLocation_V1_0;CH1903plus_LV95;wkbPoint
+
+// list of fields in layer
+// each field:
+// #field;NAME,TYPE, WIDTH, NULLABLE,UNIQUE
+
+// required field: Canton Text (2)
+#field;Canton;String;2;false;false
+
+// required field: Lieu Text (50)
+#field;Lieu;String;50;false;false
+
+// required field with unique values: ID_CH Text (15)
+#field;ID_CH;String;15;false;true
+
+#field;ID_Canton;String;20;true;false
+
+#field;ID_autre;String;15;true;true
+
+#field;Cat_Struct;String;1;false;false
+
+#field;Cat_Faune;String;1;true;false
+
+#field;Imp_LPN;String;1;false;false
+
+#field;Nb_sp_LR;Integer;3;false;false
+
+#field;Nb_sp_prio;Integer;3;false;false
+
+#field;Nb_Ende;Integer;3;false;false
+
+#field;Statu_prot;String;10;false;false
+
+#layer_End
+
+// 2. layer
+#layer;SourcesSurface_V1_0;CH1903plus_LV95;wkbPolygon
+
+// list of fields in layer
+
+// obligatoire field: Canton Text (2)
+#field;Canton;String;2;false;false
+// required field: Lieu Text (50)
+#field;Lieu;String;50;false;false
+
+// obligatoire field with unique values: ID_CH Text (15)
+#field;ID_CH;String;15;false;true
+
+#field;ID_Canton;String;20;true;false
+
+#field;ID_autre;String;15;true;true
+
+#field;Cat_Struct;String;1;false;false
+
+#field;Cat_Faune;String;1;true;false
+
+#field;Imp_LPN;String;1;false;false
+
+#field;Statu_prot;String;10;false;false
+
+#field;Type_peri;String;3;false;false
+#field;Conditions;String;2;false;false
+#field;Remarque;String;254;true;false
+
+#layer_End
+
+// 3. layer
+#layer;Cat_struct_V1_0;None;wkbNone
+
+// list of fields in table
+
+// obligatoire field: Code Text (1)
+#field;Code;String;1;false;false
+
+// obligatoire field: FR Text (150)
+#field;FR;String;150;false;false
+// obligatoire field: DE Text (150)
+#field;DE;String;150;false;false
+// obligatoire field: IT Text (150)
+#field;IT;String;150;false;false
+
+#layer_End
+
+// 4. layer
+#layer;Cat_Faune_V1_0;None;wkbNone
+
+// list of fields in table
+
+// obligatoire field: Code Text (1)
+#field;Code;String;1;false;false
+#field;FR;String;150;false;false
+#field;DE;String;150;false;false
+#field;IT;String;150;false;false
+
+#layer_End
+
+// 5. layer
+#layer;Statut_prot_V1_0;None;wkbNone
+
+// list of fields in table
+
+// obligatoire field: Code Text (3)
+#field;Code;String;3;false;false
+#field;FR;String;150;false;false
+#field;DE;String;150;false;false
+#field;IT;String;150;false;false
+
+#layer_End
+
+// 6. layer
+#layer;Imp_LPN_V1_0;None;wkbNone
+
+// list of fields in table
+#field;Code;String;1;false;false
+#field;FR;String;150;false;false
+#field;DE;String;150;false;false
+#field;IT;String;150;false;false
+
+#layer_End
+
+// 7. layer
+#layer;Type_peri_V1_0;None;wkbNone
+
+// list of fields in table
+
+// obligatoire field: Code Text (3)
+#field;Code;String;3;false;false
+#field;FR;String;150;false;false
+#field;DE;String;150;false;false
+#field;IT;String;150;false;false
+
+#layer_End
+
+// 8. layer
+#layer;Conditions_V1_0;None;wkbNone
+
+// list of fields in table
+
+// obligatoire field: Code Text (2)
+#field;Code;String;2;false;false
+#field;FR;String;150;false;false
+#field;DE;String;150;false;false
+#field;IT;String;150;false;false
+
+#layer_End

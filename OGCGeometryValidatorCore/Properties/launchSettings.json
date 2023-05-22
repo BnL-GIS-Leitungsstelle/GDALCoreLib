@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OGCGeometryValidatorCore": {
+      "commandName": "Project",
+      "commandLineArgs": "/path=D:\\Analyse\\Flaechenstatistik_Generiert_OGR20220704_094301"
+    }
+  }
+}
