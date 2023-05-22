@@ -66,6 +66,13 @@ public partial class OgctLayer : IOgctLayer
     }
 
 
+    /// <summary>
+    /// TODO: Fields with a reserved name cannot be used as user defined fields
+    /// </summary>
+    /// <param name="targetLayer"></param>
+    /// <param name="generateNewFids"></param>
+    /// <param name="reportProgressPercentage"></param>
+    /// <returns></returns>
     public long CopyFeatures(IOgctLayer targetLayer, bool generateNewFids = false, Action<int> reportProgressPercentage = null)
     {
         var ogctTargetLayer = (OgctLayer)targetLayer;
