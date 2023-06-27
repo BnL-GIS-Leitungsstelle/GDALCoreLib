@@ -15,126 +15,13 @@ namespace OGCToolsNetCoreLib.DataAccess
 {
     /// <summary>
     /// Access to different file-formats of geodata:
-    /// vector-formats: FGDB, GPKG and shp mainly.
+    /// vector-formats: FGDB and GPKG mainly. sometimes shp..
     /// raster-formats: tif
     /// 
+    /// for new GDAL-Version 3.6.4 with FGDb-write-access
     /// </summary>
     public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     {
-        /// <summary>
-        /// list of drivers included PROJ(7.2.0), SQLITE3, GEOS(3.9.0), HDF4, HDF5, GEOTIFF, JPEG, PNG, LIBZ, LERC, CURL
-        /// Current version targets GDAL 3.2.0 with minimal drivers
-        /// from github on 30.7.21
-        /// https://github.com/MaxRev-Dev/gdal.netcore
-        /// </summary>
-        //public readonly List<string> MinimalAvailableDrivers = new()
-        //{
-        //    "hdf4",
-        //    "hdf5",
-        //    "gtiff",
-        //    "aaigrid",
-        //    "adrg",
-        //    "airsar",
-        //    "arg",
-        //    "blx",
-        //    "bmp",
-        //    "bsb",
-        //    "cals",
-        //    "ceos",
-        //    "coasp",
-        //    "cosar",
-        //    "ctg",
-        //    "dimap",
-        //    "dted",
-        //    //"e00grid", retired
-        //    "elas",
-        //    "ers",
-        //    "fit",
-        //    "gff",
-        //    "gxf",
-        //    "hf2",
-        //    "idrisi",
-        //    //"ignfheightasciigrid", retired
-        //    "ilwis",
-        //    "ingr",
-        //    "iris",
-        //    "jaxapalsar",
-        //    "jdem",
-        //    "kmlsuperoverlay",
-        //    "l1b",
-        //    "leveller",
-        //    "map",
-        //    "mrf",
-        //    "msgn",
-        //    "ngsgeoid",
-        //    "nitf",
-        //    "pds",
-        //    "prf",
-        //    "r",
-        //    "rmf",
-        //    "rs2",
-        //    "safe",
-        //    "saga",
-        //    "sdts",
-        //    "sentinel2",
-        //    "sgi",
-        //    "sigdem",
-        //    "srtmhgt",
-        //    "terragen",
-        //    "til",
-        //    "tsx",
-        //    "usgsdem",
-        //    "xpm",
-        //    "xyz",
-        //    "zmap",
-        //    "rik",
-        //    "ozi",
-        //    "grib",
-        //    "rasterlite",
-        //    "mbtiles",
-        //    "pdf",
-        //    //"aeronavfaa", retired
-        //    "arcgen",
-        //    //"bna", retired
-        //    "cad",
-        //    "csv",
-        //    "dgn",
-        //    "dxf",
-        //    "edigeo",
-        //    "geoconcept",
-        //    "georss",
-        //    "gml",
-        //    "gpsbabel",
-        //    "gpx",
-        //    //"htf", retired
-        //    "jml",
-        //    "mvt",
-        //    //"openair", retired
-        //    "openfilegdb",
-        //    "pgdump",
-        //    "rec",
-        //    "s57",
-        //    //"segukooa", retired
-        //    //"segy", retired
-        //    "selafin",
-        //    "ESRI Shapefile",
-        //    //"sua", retired
-        //    "svg",
-        //    "sxf",
-        //    "tiger",
-        //    "vdv",
-        //    "wasp",
-        //    //"xplane", retired
-        //    "idrisi",
-        //    "pds",
-        //    "sdts",
-        //    "gpkg",
-        //    "vfk",
-        //    "osm",
-        //    "PostgreSQL"
-        //};
-
-
         public GeoDataSourceAccessor()
         {
             if (Ogr.GetDriverCount() == 0)

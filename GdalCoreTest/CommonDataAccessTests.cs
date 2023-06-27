@@ -1,14 +1,15 @@
 using System.IO;
 using GdalCoreTest.Helper;
 using OGCToolsNetCoreLib.DataAccess;
-using OSGeo.GDAL;
 using OSGeo.OGR;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace GdalCoreTest
 {
-
+    /// <summary>
+    /// for new GDAL-Version 3.6.4 with FGDb-write-access
+    /// </summary>
     [Collection("Sequential")]
     public class CommonDataAccessTests
     {
@@ -19,8 +20,6 @@ namespace GdalCoreTest
         {
             _outputHelper = outputHelper;
             GdalConfiguration.ConfigureGdal();
-            //Ogr.RegisterAll();
-            //Gdal.AllRegister();
         }
 
         [Fact]

@@ -51,7 +51,7 @@ namespace GdalCoreTest
             }
             else
             {
-                Assert.True(layerNames.Count > 0 && layerNames.Count < 8);
+                Assert.True(layerNames.Count > 0 && layerNames.Count < 17);
             }
         }
 
@@ -97,6 +97,53 @@ namespace GdalCoreTest
             }
         }
 
+        /// <summary>
+        /// creates new example layers with spRef = LV95 and of polygon-Featuretype
+        /// </summary>
+        /// <param name="file"></param>
+        [Theory]
+        [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
+        public void CreateLayer_InFgdb_WithValidFiles_IsWorking(string file)
+        {
+            // only fgdb's are allowed for the test
+            if (file.EndsWith(".gdb") == false)
+                return;
+
+            string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "createdLayer");
+
+            file = Path.Combine(outputdirectory, Path.GetFileName(file));
+
+            _outputHelper.WriteLine($"CreateTest datasource of file: {Path.GetFileName(file)}");
+
+            var supportedDatasource = SupportedDatasource.GetSupportedDatasource(file);
+
+            // fields to add
+            var fieldList = new List<FieldDefnInfo>
+            {
+                new("ID_CH", FieldType.OFTString, 15, false, true),
+                new("Canton", FieldType.OFTString, 2, false, false)
+            };
+
+            if (supportedDatasource.Access == EAccessLevel.Full)
+            {
+                using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true, true, ESpatialRefWKT.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
+
+                if (supportedDatasource.Type == EDataSourceType.SHP)
+                {
+                    using var layer = dataSource.OpenLayer(dataSource.GetLayerNames().First());
+                }
+                else
+                {
+                    using var layer = dataSource.CreateAndOpenLayer("createdLayer", ESpatialRefWKT.CH1903plus_LV95, wkbGeometryType.wkbPolygon, fieldList);
+                }
+
+                var layerNames = dataSource.GetLayerNames();
+
+
+                var layerInfo = dataSource.GetLayerInfo(layerNames.First());
+                Assert.True(layerInfo.GeomType == wkbGeometryType.wkbPolygon || layerInfo.GeomType == wkbGeometryType.wkbMultiPolygon);
+            }
+        }
 
         /// <summary>
         /// creates new layers with spRef = LV95 and of polygon-Featuretype
@@ -216,12 +263,12 @@ namespace GdalCoreTest
                     inputLayer.LayerDetails.Schema.FieldList.Any(field => field.Type == FieldType.OFTBinary);
 
                 var hasTooLongFieldNamesThatAreIndistinguishableWhenShortened =
-                    inputLayer.LayerDetails.Schema.FieldList.Select(field => field.Name.Substring(0, Math.Min(10,field.Name.Length))).Distinct()
+                    inputLayer.LayerDetails.Schema.FieldList.Select(field => field.Name.Substring(0, Math.Min(10, field.Name.Length))).Distinct()
                         .Count() != inputLayer.LayerDetails.Schema.FieldList.Count;
 
-                
 
-                using var targetDataSource = new GeoDataSourceAccessor().OpenDatasource(fileOut, true, true,ESpatialRefWKT.CH1903plus_LV95);
+
+                using var targetDataSource = new GeoDataSourceAccessor().OpenDatasource(fileOut, true, true, ESpatialRefWKT.CH1903plus_LV95);
 
                 using var targetLayer = targetDataSource.OpenLayer(targetDataSource.GetLayerNames().First());
                 if (hasBinaryField || hasTooLongFieldNamesThatAreIndistinguishableWhenShortened)
@@ -280,7 +327,7 @@ namespace GdalCoreTest
 
                     string outputFile = Path.Combine(outputdirectory, outputFileName);
 
-                    using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, true, true,ESpatialRefWKT.CH1903plus_LV95);
+                    using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, true, true, ESpatialRefWKT.CH1903plus_LV95);
 
                     layer.CopyToLayer(outputDatasource, layerInfo.Name,
                         recordsLimitToCopy * i, recordsLimitToCopy * (i - 1));
@@ -291,6 +338,39 @@ namespace GdalCoreTest
             }
         }
 
+        /// <summary>
+        /// copy layers within fgdb
+        /// </summary>
+        /// <param name="file"></param>
+        [Theory]
+        [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
+        public void CopyLayers_WithinFgdb_IsWorking(string file)
+        {
+            string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "copiedLayers");
+
+            // only fgdbs are allowed in test
+            if (file.EndsWith(".gdb") == false)
+                return;
+
+            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+
+            var layerNames = dataSource.GetLayerNames();
+
+            foreach (var layerName in layerNames)
+            {
+                using var sourceLayer = dataSource.OpenLayer(layerName);
+                var layerInfo = sourceLayer.LayerDetails;
+
+                sourceLayer.CopyToLayer(dataSource, layerInfo.Name + "_copy");
+
+                using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(file, true, false, ESpatialRefWKT.CH1903plus_LV95);
+                sourceLayer.CopyToLayer(outputDatasource, layerInfo.Name + "_copy_Output");
+
+
+
+                continue;
+            }
+        }
 
         /// <summary>
         /// creates new layers with spRef = LV95 and of polygon-Featuretype
