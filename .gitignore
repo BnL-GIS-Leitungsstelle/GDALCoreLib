@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /GdalCoreTest/samples-vector/amphib_point_SpRefLV95_epsg2056_94rec.shape
+/GdalCoreTest/samples-vector/copiedPartedLayer
