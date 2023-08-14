@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using GdalCoreTest.Helper;
-using OGCToolsNetCoreLib;
 using OGCToolsNetCoreLib.Common;
 using OGCToolsNetCoreLib.DataAccess;
 using OGCToolsNetCoreLib.Exceptions;
 using OGCToolsNetCoreLib.Layer;
 using OSGeo.OGR;
-using OSGeo.OSR;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,6 +23,9 @@ namespace GdalCoreTest
             _outputHelper = outputHelper;
             GdalConfiguration.ConfigureGdal();
         }
+
+
+
 
         // 1. GetLayerNames
         // 2. Exists
@@ -97,18 +97,15 @@ namespace GdalCoreTest
             }
         }
 
+
         /// <summary>
-        /// creates new example layers with spRef = LV95 and of polygon-Featuretype
+        /// creates new layers with spRef = LV95 and of polygon-Featuretype
         /// </summary>
         /// <param name="file"></param>
         [Theory]
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
-        public void CreateLayer_InFgdb_WithValidFiles_IsWorking(string file)
+        public void CreateLayer_WithValidFiles_IsWorking(string file)
         {
-            // only fgdb's are allowed for the test
-            if (file.EndsWith(".gdb") == false)
-                return;
-
             string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "createdLayer");
 
             file = Path.Combine(outputdirectory, Path.GetFileName(file));
@@ -138,54 +135,9 @@ namespace GdalCoreTest
                 }
 
                 var layerNames = dataSource.GetLayerNames();
-
-
+                
                 var layerInfo = dataSource.GetLayerInfo(layerNames.First());
                 Assert.True(layerInfo.GeomType == wkbGeometryType.wkbPolygon || layerInfo.GeomType == wkbGeometryType.wkbMultiPolygon);
-            }
-        }
-
-        /// <summary>
-        /// creates new layers with spRef = LV95 and of polygon-Featuretype
-        /// </summary>
-        /// <param name="file"></param>
-        [Theory]
-        [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
-        public void CreateLayer_WithValidFiles_IsWorking(string file)
-        {
-            string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "createdLayer");
-
-            file = Path.Combine(outputdirectory, Path.GetFileName(file));
-
-            _outputHelper.WriteLine($"CreateTest datasource of file: {Path.GetFileName(file)}");
-
-            var supportedDatasource = SupportedDatasource.GetSupportedDatasource(file);
-
-            // fields to add
-            var fieldList = new List<FieldDefnInfo>();
-            fieldList.Add(new FieldDefnInfo("ID_CH", FieldType.OFTString, 15, false, true));
-            fieldList.Add(new FieldDefnInfo("Canton", FieldType.OFTString, 2, false, false));
-
-
-
-            if (supportedDatasource.Access == EAccessLevel.Full)
-            {
-                using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true, true, ESpatialRefWKT.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
-
-                if (supportedDatasource.Type == EDataSourceType.SHP)
-                {
-                    using var layer = dataSource.OpenLayer(dataSource.GetLayerNames().First());
-                }
-                else
-                {
-                    using var layer = dataSource.CreateAndOpenLayer("createdLayer", ESpatialRefWKT.CH1903plus_LV95, wkbGeometryType.wkbPolygon, fieldList);
-                }
-
-                var layerNames = dataSource.GetLayerNames();
-
-
-                var layerInfo = dataSource.GetLayerInfo(layerNames.First());
-                Assert.True(layerInfo.GeomType == wkbGeometryType.wkbPolygon);
 
             }
         }

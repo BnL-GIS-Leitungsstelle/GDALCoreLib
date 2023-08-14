@@ -1,4 +1,5 @@
 using GdalCoreTest.Helper;
+using OGCToolsNetCoreLib.DataAccess;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using Xunit;
@@ -17,14 +18,24 @@ namespace GdalCoreTest
         {
             _outputHelper = outputHelper;
             GdalConfiguration.ConfigureGdal();
-            //Ogr.RegisterAll();
-            //Gdal.AllRegister();
+        }
+
+        [Fact]
+        public void GdalInfoTest()
+        {
+            var dataAccessor = new GeoDataSourceAccessor();
+
+            foreach (var info in dataAccessor.GetGdalVersionInfo())
+            {
+                _outputHelper.WriteLine(info);
+            }
         }
 
 
-
         [Theory]
-        [MemberData(nameof(TestDataPathProvider.ValidShapeVectorData), MemberType = typeof(TestDataPathProvider))]
+       // [MemberData(nameof(TestDataPathProvider.ValidShapeVectorData), MemberType = typeof(TestDataPathProvider))]
+        [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
+
         public void GetGdalInfoVector(string file)
         {
             var dataSource = Ogr.Open(file, 0);
@@ -36,6 +47,7 @@ namespace GdalCoreTest
                 Assert.NotNull(dataSource.GetLayerByIndex(i));
             }
         }
+
 
         [Theory]
         [MemberData(nameof(TestDataPathProvider.ValidTifRasterData), MemberType = typeof(TestDataPathProvider))]

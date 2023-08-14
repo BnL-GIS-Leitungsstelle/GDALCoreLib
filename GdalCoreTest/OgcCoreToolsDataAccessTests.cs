@@ -1,29 +1,39 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using GdalCoreTest.Helper;
-using OGCToolsNetCoreLib;
 using OGCToolsNetCoreLib.Common;
 using OGCToolsNetCoreLib.DataAccess;
 using OGCToolsNetCoreLib.Exceptions;
 using OGCToolsNetCoreLib.Extensions;
-using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace GdalCoreTest
-{ 
+{
     [Collection("Sequential")]
-    public class OgcCoreToolsDataAccessTests
+    public class OgcCoreToolsDataAccessTests : IClassFixture<CreateDataSourceFixture>
     {
-
         private readonly ITestOutputHelper _outputHelper;
 
-        public OgcCoreToolsDataAccessTests(ITestOutputHelper outputHelper)
+        private string _gdbFolderToCleanupAfterTest;
+
+        private CreateDataSourceFixture _fixture;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="outputHelper"></param>
+        /// <param name="fixture">will cleanup all created files within the output folder at the end of all tests</param>
+        public OgcCoreToolsDataAccessTests(ITestOutputHelper outputHelper, CreateDataSourceFixture fixture)
         {
             _outputHelper = outputHelper;
             GdalConfiguration.ConfigureGdal();
+            _fixture = fixture;
         }
+
 
         [Fact]
         public void CheckAllDriversAvailable_MoreThan100Drivers()
@@ -49,6 +59,10 @@ namespace GdalCoreTest
         public void CreateDataSourceVector_WithValidFiles_IsWorking(string file)
         {
             string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "created");
+            if (Directory.Exists(outputdirectory) == false)
+            {
+                Directory.CreateDirectory(outputdirectory);
+            }
 
             file = Path.Combine(outputdirectory, Path.GetFileName(file));
 
@@ -58,7 +72,7 @@ namespace GdalCoreTest
 
             if (isExpectedOnReadOnly)
             {
-                Assert.Throws<DataSourceReadOnlyException>( () =>new GeoDataSourceAccessor().CreateDatasource(file,null));
+                Assert.Throws<DataSourceReadOnlyException>(() => new GeoDataSourceAccessor().CreateDatasource(file, null));
             }
             else
             {
@@ -83,7 +97,7 @@ namespace GdalCoreTest
             Assert.True(File.Exists(resultFile) || Directory.Exists(resultFile));
 
             var dataSource = new GeoDataSourceAccessor().OpenDatasource(resultFile);
-            
+
             Assert.NotNull(dataSource);
         }
 
@@ -103,6 +117,7 @@ namespace GdalCoreTest
 
             Assert.False(isExpectedAsFile ? File.Exists(resultFile) : Directory.Exists(resultFile));
         }
+
 
     }
 }

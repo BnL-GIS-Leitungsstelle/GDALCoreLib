@@ -8,7 +8,7 @@ namespace OGCToolsNetCoreLib.DataAccess;
 
 public interface IGeoDataSourceAccessor
 {
-    List<string> GetInfo();
+    List<string> GetGdalVersionInfo();
 
     /// <summary>
     /// Version 3.3.3 of MaxRef.Gdal.Core provides more drivers ans retired some old

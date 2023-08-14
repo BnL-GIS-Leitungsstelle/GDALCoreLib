@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NetTopologySuite.Utilities;
 using OGCToolsNetCoreLib.Common;
 using OGCToolsNetCoreLib.Exceptions;
 using OGCToolsNetCoreLib.Extensions;
@@ -30,29 +31,22 @@ namespace OGCToolsNetCoreLib.DataAccess
             }
         }
 
-        public List<string> GetInfo()
+        public List<string> GetGdalVersionInfo()
         {
-            var info = new List<string>();
-            info.Add("GDAL configured:");
             var gdalInfo = new GdalInfo();
-            info.Add($"WorkDir= {gdalInfo.WorkingDirectory}");
-            info.Add($"Package-Version= {gdalInfo.PackageVersion}");
-            info.Add($"Gdal   -Version= {gdalInfo.Version}");
-            info.Add($"Gdal   -Info= {gdalInfo.Version}");
-
-            //var spatialReference = new SpatialReference(null);
-            //spatialReference.SetWellKnownGeogCS("wgs84");
-
-            //info.Add($"Available drivers");
-            //foreach (var availableDriver in DataAccess.GetAvailableDrivers())
-            //{
-            //    info.Add(availableDriver);
-            //}
-
-            info.Add($"Currently supported drivers");
-            foreach (var supportedSources in SupportedDatasource.Datasources)
+            var info = new List<string>
             {
-                info.Add(supportedSources.OgrDriverName);
+                "GDAL configured:",
+                $"WorkDir= {gdalInfo.WorkingDirectory}",
+                $"Package-Version= {gdalInfo.PackageVersion}",
+                $"Gdal   -Version= {gdalInfo.Version}",
+                $"Gdal   -Info= {gdalInfo.Version}",
+                $"Currently supported drivers"
+            };
+
+            foreach (var source in SupportedDatasource.Datasources)
+            {
+                info.Add($"{source.OgrDriverName,15} Access: {source.Access} Type: {source.Type}");
             }
 
             return info;
@@ -132,7 +126,7 @@ namespace OGCToolsNetCoreLib.DataAccess
         {
             using OSGeo.OGR.Driver inMemoryDriver = Ogr.GetDriverByName("Memory");
 
-            return new OgctDataSource(inMemoryDriver.CreateDataSource(Guid.NewGuid()+".inMemory", new string[0]));
+            return new OgctDataSource(inMemoryDriver.CreateDataSource(Guid.NewGuid() + ".inMemory", new string[0]));
 
         }
 
@@ -144,7 +138,7 @@ namespace OGCToolsNetCoreLib.DataAccess
         }
 
         /// <summary>
-        /// valid dataformats are Geopackage, Filegeodatabase (ReadOnly) and Shape.
+        /// valid dataformats are Geopackage, Filegeodatabase and Shape.
         /// </summary>
         /// <param name="path"></param>
         /// <param name="spatialRef">must be defined, when creating a shapefile</param>
@@ -167,8 +161,8 @@ namespace OGCToolsNetCoreLib.DataAccess
                 case EFileType.Folder when supportedDs.Type is EDataSourceType.SHP_FOLDER:
                     var shpDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
                     var dsDataSource = new OgctDataSource(shpDriver.CreateDataSource(path, new string[] { }));
-                    dsDataSource.CreateAndOpenLayer("blank", ESpatialRefWktHelpers.FromSpatialReference(spatialRef),
-                               geometryType).Dispose();
+                    var shpLayerName = Path.GetFileNameWithoutExtension(path);
+                    dsDataSource.OgrDataSource.CreateLayer(shpLayerName, spatialRef, geometryType, new string[] { }).Dispose();
 
                     return dsDataSource;
 
@@ -215,12 +209,11 @@ namespace OGCToolsNetCoreLib.DataAccess
 
 
                     var driver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
-                    // ist path a directory ?
                     var dataSource = new OgctDataSource(driver.CreateDataSource(path, new string[] { }));
                     if (supportedDs.Type == EDataSourceType.SHP)
                     {
-                        var layerName = Path.GetFileNameWithoutExtension(outputPath);
-                        dataSource.OgrDataSource.CreateLayer(layerName,spatialRef,geometryType,new string[]{}).Dispose();
+                        var layerName = Path.GetFileNameWithoutExtension(path);
+                        dataSource.OgrDataSource.CreateLayer(layerName, spatialRef, geometryType, new string[] { }).Dispose();
                     }
 
                     //OSGeo.OGR.LayerName shapeFileLayer = dataSource.CreateLayer(path, spatialRef, geometryType, new string[] { });
@@ -415,14 +408,14 @@ namespace OGCToolsNetCoreLib.DataAccess
             return projString;
         }
 
-
-
+       
         public string GetGdalInfoRaster(string file)
         {
             using var inputDataset = Gdal.Open(file, Access.GA_ReadOnly);
 
             return Gdal.GDALInfo(inputDataset, new GDALInfoOptions(null));
         }
+
 
     }
 }
