@@ -38,11 +38,11 @@ public interface IGeoDataSourceAccessor
     /// <summary>
     /// valid dataformats are Geopackage, Filegeodatabase (ReadOnly) and Shape.
     /// </summary>
-    /// <param name="path"></param>
+    /// <param name="pathAndFilename"></param>
     /// <param name="spatialRef">must be defined, when creating a shapefile</param>
     /// <param name="geometryType">must be defined, when creating a shapefile</param>
     /// <returns></returns>
-    OgctDataSource CreateDatasource(string path, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
+    OgctDataSource CreateDatasource(string pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
     /// <summary>
     /// the methods uses standard .net methods to copy the datasource. No gdal-functionality is used.

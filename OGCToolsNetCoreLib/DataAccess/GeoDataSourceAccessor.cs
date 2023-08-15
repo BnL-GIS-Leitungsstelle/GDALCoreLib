@@ -140,41 +140,41 @@ namespace OGCToolsNetCoreLib.DataAccess
         /// <summary>
         /// valid dataformats are Geopackage, Filegeodatabase and Shape.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="pathAndFilename"></param>
         /// <param name="spatialRef">must be defined, when creating a shapefile</param>
         /// <param name="geometryType">must be defined, when creating a shapefile</param>
         /// <returns></returns>
-        public OgctDataSource CreateDatasource(string path, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
+        public OgctDataSource CreateDatasource(string pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
         {
-            var supportedDs = SupportedDatasource.GetSupportedDatasource(path);
+            var supportedDs = SupportedDatasource.GetSupportedDatasource(pathAndFilename);
 
             if (supportedDs.Access == EAccessLevel.ReadOnly)
             {
                 throw new DataSourceReadOnlyException($"no create method implemented for this format: {supportedDs.Type}");
             }
 
-            // create new dir for files, i case they don't exist
-            string outputPath = Path.GetDirectoryName(path);
+            //   string outputPath = Path.GetDirectoryName(pathAndFilename);
+
 
             switch (supportedDs.FileType)
             {
                 case EFileType.Folder when supportedDs.Type is EDataSourceType.SHP_FOLDER:
+
                     var shpDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
-                    var dsDataSource = new OgctDataSource(shpDriver.CreateDataSource(path, new string[] { }));
-                    var shpLayerName = Path.GetFileNameWithoutExtension(path);
+                    var shpLayerName = Path.GetFileNameWithoutExtension(pathAndFilename);
+                    //pathAndFilename = Path.Combine(pathAndFilename, shpLayerName+".shp");
+                    var dsDataSource = new OgctDataSource(shpDriver.CreateDataSource(pathAndFilename, new string[] { }));
+
                     dsDataSource.OgrDataSource.CreateLayer(shpLayerName, spatialRef, geometryType, new string[] { }).Dispose();
 
                     return dsDataSource;
 
-                case EFileType.Folder when supportedDs.Type is EDataSourceType.OpenFGDB:
 
-                    if (Directory.Exists(path) == true)
-                    {
-                        Directory.Delete(path);
-                    }
+                case EFileType.Folder when supportedDs.Type is EDataSourceType.OpenFGDB:
+                    if (Directory.Exists(pathAndFilename)) Directory.Delete(pathAndFilename);  // deletes the fgdb
 
                     var gdbDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
-                    return new OgctDataSource(gdbDriver.CreateDataSource(path, new string[] { }));
+                    return new OgctDataSource(gdbDriver.CreateDataSource(pathAndFilename, new string[] { }));
 
 
                 case EFileType.File:
@@ -183,15 +183,13 @@ namespace OGCToolsNetCoreLib.DataAccess
                         throw new DataSourceMethodNotImplementedException($"no create method implemented for this format: {supportedDs.Type}");
                     }
 
-                    if (Directory.Exists(outputPath) == false)
-                    {
-                        Directory.CreateDirectory(outputPath);
-                    }
+                    if (Directory.Exists(Path.GetDirectoryName(pathAndFilename)) == false)
+                        Directory.CreateDirectory(Path.GetDirectoryName(pathAndFilename));
 
-                    if (File.Exists(path)) File.Delete(path);
+                    if (File.Exists(pathAndFilename)) File.Delete(pathAndFilename); // deletes the gpkg 
 
                     var gpkgDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
-                    return new OgctDataSource(gpkgDriver.CreateDataSource(path, new string[] { }));
+                    return new OgctDataSource(gpkgDriver.CreateDataSource(pathAndFilename, new string[] { }));
 
 
                 case EFileType.MultiFile:
@@ -200,29 +198,24 @@ namespace OGCToolsNetCoreLib.DataAccess
                         throw new DataSourceMethodNotImplementedException($"no create method implemented for this format: {supportedDs.Type}");
                     }
 
-                    if (Directory.Exists(outputPath) == false)
-                    {
-                        Directory.CreateDirectory(outputPath);
-                    }
-
-                    DeleteDatasource(path); // delete, if it already exists
-
+                    if (Directory.Exists(Path.GetDirectoryName(pathAndFilename)) == false)
+                        Directory.CreateDirectory(Path.GetDirectoryName(pathAndFilename));
+                    DeleteDatasource(pathAndFilename); // delete all known shape-file sub-formats, if shp already exists
 
                     var driver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
-                    var dataSource = new OgctDataSource(driver.CreateDataSource(path, new string[] { }));
-                    if (supportedDs.Type == EDataSourceType.SHP)
+                    var dataSource = new OgctDataSource(driver.CreateDataSource(pathAndFilename, new string[] { }));
+                    var layerName = Path.GetFileNameWithoutExtension(pathAndFilename);
+
+                    using (var layer = dataSource.OgrDataSource.CreateLayer(layerName, spatialRef, geometryType,
+                               new string[] { }))
                     {
-                        var layerName = Path.GetFileNameWithoutExtension(path);
-                        dataSource.OgrDataSource.CreateLayer(layerName, spatialRef, geometryType, new string[] { }).Dispose();
+
                     }
-
-                    //OSGeo.OGR.LayerName shapeFileLayer = dataSource.CreateLayer(path, spatialRef, geometryType, new string[] { });
-                    //if (shapeFileLayer == null) throw new Exception("Could not create shapefile " + fileName + " in " + directory);
-
+                    
                     return dataSource;
 
                 default:
-                    throw new DataSourceMethodNotImplementedException("unknown EFiletype is used");
+                    throw new DataSourceMethodNotImplementedException($"unhandled EFiletype ({supportedDs.FileType}) is used");
             }
         }
 
@@ -408,7 +401,7 @@ namespace OGCToolsNetCoreLib.DataAccess
             return projString;
         }
 
-       
+
         public string GetGdalInfoRaster(string file)
         {
             using var inputDataset = Gdal.Open(file, Access.GA_ReadOnly);

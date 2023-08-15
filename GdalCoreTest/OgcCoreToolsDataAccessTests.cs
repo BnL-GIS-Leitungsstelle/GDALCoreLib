@@ -78,8 +78,10 @@ namespace GdalCoreTest
             {
                 var spRef = ESpatialRefWKT.CH1903plus_LV95;
 
-                var dataSource = new GeoDataSourceAccessor().CreateDatasource(file, new SpatialReference(spRef.GetEnumDescription(typeof(ESpatialRefWKT))), wkbGeometryType.wkbPolygon);
-                Assert.NotNull(dataSource);
+                using (var dataSource = new GeoDataSourceAccessor().CreateDatasource(file, new SpatialReference(spRef.GetEnumDescription(typeof(ESpatialRefWKT))), wkbGeometryType.wkbPolygon))
+                {
+                      Assert.NotNull(dataSource);
+                }
             }
         }
 
