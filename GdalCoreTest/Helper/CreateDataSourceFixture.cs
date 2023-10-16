@@ -3,6 +3,11 @@ using System.IO;
 
 namespace GdalCoreTest.Helper;
 
+/// <summary>
+/// Class to cleanup all created testdata after running all tests in a test-class.
+/// Must be added to a testclass as interface : IClassFixture<CreateDataSourceFixture>
+/// and parameter in constructur with a private class variable.
+/// </summary>
 public class CreateDataSourceFixture : IDisposable
 {
     public string PathToCleanup { get; private set; }

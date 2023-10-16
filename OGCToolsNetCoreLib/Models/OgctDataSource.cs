@@ -96,9 +96,15 @@ namespace OGCToolsNetCoreLib.Models
             return result != null;
         }
 
+        /// <summary>
+        /// takes sql-dialect into account
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public IOgctLayer ExecuteSQL(string command)
         {
-            var result = _dataSource.ExecuteSQL(command, null, OgcConstants.GpkgSqlDialect);
+            var result = _dataSource.ExecuteSQL(command, null, SupportInfo.Type == EDataSourceType.GPKG ? OgcConstants.GpkgSqlDialect : "");
+
             return new OgctLayer(result, this);
         }
 
@@ -315,7 +321,6 @@ namespace OGCToolsNetCoreLib.Models
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="file"></param>
         /// <param name="layerName"></param>
         /// <param name="newLayerName"></param>
         public void RenameLayerGpkg(string layerName, string newLayerName)
@@ -331,6 +336,25 @@ namespace OGCToolsNetCoreLib.Models
             _dataSource.CommitTransaction();
         }
 
+
+        /// <summary>
+        /// NOT WORKING
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="layerName"></param>
+        /// <param name="newLayerName"></param>
+        public void RenameLayerOpenFgdb(string layerName, string newLayerName)
+        {
+            if (SupportInfo.Type != EDataSourceType.OpenFGDB || !HasLayer(layerName) || HasLayer(newLayerName))
+                return;
+            _dataSource.StartTransaction(1);
+
+            var sqlDdl = $"ALTER TABLE {layerName} RENAME TO {newLayerName};"; 
+            _ = ExecuteSQL(sqlDdl);
+
+            _dataSource.SyncToDisk();
+            _dataSource.CommitTransaction();
+        }
 
         public void Dispose()
         {
