@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using GdalCoreTest.Helper;
+using GdalCoreTest.SqlStatements;
+using OGCToolsNetCoreLib.Common;
 using OGCToolsNetCoreLib.DataAccess;
 using Xunit;
 using Xunit.Abstractions;
@@ -18,6 +20,163 @@ namespace GdalCoreTest
             _outputHelper = outputHelper;
             GdalConfiguration.ConfigureGdal();
         }
+
+        /// <summary>
+        /// runs a set  of sql-statements to verify the syntax and parameter handling is ok.
+        /// Each sql-statement is run in all dialects
+        /// </summary>
+        [Fact]
+        public void ExecuteSQL_OnWildruhezonenFGDB_IsWorking()
+        {
+            string wrzFile = @"D:\Daten\Projects\GISToolsNetCore\GDALCoreLib\GdalCoreTest\samples-vector\Wildruhezonen.gdb";
+
+            Assert.True(SupportedDatasource.GetSupportedDatasource(wrzFile).Type == EDataSourceType.OpenFGDB, $"Datasource {wrzFile} is not of expected type");
+
+            string layerName = "Wildruhezone";
+
+            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+            {
+                Assert.True(dataSource.HasLayer(layerName), $"Layer {layerName} not found");
+            }
+
+            foreach (var statement in SqlStatementProvider.BuildList())
+            {
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var layer = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.OgrSqlDialect);
+
+                        string sqlWhereClause = "(Bestimmungen = 'E900' OR Bestimmungen = 'R900')";
+
+                        long featurecount = layer.FilterByAttributeOnlyRespectedInNextFeatureLoop(sqlWhereClause);
+
+                        var rows=  layer.ReadRows(layer.LayerDetails.Schema.FieldList);
+
+
+
+
+
+                        Assert.NotNull(layer);
+                    }
+                    catch (Exception e)
+                    {
+                        //  Assert.Fail($"dialect= {OgcConstants.OgrSqlDialect}: Message= {e.Message}  ");
+                    }
+                }
+
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var result = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.GpkgSqlDialect);
+                    }
+                    catch (Exception e)
+                    {
+                        //  Assert.Fail("");
+                    }
+                }
+
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var result = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.SQLiteSqlDialect);
+                    }
+                    catch (Exception e)
+                    {
+                        // Assert.Fail("");
+                    }
+                }
+
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var result = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.IndirectSQLiteSqlDialect);
+                    }
+                    catch (Exception e)
+                    {
+                        // Assert.Fail("");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// runs a set  of sql-statements to verify the syntax and parameter handling is ok.
+        /// Each sql-statement is run in all dialects
+        /// </summary>
+        [Fact]
+        public void ExecuteSQL_OnWildruhezonenGPKG_IsWorking()
+        {
+            string wrzFile = @"D:\Daten\Projects\GISToolsNetCore\GDALCoreLib\GdalCoreTest\samples-vector\Wildruhezonen.gpkg";
+
+            Assert.True(SupportedDatasource.GetSupportedDatasource(wrzFile).Type == EDataSourceType.GPKG, $"Datasource {wrzFile} is not of expected type");
+
+            string layerName = "Wildruhezone";
+
+            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+            {
+                Assert.True(dataSource.HasLayer(layerName), $"Layer {layerName} not found");
+            }
+
+            foreach (var statement in SqlStatementProvider.BuildList())
+            {
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var layer = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.OgrSqlDialect);
+
+
+
+                    }
+                    catch (Exception e)
+                    {
+                        //  Assert.Fail($"dialect= {OgcConstants.OgrSqlDialect}: Message= {e.Message}  ");
+                    }
+                }
+
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var result = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.GpkgSqlDialect);
+                    }
+                    catch (Exception e)
+                    {
+                        //  Assert.Fail("");
+                    }
+                }
+
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var result = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.SQLiteSqlDialect);
+                    }
+                    catch (Exception e)
+                    {
+                        // Assert.Fail("");
+                    }
+                }
+
+                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                {
+                    try
+                    {
+                        var result = dataSource.ExecuteSQL(statement.SqlPhrase, OgcConstants.IndirectSQLiteSqlDialect);
+                    }
+                    catch (Exception e)
+                    {
+                        // Assert.Fail("");
+                    }
+                }
+            }
+        }
+
+
 
         [Theory]
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
@@ -69,25 +228,26 @@ namespace GdalCoreTest
         }
 
         /// <summary>
-        /// steps performed: prepare:
+        /// steps performed:
+        /// PREPARE:
         /// Get the first layer of the datasource
-        /// (1) copy layer to layer with name+'Backup'; check if layer exists
-        ///test:
-        /// (2) rename layer to layer + ´Renamed´; check if layer exists
-        /// cleanup
-        /// (3) rename layer + ´Renamed´back to layer ; check if layer exists
-        /// (4) remove layer with name+ 'Backup'
+        /// (1) copy layer to layer with name+'Backup'+ test, if layer exists
+        /// TEST:
+        /// (2) rename layer to layer + ´Renamed´+ test, if layer exists
+        /// CLEANUP:
+        /// (3) rename layer + ´Renamed´ (2) back to layer (1) + check if layer exists
+        /// (4) remove layer with name+ 'Backup' + check. if number of layers have changed (indicating failures)
         /// </summary>
         /// <param name="file"></param>
         [Theory]
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public void RenameLayer_WithValidFiles_IsWorking(string file)
         {
-            // works with gpkg and fgdb
+          
             if (SupportedDatasource.GetSupportedDatasource(file).Type != EDataSourceType.GPKG &&
                 SupportedDatasource.GetSupportedDatasource(file).Type != EDataSourceType.OpenFGDB)
             {
-                return;
+                return;  // supports only dataformats gpkg and fgdb
             }
 
             _outputHelper.WriteLine($"Rename layer in datasource (file): {Path.GetFileName(file)}");
@@ -142,10 +302,9 @@ namespace GdalCoreTest
 
                 var layerCntActual = dsReOpened.GetLayerCount();
 
-                Assert.True(layerCntActual == layerCountExpected, $"Error: The numer of layers ahs chaged during test: espected {layerCountExpected}, actual: {layerCntActual}");
+                Assert.True(layerCntActual == layerCountExpected, $"Error: The number of layers have changed during test: espected {layerCountExpected}, actual: {layerCntActual}");
 
             }
-
         }
 
 

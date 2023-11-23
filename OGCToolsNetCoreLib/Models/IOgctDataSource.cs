@@ -15,6 +15,7 @@ public interface IOgctDataSource : IDisposable
     int GetLayerCount();
     bool LayerExists(string layerName);
     IOgctLayer ExecuteSQL(string command);
+    IOgctLayer ExecuteSQL(string command, string dialect);
     void FlushCache();
     List<string> GetLayerNames(ELayerType layerType = ELayerType.All);
     IOgctLayer GetLayerByName(string layerName);

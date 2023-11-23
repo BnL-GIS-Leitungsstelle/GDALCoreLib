@@ -103,10 +103,24 @@ namespace OGCToolsNetCoreLib.Models
         /// <returns></returns>
         public IOgctLayer ExecuteSQL(string command)
         {
-            var result = _dataSource.ExecuteSQL(command, null, SupportInfo.Type == EDataSourceType.GPKG ? OgcConstants.GpkgSqlDialect : "");
+            var result = _dataSource.ExecuteSQL(command, null, SupportInfo.Type == EDataSourceType.GPKG ? OgcConstants.GpkgSqlDialect : OgcConstants.OgrSqlDialect);
 
             return new OgctLayer(result, this);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="dialect">can be chosen </param>
+        /// <returns></returns>
+        public IOgctLayer ExecuteSQL(string command, string dialect)
+        {
+            var result = _dataSource.ExecuteSQL(command, null, dialect);
+
+            return new OgctLayer(result, this);
+        }
+
 
         /// <summary>
         /// only for FGDB's
