@@ -9,7 +9,7 @@ using Cocona;
 //  e.g. C:\Data
 
 
-CoconaApp.Run(([Argument(Description = "top level path to first FGDB, e.g. ")]string topLevelPath) =>
+CoconaApp.Run(([Argument(Description = @"top level path to first FGDB, e.g. G:\BnL\Daten\Ablage\DNL ")]string topLevelPath) =>
 {
     var extractor = new FgdbExtractor(topLevelPath);
     Console.Write($"Running ");

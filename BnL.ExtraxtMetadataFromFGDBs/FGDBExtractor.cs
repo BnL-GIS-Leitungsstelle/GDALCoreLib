@@ -48,7 +48,6 @@ public class FgdbExtractor
     public FgdbExtractor(string topLevelPath)
     {
         StartPath = topLevelPath;
-        GdalToolsLib.GdalConfiguration.ConfigureGdal();
     }
 
     public void Run()
@@ -64,6 +63,10 @@ public class FgdbExtractor
             Console.WriteLine($"Extract FDGB = {fgdbPath}.");
 
             using var ds = new GeoDataSourceAccessor().OpenDatasource(fgdbPath);
+            if (ds == null)
+            {
+                continue;
+            }
             var layerNameList = ds.GetLayerNames();
 
             foreach (var layerName in layerNameList)

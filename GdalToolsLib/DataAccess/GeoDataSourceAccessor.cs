@@ -23,6 +23,8 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 {
     public GeoDataSourceAccessor()
     {
+        GdalConfiguration.ConfigureGdal();
+
         if (Ogr.GetDriverCount() == 0)
         {
             Ogr.RegisterAll();
@@ -114,8 +116,12 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
             return dataSource;
         }
         var ds = Ogr.Open(path, writePermissions ? 1 : 0);
-        if (ds == null) throw new Exception("Could not open Datasource: " + path);
-
+        if (ds == null)  // fgdb is empty or contains only raster-files
+        {
+            Console.WriteLine("Could not open the FGDB: its empty, broken or contains only raster-featureclasses");
+            return null;
+        }
+        
         return new OgctDataSource(ds);
     }
 
