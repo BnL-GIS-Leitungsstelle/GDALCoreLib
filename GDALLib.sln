@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalCoreTest", "GdalCoreTest\GdalCoreTest.csproj", "{AC09786C-D8F6-4F1A-852F-7B7E08542822}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OGCToolsNetCoreLib", "OGCToolsNetCoreLib\OGCToolsNetCoreLib.csproj", "{8582D8B6-5428-4011-A372-4C8FA87AEF1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalToolsLib", "OGCToolsNetCoreLib\GdalToolsLib.csproj", "{8582D8B6-5428-4011-A372-4C8FA87AEF1E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerfulDiLogSettingsConsoleTemplate", "PowerfulDiLogSettingsConsoleTemplate\PowerfulDiLogSettingsConsoleTemplate.csproj", "{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}"
 EndProject
