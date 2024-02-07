@@ -2,8 +2,8 @@
 using System.Linq;
 using GdalCoreTest.Helper;
 using GdalToolsLib;
-using OGCToolsNetCoreLib.DataAccess;
-using OGCToolsNetCoreLib.Models;
+using GdalToolsLib.DataAccess;
+using GdalToolsLib.Models;
 using Xunit;
 using Xunit.Abstractions;
 

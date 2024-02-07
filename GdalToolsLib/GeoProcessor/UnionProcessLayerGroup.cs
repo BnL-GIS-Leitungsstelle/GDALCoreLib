@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OGCToolsNetCoreLib.GeoProcessor;
+namespace GdalToolsLib.GeoProcessor;
 
 public class UnionProcessLayerGroup
 {

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.DataAccess;
-using OGCToolsNetCoreLib.Layer;
+using GdalToolsLib.Common;
+using GdalToolsLib.DataAccess;
+using GdalToolsLib.Layer;
 using OSGeo.OGR;
 
-namespace OGCToolsNetCoreLib.Models;
+namespace GdalToolsLib.Models;
 
 public interface IOgctDataSource : IDisposable
 {
     SupportedDatasource SupportInfo { get; }
     string Name { get; }
-    IOgctLayer CreateAndOpenLayer(string layerName, ESpatialRefWKT eSpatialRef, wkbGeometryType geometryType, List<FieldDefnInfo> fieldDefnInfos = null, bool overwriteExisting = true);
+    IOgctLayer CreateAndOpenLayer(string layerName, ESpatialRefWkt eSpatialRef, wkbGeometryType geometryType, List<FieldDefnInfo> fieldDefnInfos = null, bool overwriteExisting = true);
     int GetLayerCount();
     bool LayerExists(string layerName);
     IOgctLayer ExecuteSQL(string command);

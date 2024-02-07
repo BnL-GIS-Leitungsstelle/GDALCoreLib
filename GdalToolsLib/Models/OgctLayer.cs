@@ -4,20 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NetTopologySuite.IO;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.DataAccess;
-using OGCToolsNetCoreLib.Exceptions;
-using OGCToolsNetCoreLib.Extensions;
-using OGCToolsNetCoreLib.Feature;
-using OGCToolsNetCoreLib.Geometry;
-using OGCToolsNetCoreLib.GeoProcessor;
-using OGCToolsNetCoreLib.Helpers;
-using OGCToolsNetCoreLib.Layer;
+using GdalToolsLib.Common;
+using GdalToolsLib.DataAccess;
+using GdalToolsLib.Exceptions;
+using GdalToolsLib.Extensions;
+using GdalToolsLib.Feature;
+using GdalToolsLib.Geometry;
+using GdalToolsLib.GeoProcessor;
+using GdalToolsLib.Helpers;
+using GdalToolsLib.Layer;
 using OSGeo.OGR;
 using OSGeo.OSR;
 
-namespace OGCToolsNetCoreLib.Models;
+namespace GdalToolsLib.Models;
 
 public partial class OgctLayer : IOgctLayer
 {
@@ -55,7 +54,7 @@ public partial class OgctLayer : IOgctLayer
 
     public LayerDetails LayerDetails => new LayerDetails(this);
 
-    public ESpatialRefWKT GetSpatialRef()
+    public ESpatialRefWkt GetSpatialRef()
     {
         return new LayerSpatialRef(_layer).SpRef;
     }

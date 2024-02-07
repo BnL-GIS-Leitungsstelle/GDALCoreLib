@@ -1,71 +1,66 @@
-﻿using OGCToolsNetCoreLib.Extensions;
-using OSGeo.OGR;
-using System;
-using OGCToolsNetCoreLib.Feature;
-using OGCToolsNetCoreLib.Models;
+﻿using GdalToolsLib.Extensions;
+using GdalToolsLib.Feature;
+using GdalToolsLib.Models;
 
-namespace OGCToolsNetCoreLib.Geometry
+namespace GdalToolsLib.Geometry;
+
+public class GeometryValidationResult
 {
-    public class GeometryValidationResult
+    public bool Valid { get; set; }
+
+    public EGeometryValidationType ValidationResultType { get; set; }
+
+    public EFeatureErrorLevel ErrorLevel { get; set; }
+
+
+    public long FeatureFid { get; set; }
+
+
+    public string ObjNummer { get; set; }
+    public string Name { get; set; }
+
+    public string Remarks { get; set; }
+
+    private GeometryValidationResult()
+    { }
+
+
+    public GeometryValidationResult(OgctFeature feature, OgctLayer layer, EGeometryValidationType validationType, string remarks = default)
     {
-        public bool Valid { get; set; }
+        Valid = validationType == EGeometryValidationType.IsValid;
+        FeatureFid = feature.FID;
 
-        public EGeometryValidationType ValidationResultType { get; set; }
+        ObjNummer = feature.ObjNumber;
+        Name = feature.ObjName;
+        ValidationResultType = validationType;
 
-        public EFeatureErrorLevel ErrorLevel { get; set; }
-
-
-        public long FeatureFid { get; set; }
-
-
-        public string ObjNummer { get; set; }
-        public string Name { get; set; }
-
-        public string Remarks { get; set; }
-
-        private GeometryValidationResult()
-        { }
-
-
-        public GeometryValidationResult(OgctFeature feature, OgctLayer layer, EGeometryValidationType validationType, string remarks = default)
+        switch (ValidationResultType)
         {
-            Valid = validationType == EGeometryValidationType.IsValid;
-            FeatureFid = feature.FID;
+            case EGeometryValidationType.IsValid:
+                ErrorLevel = EFeatureErrorLevel.None;
+                break;
 
-            ObjNummer = feature.ObjNumber;
-            Name = feature.ObjName;
-            ValidationResultType = validationType;
+            case EGeometryValidationType.FeatureToLayerMultiSurfaceTypeMismatch:
+            case EGeometryValidationType.VerySmall:
+            case EGeometryValidationType.GeometrytypeMismatchAccordingToLayer:
+            case EGeometryValidationType.NonSimpleGeometry:
+                ErrorLevel = EFeatureErrorLevel.Warning;
+                break;
 
-            switch (ValidationResultType)
-            {
-                case EGeometryValidationType.IsValid:
-                    ErrorLevel = EFeatureErrorLevel.None;
-                    break;
-
-                case EGeometryValidationType.FeatureToLayerMultiSurfaceTypeMismatch:
-                case EGeometryValidationType.VerySmall:
-                case EGeometryValidationType.GeometrytypeMismatchAccordingToLayer:
-                case EGeometryValidationType.NonSimpleGeometry:
-                    ErrorLevel = EFeatureErrorLevel.Warning;
-                    break;
-
-                default:
-                    ErrorLevel = EFeatureErrorLevel.Error;
-                    break;
-            }
-
-
-            Remarks = remarks;
-
-            // log..
-
+            default:
+                ErrorLevel = EFeatureErrorLevel.Error;
+                break;
         }
 
-        public override string ToString()
-        {
-            return Valid ? $"Geometry in FID = ({FeatureFid}) is VALID" : $" Invalid geometry in FID = ({FeatureFid}, ObjNummer = {ObjNummer}, Name = {Name}), Message: {ValidationResultType.GetEnumDescription(typeof(EGeometryValidationType))} ({Remarks})";
-        }
+
+        Remarks = remarks;
+
+        // log..
+
     }
 
-
+    public override string ToString()
+    {
+        return Valid ? $"Geometry in FID = ({FeatureFid}) is VALID" : $" Invalid geometry in FID = ({FeatureFid}, ObjNummer = {ObjNummer}, Name = {Name}), Message: {ValidationResultType.GetEnumDescription(typeof(EGeometryValidationType))} ({Remarks})";
+    }
 }

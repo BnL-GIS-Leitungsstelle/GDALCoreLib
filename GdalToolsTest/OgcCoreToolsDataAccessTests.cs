@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using GdalCoreTest.Helper;
 using GdalToolsLib;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.DataAccess;
-using OGCToolsNetCoreLib.Exceptions;
-using OGCToolsNetCoreLib.Extensions;
+using GdalToolsLib.Common;
+using GdalToolsLib.DataAccess;
+using GdalToolsLib.Exceptions;
+using GdalToolsLib.Extensions;
 using OSGeo.OGR;
 using OSGeo.OSR;
 using Xunit;
@@ -77,9 +77,9 @@ namespace GdalCoreTest
             }
             else
             {
-                var spRef = ESpatialRefWKT.CH1903plus_LV95;
+                var spRef = ESpatialRefWkt.CH1903plus_LV95;
 
-                using (var dataSource = new GeoDataSourceAccessor().CreateDatasource(file, new SpatialReference(spRef.GetEnumDescription(typeof(ESpatialRefWKT))), wkbGeometryType.wkbPolygon))
+                using (var dataSource = new GeoDataSourceAccessor().CreateDatasource(file, new SpatialReference(spRef.GetEnumDescription(typeof(ESpatialRefWkt))), wkbGeometryType.wkbPolygon))
                 {
                       Assert.NotNull(dataSource);
                 }

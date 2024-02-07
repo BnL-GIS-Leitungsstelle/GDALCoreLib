@@ -1,11 +1,10 @@
-﻿namespace OGCToolsNetCoreLib.DataAccess
+﻿namespace GdalToolsLib.DataAccess;
+
+public enum EDataSourceType
 {
-    public enum EDataSourceType
-    {
-        GPKG,
-        SHP,
-        SHP_FOLDER,
-        OpenFGDB,
-        InMemory
-    }
+    GPKG,
+    SHP,
+    SHP_FOLDER,
+    OpenFGDB,
+    InMemory
 }

@@ -1,84 +1,77 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="OGCToolsNetCoreLib.Common.GlobalGisConstants">
-    <Position X="0.5" Y="6" Width="2.25" />
+  <Class Name="GdalToolsLib.Common.GlobalGisConstants">
+    <Position X="0.5" Y="4.75" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Common\GlobalGisConstants.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="OGCToolsNetCoreLib.Common.OgcConstants">
-    <Position X="0.5" Y="4.5" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AQAAAgAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Common\OgcConstants.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="OGCToolsNetCoreLib.DataAccess.GeoDataSourceAccessor">
+  <Class Name="GdalToolsLib.DataAccess.GeoDataSourceAccessor">
     <Position X="3" Y="3.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAgAQAAIAAAABAAQAAAACIBAAAACAEQEAgAAAAAAAAA=</HashCode>
+      <HashCode>AAgAQAAIAAAABAAQAAAAAIBAAAICAAQEAgAAAAAAAAA=</HashCode>
       <FileName>DataAccess\GeoDataSourceAccessor.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="OGCToolsNetCoreLib.DataAccess.SupportedDatasource">
+  <Class Name="GdalToolsLib.DataAccess.SupportedDatasource">
     <Position X="0.5" Y="0.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAgAAAACgAEAEAAAAAAAAAAAEAwAAAQAACAEAAAA=</HashCode>
       <FileName>DataAccess\SupportedDatasource.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="OGCToolsNetCoreLib.GdalInfo">
-    <Position X="3" Y="0.5" Width="2" />
+  <Class Name="GdalToolsLib.Common.GdalInfo">
+    <Position X="3" Y="0.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>IAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAEQQAAA=</HashCode>
-      <FileName>GdalInfo.cs</FileName>
+      <FileName>Common\GdalInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Interface Name="OGCToolsNetCoreLib.Models.IOgctDataSource">
+  <Interface Name="GdalToolsLib.Models.IOgctDataSource">
     <Position X="5.25" Y="0.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAFEAAAAAMAAgAABAAAQAQChgAAAAAAAgACBAAAAgA=</HashCode>
+      <HashCode>AAAFEAAAAAMAAgAABAAAQAQChgAAAAIAAgACBAAAAgA=</HashCode>
       <FileName>Models\IOgctDataSource.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="OGCToolsNetCoreLib.Models.IOgctFeature">
+  <Interface Name="GdalToolsLib.Models.IOgctFeature">
     <Position X="10.5" Y="0.5" Width="1.75" />
     <TypeIdentifier>
       <HashCode>AgAAAAAAgAAAIgAAAgAAAIAAgAAACAQAEAAAAQEAAEA=</HashCode>
       <FileName>Models\IOgctFeature.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="OGCToolsNetCoreLib.Models.IOgctGeometry">
+  <Interface Name="GdalToolsLib.Models.IOgctGeometry">
     <Position X="10.5" Y="4.75" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>BCBQAAIAoJAACAAAAAgAAAAgABAAAQAAASAAAQAAAIA=</HashCode>
+      <HashCode>BCBQAAIAoJAACAAAAAgAAAAgIBAAAQAAASAAAQABAIA=</HashCode>
       <FileName>Models\IOgctGeometry.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="OGCToolsNetCoreLib.Models.IOgctLayer">
+  <Interface Name="GdalToolsLib.Models.IOgctLayer">
     <Position X="7.75" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAgZUAIAgAgAggAAAAIAAQIAAQAAAABIAIAAUBCgEA=</HashCode>
+      <HashCode>AQAgZUAIAgAgAggAAAAIAAQIAAQABAABIAIAAUACgEA=</HashCode>
       <FileName>Models\IOgctLayer.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Enum Name="OGCToolsNetCoreLib.DataAccess.EAccessLevel">
+  <Enum Name="GdalToolsLib.DataAccess.EAccessLevel">
     <Position X="8.75" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAIAAAAAAA=</HashCode>
       <FileName>DataAccess\EAccessLevel.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="OGCToolsNetCoreLib.DataAccess.EDataSourceType">
+  <Enum Name="GdalToolsLib.DataAccess.EDataSourceType">
     <Position X="5.25" Y="6" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AEgAAAAAAAAAAAAAAACAQAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DataAccess\EDataSourceType.cs</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="OGCToolsNetCoreLib.DataAccess.EFileType">
+  <Enum Name="GdalToolsLib.DataAccess.EFileType">
     <Position X="7" Y="7.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAQAAABAA=</HashCode>

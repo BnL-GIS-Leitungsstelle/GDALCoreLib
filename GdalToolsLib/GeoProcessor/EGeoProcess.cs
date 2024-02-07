@@ -1,4 +1,4 @@
-﻿namespace OGCToolsNetCoreLib.GeoProcessor;
+﻿namespace GdalToolsLib.GeoProcessor;
 
 public enum EGeoProcess
 {

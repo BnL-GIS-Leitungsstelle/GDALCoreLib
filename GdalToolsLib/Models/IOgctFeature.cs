@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using OGCToolsNetCoreLib.Feature;
-using OGCToolsNetCoreLib.Geometry;
-using OGCToolsNetCoreLib.Layer;
+using GdalToolsLib.Feature;
+using GdalToolsLib.Geometry;
+using GdalToolsLib.Layer;
 using OSGeo.OGR;
 
-namespace OGCToolsNetCoreLib.Models;
+namespace GdalToolsLib.Models;
 
 public interface IOgctFeature : IDisposable
 {

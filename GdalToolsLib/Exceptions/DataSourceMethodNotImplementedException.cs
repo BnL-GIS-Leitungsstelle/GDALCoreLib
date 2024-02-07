@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace OGCToolsNetCoreLib.Exceptions
+namespace GdalToolsLib.Exceptions;
+
+public class DataSourceMethodNotImplementedException : Exception
 {
-    public class DataSourceMethodNotImplementedException : Exception
+    public DataSourceMethodNotImplementedException(string message) : base(message)
     {
-        public DataSourceMethodNotImplementedException(string message) : base(message)
-        {
-        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace OGCToolsNetCoreLib.Feature;
+namespace GdalToolsLib.Feature;
 
 
 public enum EFieldWriteErrorType

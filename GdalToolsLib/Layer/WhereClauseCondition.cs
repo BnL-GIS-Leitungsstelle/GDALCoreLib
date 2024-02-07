@@ -1,6 +1,6 @@
 ﻿using OSGeo.OGR;
 
-namespace OGCToolsNetCoreLib.Layer;
+namespace GdalToolsLib.Layer;
 
 public class WhereClauseCondition
 {

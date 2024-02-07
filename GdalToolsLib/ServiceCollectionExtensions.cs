@@ -1,15 +1,14 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using OGCToolsNetCoreLib.DataAccess;
-using OGCToolsNetCoreLib.Raster;
+﻿using GdalToolsLib.DataAccess;
+using GdalToolsLib.Raster;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace OGCToolsNetCoreLib
+namespace GdalToolsLib;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void AddOgcTools(this IServiceCollection services)
     {
-        public static void AddOgcTools(this IServiceCollection services)
-        {
-            services.AddSingleton<IGeoDataSourceAccessor, GeoDataSourceAccessor>();
-            services.AddScoped<IRasterTools, RasterTools>();
-        }
+        services.AddSingleton<IGeoDataSourceAccessor, GeoDataSourceAccessor>();
+        services.AddScoped<IRasterTools, RasterTools>();
     }
 }

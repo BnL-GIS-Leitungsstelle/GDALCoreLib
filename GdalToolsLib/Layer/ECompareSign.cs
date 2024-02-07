@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace OGCToolsNetCoreLib.Layer;
+namespace GdalToolsLib.Layer;
 
 public enum ECompareSign
 {

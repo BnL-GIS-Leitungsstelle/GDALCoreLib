@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace OGCToolsNetCoreLib.Feature;
+namespace GdalToolsLib.Feature;
 
 
 /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace OGCToolsNetCoreLib.Exceptions;
+namespace GdalToolsLib.Exceptions;
 
 public class GeometryCreationException : Exception
 {

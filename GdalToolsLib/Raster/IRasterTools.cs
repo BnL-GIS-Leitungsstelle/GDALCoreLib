@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.Models;
+using GdalToolsLib.Common;
+using GdalToolsLib.Models;
 
-namespace OGCToolsNetCoreLib.Raster;
+namespace GdalToolsLib.Raster;
 
 public interface IRasterTools
 {
@@ -27,10 +27,10 @@ public interface IRasterTools
     /// Creates Polygons from Raster. For pixels that should not be polygonized use 0!
     /// </summary>
     void PolygonizeToLayer(string tifPath, IOgctDataSource targetDataSource, string newLayerName,
-        int bandNumber = 1, ESpatialRefWKT spatialRef = ESpatialRefWKT.CH1903plus_LV95);
+        int bandNumber = 1, ESpatialRefWkt spatialRef = ESpatialRefWkt.CH1903plus_LV95);
 
     void PolygonizeAndDissolveToLayer(string tifPath, IOgctDataSource targetDataSource, string newLayerName,
-        int bandNumber = 1, ESpatialRefWKT spatialRef = ESpatialRefWKT.CH1903plus_LV95);
+        int bandNumber = 1, ESpatialRefWkt spatialRef = ESpatialRefWkt.CH1903plus_LV95);
 
     /// <summary>
     /// Splits Raster to multiple smaller files.

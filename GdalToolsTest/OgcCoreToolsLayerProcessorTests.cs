@@ -1,7 +1,4 @@
 ﻿using GdalCoreTest.Helper;
-using OGCToolsNetCoreLib;
-using OGCToolsNetCoreLib.DataAccess;
-using OGCToolsNetCoreLib.Layer;
 using OSGeo.OGR;
 using System;
 using System.Collections.Generic;
@@ -9,12 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using GdalToolsLib;
-using OGCToolsNetCoreLib.Feature;
-using OGCToolsNetCoreLib.GeoProcessor;
-using OGCToolsNetCoreLib.Helpers;
+using GdalToolsLib.DataAccess;
+using GdalToolsLib.Feature;
+using GdalToolsLib.GeoProcessor;
+using GdalToolsLib.Helpers;
+using GdalToolsLib.Layer;
 using Xunit;
 using Xunit.Abstractions;
-using OGCToolsNetCoreLib.Models;
 
 namespace GdalCoreTest
 {

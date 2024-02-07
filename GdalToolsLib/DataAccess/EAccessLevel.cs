@@ -1,8 +1,7 @@
-﻿namespace OGCToolsNetCoreLib.DataAccess
+﻿namespace GdalToolsLib.DataAccess;
+
+public enum EAccessLevel
 {
-    public enum EAccessLevel
-    {
-        ReadOnly,
-        Full
-    }
+    ReadOnly,
+    Full
 }

@@ -3,8 +3,8 @@ using System.IO;
 using GdalCoreTest.Helper;
 using GdalCoreTest.SqlStatements;
 using GdalToolsLib;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.DataAccess;
+using GdalToolsLib.Common;
+using GdalToolsLib.DataAccess;
 using Xunit;
 using Xunit.Abstractions;
 

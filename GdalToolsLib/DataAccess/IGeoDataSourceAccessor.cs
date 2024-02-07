@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.Models;
+using GdalToolsLib.Common;
+using GdalToolsLib.Models;
 using OSGeo.OGR;
 using OSGeo.OSR;
 
-namespace OGCToolsNetCoreLib.DataAccess;
+namespace GdalToolsLib.DataAccess;
 
 public interface IGeoDataSourceAccessor
 {
@@ -27,12 +27,12 @@ public interface IGeoDataSourceAccessor
     /// <param name="geometryType">only on creation of SHP-file</param>
 
     /// <returns></returns>
-    OgctDataSource OpenDatasource(string path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWKT spRef = ESpatialRefWKT.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
+    OgctDataSource OpenDatasource(string path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
 
     public OgctDataSource CreateAndOpenInMemoryDatasource();
 
-    OgctDataSource CreateAndOpenDatasource(string path, ESpatialRefWKT spatialRef,
+    OgctDataSource CreateAndOpenDatasource(string path, ESpatialRefWkt spatialRef,
         wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
     /// <summary>

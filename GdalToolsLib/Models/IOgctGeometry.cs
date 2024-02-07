@@ -2,7 +2,7 @@
 using System.Drawing;
 using OSGeo.OGR;
 
-namespace OGCToolsNetCoreLib.Models;
+namespace GdalToolsLib.Models;
 
 public interface IOgctGeometry : IDisposable
 {

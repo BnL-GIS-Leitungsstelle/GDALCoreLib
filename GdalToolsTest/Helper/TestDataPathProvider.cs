@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OGCToolsNetCoreLib.DataAccess;
+using GdalToolsLib.DataAccess;
 
 namespace GdalCoreTest.Helper
 {

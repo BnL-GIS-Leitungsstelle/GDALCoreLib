@@ -1,25 +1,24 @@
-﻿
-using OSGeo.GDAL;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
+using OSGeo.GDAL;
 using OSGeo.OGR;
 
-namespace OGCToolsNetCoreLib.Common
+namespace GdalToolsLib.Common;
+
+public class GdalInfo
 {
-    public class GdalInfo
+    public string PackageVersion { get; } = Assembly.GetAssembly(typeof(Ogr))!
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+        .InformationalVersion;
+
+    public string WorkingDirectory { get; } = Directory.GetCurrentDirectory();
+    public string Version { get; } = Gdal.VersionInfo("RELEASE_NAME");
+    public string Info { get; } = Gdal.VersionInfo("");
+
+
+    public override string ToString()
     {
-        public string PackageVersion { get; } = Assembly.GetAssembly(typeof(Ogr))
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            .InformationalVersion;
-
-        public string WorkingDirectory { get; } = Directory.GetCurrentDirectory();
-        public string Version { get; } = Gdal.VersionInfo("RELEASE_NAME");
-        public string Info { get; } = Gdal.VersionInfo("");
-
-
-        public override string ToString()
-        {
-            return $"GDAL-Configuration: WorkingDir={WorkingDirectory}, Package={PackageVersion}, GDAL-Version/Info={Version}/{Info} ";
-        }
+        return
+            $"GDAL-Configuration: WorkingDir={WorkingDirectory}, Package={PackageVersion}, GDAL-Version/Info={Version}/{Info} ";
     }
 }

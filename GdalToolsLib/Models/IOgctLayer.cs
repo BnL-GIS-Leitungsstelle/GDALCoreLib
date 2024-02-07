@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using OGCToolsNetCoreLib.Common;
-using OGCToolsNetCoreLib.Feature;
-using OGCToolsNetCoreLib.Geometry;
-using OGCToolsNetCoreLib.GeoProcessor;
-using OGCToolsNetCoreLib.Layer;
+using GdalToolsLib.Common;
+using GdalToolsLib.Feature;
+using GdalToolsLib.Geometry;
+using GdalToolsLib.GeoProcessor;
+using GdalToolsLib.Layer;
 
-namespace OGCToolsNetCoreLib.Models;
+namespace GdalToolsLib.Models;
 
 public interface IOgctLayer : IDisposable
 {
     string Name { get; }
     LayerDetails LayerDetails { get; }
     IOgctDataSource DataSource { get; }
-    ESpatialRefWKT GetSpatialRef();
+    ESpatialRefWkt GetSpatialRef();
     long CopyFeatures(IOgctLayer targetLayer, bool generateNewFids = false, Action<int> reportProgressPercentage = null);
     bool IsGeometryType();
     long CopyToLayer(IOgctLayer targetLayer);

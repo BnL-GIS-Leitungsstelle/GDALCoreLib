@@ -1,13 +1,12 @@
-﻿namespace OGCToolsNetCoreLib.Layer
+﻿namespace GdalToolsLib.Layer;
+
+public enum ELayerValidationType
 {
-    public enum ELayerValidationType
-    {
-        LayerIsNoneGeometryType,
+    LayerIsNoneGeometryType,
 
-        LayerHasInvalidGeometries,
+    LayerHasInvalidGeometries,
 
-        NotNamed,
+    NotNamed,
 
-        IsValid
-    }
+    IsValid
 }

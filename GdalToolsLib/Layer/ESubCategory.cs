@@ -1,4 +1,4 @@
-﻿namespace OGCToolsNetCoreLib.Layer;
+﻿namespace GdalToolsLib.Layer;
 
 public enum ESubCategory
 {

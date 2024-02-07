@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using OGCToolsNetCoreLib.Helpers;
+using GdalToolsLib.Helpers;
 
-namespace OGCToolsNetCoreLib.Layer;
+namespace GdalToolsLib.Layer;
 
 public class ConditionGroup
 {

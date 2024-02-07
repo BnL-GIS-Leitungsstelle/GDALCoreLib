@@ -1,9 +1,8 @@
-﻿namespace OGCToolsNetCoreLib.Feature
+﻿namespace GdalToolsLib.Feature;
+
+public enum EFeatureErrorLevel
 {
-    public enum EFeatureErrorLevel
-    {
-        None,
-        Warning,
-        Error
-    }
+    None,
+    Warning,
+    Error
 }

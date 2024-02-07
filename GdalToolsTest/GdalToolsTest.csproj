@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GdalToolsLib\GdalToolsLib.csproj" />
-    <ProjectReference Include="..\OGCToolsNetCoreLib\GdalToolsLib.csproj" />
   </ItemGroup>
 
 </Project>

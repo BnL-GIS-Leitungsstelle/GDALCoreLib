@@ -1,6 +1,6 @@
 using GdalCoreTest.Helper;
 using GdalToolsLib;
-using OGCToolsNetCoreLib.DataAccess;
+using GdalToolsLib.DataAccess;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using Xunit;

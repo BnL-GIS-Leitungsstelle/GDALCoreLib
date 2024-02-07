@@ -1,5 +1,5 @@
-﻿using OGCToolsNetCoreLib.Geometry;
-using System;
+﻿using System;
+using GdalToolsLib.Geometry;
 
 namespace GdalCoreTest.Helper
 {

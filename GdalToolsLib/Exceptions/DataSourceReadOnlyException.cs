@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace OGCToolsNetCoreLib.Exceptions
+namespace GdalToolsLib.Exceptions;
+
+public class DataSourceReadOnlyException:Exception
 {
-    public class DataSourceReadOnlyException:Exception
+    public DataSourceReadOnlyException(string message):base(message)
     {
-        public DataSourceReadOnlyException(string message):base(message)
-        {
-        }
     }
 }

@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 
-namespace OGCToolsNetCoreLib.Layer
+namespace GdalToolsLib.Layer;
+
+public class DissolveCondition
 {
-    public class DissolveCondition
+    public List<ConditionGroup> DissolveGroups { get; set; }
+
+    public DissolveCondition()
     {
-        public List<ConditionGroup> DissolveGroups { get; set; }
+        DissolveGroups = new List<ConditionGroup>();
+    }
 
-        public DissolveCondition()
-        {
-            DissolveGroups = new List<ConditionGroup>();
-        }
-
-        public void AddDissolveGroup(ConditionGroup group)
-        {
-            DissolveGroups.Add(group);
-        }
+    public void AddDissolveGroup(ConditionGroup group)
+    {
+        DissolveGroups.Add(group);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace OGCToolsNetCoreLib.Feature;
+﻿namespace GdalToolsLib.Feature;
 
 /// <summary>
 /// Error codes by https://gdal.org/doxygen/ogr__core_8h.html
