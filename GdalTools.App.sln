@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerfulDiLogSettingsConsoleTemplate", "PowerfulDiLogSettingsConsoleTemplate\PowerfulDiLogSettingsConsoleTemplate.csproj", "{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalToolsTest", "GdalToolsTest\GdalToolsTest.csproj", "{5BCD4F4E-5E4F-4129-8BEC-4FF26DED9D27}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalToolsLib", "GdalToolsLib\GdalToolsLib.csproj", "{2BDD423B-0D42-4B1F-BBF1-3C2420479296}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2EFF94A-C859-45E5-99F4-7F0120AED2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BCD4F4E-5E4F-4129-8BEC-4FF26DED9D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BCD4F4E-5E4F-4129-8BEC-4FF26DED9D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BCD4F4E-5E4F-4129-8BEC-4FF26DED9D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BCD4F4E-5E4F-4129-8BEC-4FF26DED9D27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {30DCD39C-2628-4D8B-91F1-AEF85502FA04}
+	EndGlobalSection
+EndGlobal
