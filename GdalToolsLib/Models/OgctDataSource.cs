@@ -17,7 +17,7 @@ public class OgctDataSource : IOgctDataSource
     private readonly DataSource _dataSource;
     public SupportedDatasource SupportInfo { get; set; }
 
-    public string Name => _dataSource.name;
+    public string? Name => _dataSource.name;
 
     internal DataSource OgrDataSource => _dataSource;
 
@@ -31,7 +31,7 @@ public class OgctDataSource : IOgctDataSource
 
     private Exception CannotWriteException => new DataSourceMethodNotImplementedException($"Write operations are unsupported in this type of datasource");
 
-    public IOgctLayer CreateAndOpenLayer(string layerName, ESpatialRefWkt eSpatialRef, wkbGeometryType geometryType, List<FieldDefnInfo> fieldDefnInfos = null, bool overwriteExisting = true)
+    public IOgctLayer CreateAndOpenLayer(string? layerName, ESpatialRefWkt eSpatialRef, wkbGeometryType geometryType, List<FieldDefnInfo> fieldDefnInfos = null, bool overwriteExisting = true)
     {
         var supportedDatasource = SupportedDatasource.GetSupportedDatasource(Name);
 
@@ -90,7 +90,7 @@ public class OgctDataSource : IOgctDataSource
     }
 
 
-    public bool HasLayer(string layerName)
+    public bool HasLayer(string? layerName)
     {
         OSGeo.OGR.Layer result = _dataSource.GetLayerByName(layerName);
         return result != null;
@@ -127,7 +127,7 @@ public class OgctDataSource : IOgctDataSource
     /// </summary>
     /// <param name="layerName"></param>
     /// <returns></returns>
-    public string ExecuteSqlFgdbGetLayerDefinition(string layerName)
+    public string ExecuteSqlFgdbGetLayerDefinition(string? layerName)
     {
         if (SupportInfo.Type != EDataSourceType.OpenFGDB)
         {
@@ -153,7 +153,7 @@ public class OgctDataSource : IOgctDataSource
     /// </summary>
     /// <param name="layerName"></param>
     /// <returns></returns>
-    public string ExecuteSqlFgdbGetLayerMetadata(string layerName)
+    public string ExecuteSqlFgdbGetLayerMetadata(string? layerName)
     {
         if (SupportInfo.Type != EDataSourceType.OpenFGDB)
         {
@@ -177,9 +177,9 @@ public class OgctDataSource : IOgctDataSource
         _dataSource.FlushCache();
     }
 
-    public List<string> GetLayerNames(ELayerType layerType = ELayerType.All)
+    public List<string?> GetLayerNames(ELayerType layerType = ELayerType.All)
     {
-        var layerNames = new List<string>();
+        var layerNames = new List<string?>();
 
         for (int i = 0; i < GetLayerCount(); i++)
         {
@@ -233,30 +233,30 @@ public class OgctDataSource : IOgctDataSource
         return layerNames;
     }
 
-    public IOgctLayer GetLayerByName(string layerName)
+    public IOgctLayer GetLayerByName(string? layerName)
     {
         return new OgctLayer(_dataSource.GetLayerByName(layerName), this);
     }
 
-    public int GetLayerIndexByName(string layerName)
+    public int GetLayerIndexByName(string? layerName)
     {
         for (int i = 0; i < _dataSource.GetLayerCount(); i++)
         {
             using (OSGeo.OGR.Layer layer = _dataSource.GetLayerByIndex(i))
             {
-                if (layer.GetName().ToLower() == layerName.ToLower()) return i;
+                if (layer.GetName().ToLower() == layerName!.ToLower()) return i;
             }
         }
 
         throw new DirectoryNotFoundException($"LayerName not found= {layerName} in {_dataSource.name} ");
     }
 
-    public LayerDetails GetLayerInfo(string layerName)
+    public LayerDetails GetLayerInfo(string? layerName)
     {
         return new LayerDetails(this, layerName);
     }
 
-    public bool DeleteLayer(string layerName)
+    public bool DeleteLayer(string? layerName)
     {
         if (SupportInfo.Type == EDataSourceType.SHP)// if layer in shape then delete shp-file
         {
@@ -266,7 +266,7 @@ public class OgctDataSource : IOgctDataSource
     }
 
 
-    public IOgctLayer OpenLayer(string layerName)
+    public IOgctLayer OpenLayer(string? layerName)
     {
         if (!HasLayer(layerName))
         {
@@ -276,7 +276,7 @@ public class OgctDataSource : IOgctDataSource
         return layer;
     }
 
-    public IOgctLayer OpenLayer(string layerName, string orderByFieldname)
+    public IOgctLayer OpenLayer(string? layerName, string orderByFieldname)
     {
         if (!HasLayer(layerName))
         {
@@ -305,7 +305,7 @@ public class OgctDataSource : IOgctDataSource
     /// <param name="outputLayerName"></param>
     /// <param name="unionProcessOptions"></param>
     /// <returns></returns>
-    public IOgctLayer UnionManyLayers(List<string> inputLayerNames, string outputLayerName,
+    public IOgctLayer UnionManyLayers(List<string?> inputLayerNames, string? outputLayerName,
         string[] unionProcessOptions)
     {
         var unionGroup = new UnionProcessLayerGroup(inputLayerNames, outputLayerName);
@@ -337,7 +337,7 @@ public class OgctDataSource : IOgctDataSource
     /// </summary>
     /// <param name="layerName"></param>
     /// <param name="newLayerName"></param>
-    public void RenameLayerGpkg(string layerName, string newLayerName)
+    public void RenameLayerGpkg(string? layerName, string? newLayerName)
     {
         if (SupportInfo.Type != EDataSourceType.GPKG || !HasLayer(layerName) || HasLayer(newLayerName))
             return;
@@ -357,7 +357,7 @@ public class OgctDataSource : IOgctDataSource
     /// <param name="file"></param>
     /// <param name="layerName"></param>
     /// <param name="newLayerName"></param>
-    public void RenameLayerOpenFgdb(string layerName, string newLayerName)
+    public void RenameLayerOpenFgdb(string? layerName, string? newLayerName)
     {
         if (SupportInfo.Type != EDataSourceType.OpenFGDB || !HasLayer(layerName) || HasLayer(newLayerName))
             return;

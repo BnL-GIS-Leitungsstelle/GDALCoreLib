@@ -13,12 +13,12 @@ public class LayerSchema
     /// <summary>
     /// Name of the key-field in the DB
     /// </summary>
-    public string FidColumnName { get; private set; }
+    public string? FidColumnName { get; private set; }
 
     /// <summary>
     /// Name of the geometry-field in the DB
     /// </summary>
-    public string GeometryColumnName { get; private set; }
+    public string? GeometryColumnName { get; private set; }
 
     /// <summary>
     /// List of all fields, with attributes
@@ -47,12 +47,12 @@ public class LayerSchema
         FieldList = new List<FieldDefnInfo>();
     }
 
-    public bool IsEqual(LayerSchema otherSchema)
+    public bool IsEqual(LayerSchema? otherSchema)
     {
         return Compare(otherSchema) == String.Empty;
     }
 
-    public string Compare(LayerSchema otherSchema)
+    public string Compare(LayerSchema? otherSchema)
     {
         string result = String.Empty;
 

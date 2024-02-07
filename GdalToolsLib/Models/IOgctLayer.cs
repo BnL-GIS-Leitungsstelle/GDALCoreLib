@@ -19,7 +19,7 @@ public interface IOgctLayer : IDisposable
     long CopyFeatures(IOgctLayer targetLayer, bool generateNewFids = false, Action<int> reportProgressPercentage = null);
     bool IsGeometryType();
     long CopyToLayer(IOgctLayer targetLayer);
-    long CopyToLayer(IOgctDataSource targetDataSource, string newLayerName, bool overwriteExisting = true);
+    long CopyToLayer(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true);
 
     /// <summary>
     /// Copies a named layer in the same or into other datasource (same: possible for gpkg).
@@ -43,13 +43,13 @@ public interface IOgctLayer : IDisposable
     /// </list>
     /// <param name="sqlRecordFilter">filters a record range like: SELECT * FROM layername LIMIT recLimit OFFSET recOffset </param>
     /// </remarks>
-    void CopyToLayer(IOgctDataSource targetDataSource, string layerNameOut, int recLimit, int recOffset);
+    void CopyToLayer(IOgctDataSource targetDataSource, string? layerNameOut, int recLimit, int recOffset);
 
-    string BufferToLayer(IOgctDataSource dataSource, double bufferDistance, string outputLayerNameAppendix = "Buffer", bool overwriteExisting = true);
+    string? BufferToLayer(IOgctDataSource dataSource, double bufferDistance, string outputLayerNameAppendix = "Buffer", bool overwriteExisting = true);
 
-    string GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, string outputLayerName = null);
+    string? GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, string? outputLayerName = null);
 
-    void UnifyInSingleGpkg(IOgctLayer otherLayer, string resultLayerName, string[] unionProcessOptions);
+    void UnifyInSingleGpkg(IOgctLayer otherLayer, string? resultLayerName, string[] unionProcessOptions);
 
     IOgctFeature CreateAndOpenFeature(long fid);
     int CreateField(FieldDefnInfo newFieldInfo);
@@ -91,7 +91,7 @@ public interface IOgctLayer : IDisposable
     /// <param name="wkt"></param>
     void SetSpatialFilterNotImplemented(string wkt);
     
-    void CopySchema(IOgctDataSource targetDataSource, string newLayerName, bool overwriteExisting = true);
+    void CopySchema(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true);
 
     /// <summary>
     /// Dissolves a named layer in the same (same: possible for gpkg) or into another datasource .
@@ -118,7 +118,7 @@ public interface IOgctLayer : IDisposable
     ///  <param name="overwriteExisting">overwites output-layer, if exists </param>      
     /// </remarks>
     /// <returns>name of the output layer</returns>
-    string DissolveToLayer(IOgctDataSource dataSource, List<FieldDefnInfo> fieldsUsedForDissolve, string outputLayerNameAppendix = "Dissolve", bool overwriteExisting = true);
+    string? DissolveToLayer(IOgctDataSource dataSource, List<FieldDefnInfo> fieldsUsedForDissolve, string outputLayerNameAppendix = "Dissolve", bool overwriteExisting = true);
     Task<IList<SelfOverlapErrorResult>> ValidateSelfOverlapAsync(Action<double> reportSelfOverlapValidationProgress = null,
         CancellationToken? cancellationToken = null);
     IOgctFeature OpenFeatureByFid(long featureId);

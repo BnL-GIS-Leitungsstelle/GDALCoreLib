@@ -11,7 +11,7 @@ public class LayerValidationResult
     /// <summary>
     /// Returns the name of the file that was validated.
     /// </summary>
-    public string FileName { get; private set; }
+    public string? FileName { get; private set; }
     /// <summary>
     /// Returns the name of the layerName that was validated.
     /// </summary>
@@ -30,7 +30,7 @@ public class LayerValidationResult
     public ELayerValidationType ValidationResultType { get; set; }
 
 
-    public LayerValidationResult(string fileName,string layerName)
+    public LayerValidationResult(string? fileName,string layerName)
     {
         FileName = fileName;
         LayerName = layerName;

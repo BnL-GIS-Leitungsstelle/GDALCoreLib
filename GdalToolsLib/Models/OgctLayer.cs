@@ -142,14 +142,14 @@ public partial class OgctLayer : IOgctLayer
         return CopyFeatures(targetLayer);
     }
 
-    public long CopyToLayer(IOgctDataSource targetDataSource, string newLayerName, bool overwriteExisting = true)
+    public long CopyToLayer(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true)
     {
         using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
         CloneFieldSchema(targetLayer);
         return CopyFeatures(targetLayer);
     }
 
-    public void CopySchema(IOgctDataSource targetDataSource, string newLayerName, bool overwriteExisting = true)
+    public void CopySchema(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true)
     {
         using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
         CloneFieldSchema(targetLayer);
@@ -183,7 +183,7 @@ public partial class OgctLayer : IOgctLayer
     /// </list>
     /// <param name="sqlRecordFilter">filters a record range like: SELECT * FROM layername LIMIT recLimit OFFSET recOffset </param>
     /// </remarks>
-    public void CopyToLayer(IOgctDataSource targetDataSource, string layerNameOut, int recLimit, int recOffset)
+    public void CopyToLayer(IOgctDataSource targetDataSource, string? layerNameOut, int recLimit, int recOffset)
     {
         var sourceTypeIn = SupportedDatasource.GetSupportedDatasource(_dataSource.Name);
         var sourceTypeOut = SupportedDatasource.GetSupportedDatasource(targetDataSource.Name);
@@ -265,9 +265,9 @@ public partial class OgctLayer : IOgctLayer
     ///  <param name="overwriteExisting">overwrites output-layer, if exists </param>      
     /// </remarks>
     /// <returns>name of the output layer</returns>
-    public string DissolveToLayer(IOgctDataSource dataSource, List<FieldDefnInfo> fieldsUsedForDissolve, string outputLayerNameAppendix = "Dissolve", bool overwriteExisting = true)
+    public string? DissolveToLayer(IOgctDataSource dataSource, List<FieldDefnInfo> fieldsUsedForDissolve, string outputLayerNameAppendix = "Dissolve", bool overwriteExisting = true)
     {
-        string outputLayerName = String.IsNullOrWhiteSpace(outputLayerNameAppendix) ? LayerDetails.Name + "Dissolve" : LayerDetails.Name + outputLayerNameAppendix.Trim();
+        string? outputLayerName = String.IsNullOrWhiteSpace(outputLayerNameAppendix) ? LayerDetails.Name + "Dissolve" : LayerDetails.Name + outputLayerNameAppendix.Trim();
 
         if (fieldsUsedForDissolve.Count == 0)  // dissolve on all fields
         {
@@ -278,8 +278,8 @@ public partial class OgctLayer : IOgctLayer
 
 
         // create outputLayer
-        IOgctLayer outputLayer = null;
-        OgctDataSource outputDataSource = null;
+        IOgctLayer outputLayer = null!;
+        OgctDataSource outputDataSource = null!;
 
         // dissolved layers contain usually multiparts
         var multiGeomType = ForceMultiPartGeomType(LayerDetails.GeomType);
@@ -289,7 +289,7 @@ public partial class OgctLayer : IOgctLayer
             case EDataSourceType.SHP:
                 var outputDsAccessor = new GeoDataSourceAccessor();
 
-                string outputDsPath = dataSource.Name.Replace(LayerDetails.Name, outputLayerName);
+                string? outputDsPath = dataSource.Name.Replace(LayerDetails.Name, outputLayerName);
 
                 outputDataSource = outputDsAccessor.CreateAndOpenDatasource(outputDsPath, GetSpatialRef(), multiGeomType);
                 outputLayer = outputDataSource.OpenLayer(outputLayerName);
@@ -393,10 +393,10 @@ public partial class OgctLayer : IOgctLayer
     /// <returns></returns>
     /// <exception cref="DataSourceReadOnlyException"></exception>
     /// <exception cref="DataSourceMethodNotImplementedException"></exception>
-    public string BufferToLayer(IOgctDataSource dataSource, double bufferDistance,
+    public string? BufferToLayer(IOgctDataSource dataSource, double bufferDistance,
         string outputLayerNameAppendix = "Buffer", bool overwriteExisting = true)
     {
-        string outputLayerName = String.IsNullOrWhiteSpace(outputLayerNameAppendix)
+        string? outputLayerName = String.IsNullOrWhiteSpace(outputLayerNameAppendix)
             ? LayerDetails.Name + "Buffer"
             : LayerDetails.Name + outputLayerNameAppendix.Trim();
 
@@ -409,7 +409,7 @@ public partial class OgctLayer : IOgctLayer
             case EDataSourceType.SHP:
                 var outputDsAccessor = new GeoDataSourceAccessor();
 
-                string outputDsPath = dataSource.Name.Replace(LayerDetails.Name, outputLayerName);
+                string? outputDsPath = dataSource.Name.Replace(LayerDetails.Name, outputLayerName);
 
                 outputDataSource = outputDsAccessor.CreateAndOpenDatasource(outputDsPath, GetSpatialRef(),
                     wkbGeometryType.wkbPolygon);
@@ -464,7 +464,7 @@ public partial class OgctLayer : IOgctLayer
     /// <param name="otherLayer"></param>
     /// <param name="outputLayerName"></param>
     /// <returns></returns>
-    public string GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, string outputLayerName = null)
+    public string? GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, string? outputLayerName = null)
     {
         outputLayerName = outputLayerName == null ? $"{this.Name}{geoProcess}" : $"{outputLayerName}{geoProcess}";
 
@@ -861,13 +861,13 @@ public partial class OgctLayer : IOgctLayer
     public OgctFeature OpenNextFeature()
     {
         var nextFeature = _layer.GetNextFeature();
-        return nextFeature != null ? new OgctFeature(nextFeature, this) : null;
+        return (nextFeature != null ? new OgctFeature(nextFeature, this) : null)!;
     }
 
     public IOgctFeature OpenFeatureByFid(long featureId)
     {
         var feature = _layer.GetFeature(featureId);
-        return feature != null ? new OgctFeature(feature, this) : null;
+        return (feature != null ? new OgctFeature(feature, this) : null)!;
 
     }
 
@@ -976,7 +976,7 @@ public partial class OgctLayer : IOgctLayer
             }
         }
 
-        return cancellationToken?.IsCancellationRequested ?? false ? null : result;
+        return (cancellationToken?.IsCancellationRequested ?? false ? null : result)!;
     }
 
 
@@ -1018,7 +1018,7 @@ public partial class OgctLayer : IOgctLayer
         return validationResult;
     }
 
-    private void GeoprocessingInSingleGpkg(EGeoProcess geoOperation, IOgctLayer otherLayer, string resultLayerName)
+    private void GeoprocessingInSingleGpkg(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
     {
         using var tempInMemoryDataset = new GeoDataSourceAccessor().CreateAndOpenInMemoryDatasource();
 
@@ -1078,7 +1078,7 @@ public partial class OgctLayer : IOgctLayer
     /// <param name="unionProcessOptions"></param>
     /// <exception cref="NotSupportedException"></exception>
     /// <exception cref="ApplicationException"></exception>
-    public void UnifyInSingleGpkg(IOgctLayer otherLayer, string resultLayerName, string[] unionProcessOptions)
+    public void UnifyInSingleGpkg(IOgctLayer otherLayer, string? resultLayerName, string[] unionProcessOptions)
     {
         using (var resultLayer = DataSource.CreateAndOpenLayer(resultLayerName, GetSpatialRef(),
                    LayerDetails.GeomType, LayerDetails.Schema.FieldList, false))

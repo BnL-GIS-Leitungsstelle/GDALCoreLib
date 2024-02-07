@@ -6,9 +6,9 @@ namespace GdalToolsLib.Layer;
 
 public class LayerDetails
 {
-    public string DataSourceFileName { get; private set; }
+    public string? DataSourceFileName { get; private set; }
 
-    public string Name { get; private set; }
+    public string? Name { get; private set; }
 
     public wkbGeometryType GeomType { get; private set; }
 
@@ -17,11 +17,11 @@ public class LayerDetails
 
     // public SpatialReference SpatialRef { get; private set; }
 
-    public LayerSpatialRef Projection { get; set; }
+    public LayerSpatialRef? Projection { get; set; }
 
-    public LayerExtent Extent { get; set; }
+    public LayerExtent? Extent { get; set; }
 
-    public LayerSchema Schema { get; set; }
+    public LayerSchema? Schema { get; set; }
 
     public int FieldCount { get; private set; }
 
@@ -38,7 +38,7 @@ public class LayerDetails
     /// http://ogdi.sourceforge.net/prop/6.2.CapabilitiesMetadata.html
     /// Note that installing a query string will generally result in resetting the current reading position (ala OGR_L_ResetReading()).
     /// </summary>
-    public string AttributeFilter { get; private set; }
+    public string? AttributeFilter { get; private set; }
 
 
     /// <summary>
@@ -47,7 +47,7 @@ public class LayerDetails
     /// <param name="file"></param>
     /// <param name="layerName"></param>
     /// <param name="attributeFilter">a kind of WHERE-clause</param>
-    public LayerDetails(string file, string layerName, string attributeFilter = default)
+    public LayerDetails(string? file, string? layerName, string? attributeFilter = default!)
     {
         using (var ds = new GeoDataSourceAccessor().OpenDatasource(file))
         {
@@ -63,7 +63,7 @@ public class LayerDetails
     /// <param name="dataSource"></param>
     /// <param name="layerName"></param>
     /// <param name="attributeFilter">a kind of WHERE-clause</param>
-    public LayerDetails(OgctDataSource dataSource, string layerName, string attributeFilter = default)
+    public LayerDetails(OgctDataSource dataSource, string? layerName, string? attributeFilter = default)
     {
         using (var layer = dataSource.OpenLayer(layerName))
         {
@@ -77,7 +77,7 @@ public class LayerDetails
     /// <param name="layerName"></param>
     /// <param name="projection"></param>
     /// <param name="geometryType"></param>
-    public LayerDetails(string layerName, string projection, wkbGeometryType geometryType)
+    public LayerDetails(string? layerName, string projection, wkbGeometryType geometryType)
     {
         Name = layerName;
         Projection = new LayerSpatialRef(projection);
@@ -90,12 +90,12 @@ public class LayerDetails
     /// </summary>
     /// <param name="layer"></param>
     /// <param name="attributeFilter"></param>
-    public LayerDetails(OgctLayer layer, string attributeFilter = default)
+    public LayerDetails(OgctLayer layer, string? attributeFilter = default)
     {
-        Initialize(layer.DataSource.Name , layer, attributeFilter);
+        Initialize(layer.DataSource.Name, layer, attributeFilter);
     }
 
-    private void Initialize(string file, IOgctLayer layer, string attributeFilter)
+    private void Initialize(string? file, IOgctLayer layer, string? attributeFilter)
     {
         var ogrLayer = ((OgctLayer)layer).OgrLayer;
         GeomType = ogrLayer.GetLayerDefn().GetGeomType();

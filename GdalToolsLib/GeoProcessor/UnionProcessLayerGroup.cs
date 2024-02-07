@@ -5,7 +5,7 @@ namespace GdalToolsLib.GeoProcessor;
 
 public class UnionProcessLayerGroup
 {
-    public string ResultLayerName { get; set; }
+    public string? ResultLayerName { get; set; }
 
 
     public List<UnionProcessItem> Items { get; set; }
@@ -13,7 +13,7 @@ public class UnionProcessLayerGroup
 
 
 
-    public UnionProcessLayerGroup(List<string> layerNames, string resultLayerName)
+    public UnionProcessLayerGroup(List<string?> layerNames, string? resultLayerName)
     {
         Items = new();
 
@@ -24,7 +24,7 @@ public class UnionProcessLayerGroup
 
 
 
-    private void BuildItems(List<string> layerNames)
+    private void BuildItems(List<string?> layerNames)
     {
         if (layerNames.Count < 2)
         {
@@ -43,7 +43,7 @@ public class UnionProcessLayerGroup
             {
                 bool isTemporaryStep = i < layerNames.Count - 1;
 
-                string tempResultName = layerNames[i] + "TempUnion";
+                string? tempResultName = layerNames[i] + "TempUnion";
                 if (i==0)
                 {
                     Items.Add(new UnionProcessItem(layerNames[0], layerNames[1], tempResultName, isTemporaryStep));
@@ -56,7 +56,7 @@ public class UnionProcessLayerGroup
 
                 if (isTemporaryStep)
                 {
-                    string tempName = tempResultName + layerNames[i] + "Temp";
+                    string? tempName = tempResultName + layerNames[i] + "Temp";
                     var item = new UnionProcessItem(tempResultName, layerNames[i], tempName, isTemporaryStep);
                     tempResultName = tempName;
                 }

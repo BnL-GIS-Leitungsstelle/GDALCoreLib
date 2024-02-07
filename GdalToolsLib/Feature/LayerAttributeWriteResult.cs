@@ -11,7 +11,7 @@ public class LayerAttributeWriteResult
     /// <summary>
     /// Returns the name of the file that was validated.
     /// </summary>
-    public string FileName { get; private set; }
+    public string? FileName { get; private set; }
 
     /// <summary>
     /// Returns the name of the layer that was validated.
@@ -42,7 +42,7 @@ public class LayerAttributeWriteResult
     public EFeatureWriteErrorResult FeatureWriteErrorResultType { get; set; }
 
     
-    public LayerAttributeWriteResult(string fileName, string layerName, string attributeName, object updateValue)
+    public LayerAttributeWriteResult(string? fileName, string layerName, string attributeName, object updateValue)
     {
         FileName = fileName;
         LayerName = layerName;

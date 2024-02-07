@@ -1,18 +1,19 @@
-﻿using Newtonsoft.Json;
-using OGCToolsNetCoreLib.DataAccess;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using GdalToolsLib.DataAccess;
+using Newtonsoft.Json;
+using GdalConfiguration = GdalToolsLib.GdalConfiguration;
 
-namespace BnL.ExtraxtMetadataFromFGDBs;
+namespace BnL.ExtractMetadataFromFGDBs;
 
-public class FGDBExtractor
+public class FgdbExtractor
 {
-    public string StartPath { get; private set; }
+    public string StartPath { get; }
 
 
     /// <summary>
@@ -22,21 +23,20 @@ public class FGDBExtractor
     {
         get
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            var companyName = fvi.CompanyName;
-            var productName = fvi.ProductName;
-            var productVersion = fvi.ProductVersion;
+            var assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             var lines = new List<string>
             {
-                $"{productName} Version: {productVersion} ",
-                $"Author: {companyName}",
+                $"{fvi.ProductName} by {fvi.CompanyName}",
+                $"Version: {fvi.FileVersion} ({fvi.LegalCopyright})",
                 "",
+                $"TopLevelPath = {StartPath}",
+                "",
+                "About:",
                 "=================================================================================================",
-                "OGR/GDAL-based tool to extract metadata from FGDB-geodata layer as xml/json file.",
-                "",
-                "Writes metadata of all layers in a Geodatabase into separate xml/json-files (named as the layer).",
+                "OGR/GDAL-based tool to extract metadata from all layers in all FGDBs found,",
+                " and write this metadata into separate xml and json-files (same filename as the layers).",
                 "=================================================================================================",
             ""
             };
@@ -45,46 +45,22 @@ public class FGDBExtractor
     }
 
 
-    /// <summary>
-    /// Information on usage
-    /// </summary>
-    public IEnumerable<string> Usage
+    public FgdbExtractor(string topLevelPath)
     {
-        get
-        {
-            var lines = new List<string>
-            {
-                "",
-                "---------------- USAGE ---------------------------------------------------------",
-                "use ExtractMetadata From FGDBs with ONE required parameters: ",
-                string.Format(" /topLevelPath= path to first FGDB"),
-
-                string.Format(@" e.g. /topLevelPath=C:\Data"),
-                "",
-                "--------------------------------------------------------------------------------",
-                ""
-            };
-            return lines;
-        }
-    }
-
-    public FGDBExtractor(string[] args)
-    {
-        ShowAbout();
-
-        ReadArgs(args);
+        StartPath = topLevelPath;
+        GdalToolsLib.GdalConfiguration.ConfigureGdal();
     }
 
     public void Run()
     {
-        List<string> fgdbPathes = Directory.GetDirectories(StartPath, "*.gdb", SearchOption.AllDirectories).ToList();
+        List<string?> fgdbPathes = Directory.GetDirectories(StartPath, "*.gdb", SearchOption.AllDirectories).ToList();
 
         Console.WriteLine($"Found {fgdbPathes.Count} Filegeodatabases.");
 
+
+
         foreach (var fgdbPath in fgdbPathes)
         {
-            string path = Path.GetDirectoryName(fgdbPath);
-
             Console.WriteLine($"Extract FDGB = {fgdbPath}.");
 
             using var ds = new GeoDataSourceAccessor().OpenDatasource(fgdbPath);
@@ -99,10 +75,10 @@ public class FGDBExtractor
 
                 // To convert an XML node contained in string xml into a JSON string
 
-                WriteXmlFile(xmlMetadata, path, layerName, "_metadata");
+                //WriteXmlFile(xmlMetadata, path, layerName, "_metadata");
                 //WriteXmlFile(xmlLayerDefinition, path, layerName, "_layerDefinition");
 
-                WriteJsonFile(xmlMetadata, path, layerName, "_metadata");
+                //WriteJsonFile(xmlMetadata, path, layerName, "_metadata");
                 //WriteJsonFile(xmlLayerDefinition, path, layerName, "_layerDefinition");
             }
         }
@@ -131,37 +107,8 @@ public class FGDBExtractor
         File.WriteAllText($"{path}\\{layerName}{postfix}.json", jsonContent);
     }
 
-    private void ShowAbout()
+    public void ShowAbout()
     {
         foreach (var line in About) Console.WriteLine(line);
     }
-
-    private void ShowUsage()
-    {
-        foreach (var line in Usage) Console.WriteLine(line);
-    }
-
-
-
-    private void ReadArgs(string[] args)
-    {
-        if (args.Length == 0)
-        {
-            ShowUsage();
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
-            Environment.Exit(0);
-        }
-
-        foreach (string argument in args)
-        {
-            if (argument.StartsWith("/topLevelPath="))
-            {
-                StartPath = argument.Remove(0, 14).Replace(@"\\", @"\");
-            }
-        }
-    }
-
-
-
 }

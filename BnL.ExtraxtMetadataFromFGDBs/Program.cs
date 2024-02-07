@@ -1,19 +1,26 @@
 ﻿using System;
-
-namespace BnL.ExtraxtMetadataFromFGDBs;
+using BnL.ExtractMetadataFromFGDBs;
+using Cocona;
 
 // https://gdal.org/drivers/vector/openfilegdb.html
 
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var extractor = new FGDBExtractor(args);
+//  use ExtractMetadata From FGDBs with ONE required parameters: 
+//  topLevelPath is the path to top most dir with FGDBs
+//  e.g. C:\Data
 
-        extractor.Run();
-           
-        Console.WriteLine();
-        Console.WriteLine("Press ENTER to end..");
-        Console.ReadLine();
-    }
-}
+
+CoconaApp.Run(([Argument(Description = "top level path to first FGDB, e.g. ")]string topLevelPath) =>
+{
+    var extractor = new FgdbExtractor(topLevelPath);
+    Console.Write($"Running ");
+    extractor.ShowAbout();
+
+    extractor.Run();
+
+    Console.WriteLine();
+    Console.WriteLine("Press ENTER to end..");
+    Console.ReadLine();
+
+});
+
+

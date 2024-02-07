@@ -2,7 +2,7 @@
   "profiles": {
     "BnL.ExtraxtMetadataFromFGDBs": {
       "commandName": "Project",
-      "commandLineArgs": "/topLevelPath=G:\\BnL\\Daten\\Ablage\\DNL"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL"
     }
   }
 }

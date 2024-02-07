@@ -41,12 +41,12 @@ public class LayerExtent
         Json = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
     }
 
-    public bool IsEqual(LayerExtent otherExtent)
+    public bool IsEqual(LayerExtent? otherExtent)
     {
         return Compare(otherExtent) == String.Empty;
     }
 
-    public string Compare(LayerExtent otherExtent)
+    public string Compare(LayerExtent? otherExtent)
     {
         string result= String.Empty;
 

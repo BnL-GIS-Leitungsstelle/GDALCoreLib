@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<Version>1.0.1</Version>
+		<Authors>BAFU - BnL</Authors>
+		<Copyright>2024</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Cocona" Version="2.2.0" />
+	  <PackageReference Include="GDAl" Version="3.8.1" />
+	  <PackageReference Include="GDAL.Native" Version="3.8.1" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\GdalToolsLib\GdalToolsLib.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -46,7 +46,7 @@ public class SupportedDatasource
     /// </summary>
     /// <param name="datasourcePath"></param>
     /// <returns></returns>
-    public static SupportedDatasource GetSupportedDatasource(string datasourcePath)
+    public static SupportedDatasource GetSupportedDatasource(string? datasourcePath)
     {
         string extension = Path.GetExtension(datasourcePath);
         foreach (var supportedDatasource in Datasources.Where(ds => ds.Extension == extension))
@@ -89,7 +89,7 @@ public class SupportedDatasource
 
     }
 
-    public static bool Exists(SupportedDatasource suppDs, string path)
+    public static bool Exists(SupportedDatasource suppDs, string? path)
     {
         return suppDs.FileType switch
         {

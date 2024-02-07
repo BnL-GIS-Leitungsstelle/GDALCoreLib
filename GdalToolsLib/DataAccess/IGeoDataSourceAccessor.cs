@@ -27,12 +27,12 @@ public interface IGeoDataSourceAccessor
     /// <param name="geometryType">only on creation of SHP-file</param>
 
     /// <returns></returns>
-    OgctDataSource OpenDatasource(string path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
+    OgctDataSource OpenDatasource(string? path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
 
     public OgctDataSource CreateAndOpenInMemoryDatasource();
 
-    OgctDataSource CreateAndOpenDatasource(string path, ESpatialRefWkt spatialRef,
+    OgctDataSource CreateAndOpenDatasource(string? path, ESpatialRefWkt spatialRef,
         wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
     /// <summary>
@@ -42,7 +42,7 @@ public interface IGeoDataSourceAccessor
     /// <param name="spatialRef">must be defined, when creating a shapefile</param>
     /// <param name="geometryType">must be defined, when creating a shapefile</param>
     /// <returns></returns>
-    OgctDataSource CreateDatasource(string pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
+    OgctDataSource CreateDatasource(string? pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
     /// <summary>
     /// the methods uses standard .net methods to copy the datasource. No gdal-functionality is used.
@@ -53,7 +53,7 @@ public interface IGeoDataSourceAccessor
     /// <param name="outDir"></param>
     /// <param name="outputFilename"></param>
     /// <returns>targetFullpath</returns>
-    string CopyDatasource(string inputFile, string outDir, string outputFilename);
+    string CopyDatasource(string? inputFile, string outDir, string outputFilename);
 
     /// <summary>
     /// the methods uses standard .net methods to delete files and folders of a datasource format. No gdal-functionality is used.
@@ -61,9 +61,9 @@ public interface IGeoDataSourceAccessor
     /// eg. shp consists of many files, that needs all to be deleted.
     /// </summary>
     /// <param name="path"></param>
-    void DeleteDatasource(string path);
+    void DeleteDatasource(string? path);
 
-    int GetVectorLayerCount(string file);
+    int GetVectorLayerCount(string? file);
     IEnumerable<object[]> GetSupportedVectorData(string directory, bool ignoreShpFolder);
 
     /// <summary>

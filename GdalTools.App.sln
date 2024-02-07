@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalToolsTest", "GdalToolsT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalToolsLib", "GdalToolsLib\GdalToolsLib.csproj", "{2BDD423B-0D42-4B1F-BBF1-3C2420479296}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BnL.ExtractMetadataFromFGDBs", "BnL.ExtraxtMetadataFromFGDBs\BnL.ExtractMetadataFromFGDBs.csproj", "{1915DB08-8780-476A-80A5-B4E052888DF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BDD423B-0D42-4B1F-BBF1-3C2420479296}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1915DB08-8780-476A-80A5-B4E052888DF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1915DB08-8780-476A-80A5-B4E052888DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1915DB08-8780-476A-80A5-B4E052888DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1915DB08-8780-476A-80A5-B4E052888DF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

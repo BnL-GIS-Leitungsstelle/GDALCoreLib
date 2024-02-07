@@ -13,7 +13,7 @@ public static class FeatureExtensions
     /// <param name="feature"></param>
     /// <param name="layer"></param>
     /// <returns></returns>
-    public static string ObjNumber(this OSGeo.OGR.Feature feature, OSGeo.OGR.Layer layer)
+    public static string? ObjNumber(this OSGeo.OGR.Feature feature, OSGeo.OGR.Layer layer)
     {
         return GetFeatureFieldAsString(feature, layer, "ObjNummer");
     }
@@ -25,12 +25,12 @@ public static class FeatureExtensions
     /// <param name="feature"></param>
     /// <param name="layer"></param>
     /// <returns></returns>
-    public static string ObjName(this OSGeo.OGR.Feature feature, OSGeo.OGR.Layer layer)
+    public static string? ObjName(this OSGeo.OGR.Feature feature, OSGeo.OGR.Layer layer)
     {
         return GetFeatureFieldAsString(feature, layer, "Name");
     }
 
-    private static string GetFeatureFieldAsString(OSGeo.OGR.Feature feature, OSGeo.OGR.Layer layer, string field)
+    private static string? GetFeatureFieldAsString(OSGeo.OGR.Feature feature, OSGeo.OGR.Layer layer, string field)
     {
         var idx = layer.FindFieldIndex(field, 1);
         return idx < 0 ? string.Empty : feature.GetFieldAsString(idx);

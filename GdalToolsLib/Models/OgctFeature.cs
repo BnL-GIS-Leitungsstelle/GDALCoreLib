@@ -25,8 +25,8 @@ public class OgctFeature : IOgctFeature
     internal OSGeo.OGR.Feature OgrFeature => _feature;
 
     public long FID => _feature.GetFID();
-    public string ObjNumber => _feature.ObjNumber(_layer.OgrLayer);
-    public string ObjName => _feature.ObjName(_layer.OgrLayer);
+    public string? ObjNumber => _feature.ObjNumber(_layer.OgrLayer);
+    public string? ObjName => _feature.ObjName(_layer.OgrLayer);
 
     /// <summary>
     /// 
@@ -172,7 +172,7 @@ public class OgctFeature : IOgctFeature
             !layerGeometryType.StartsWith(wkbGeometryType.wkbMultiSurface.ToString()))
         {
             geometry.Dispose();
-            string remarks = $"feature= {featureGeomType} in layer = {layerGeometryType}";
+            string? remarks = $"feature= {featureGeomType} in layer = {layerGeometryType}";
             return new GeometryValidationResult(this, _layer, EGeometryValidationType.FeatureToLayerMultiSurfaceTypeMismatch, remarks);
         }
 
@@ -181,7 +181,7 @@ public class OgctFeature : IOgctFeature
         if (featureGeomType.StartsWith(layerGeometryType) == false)
         {
             geometry.Dispose();
-            string remarks = $"layer = {layerGeometryType} - geom = {featureGeomType}";
+            string? remarks = $"layer = {layerGeometryType} - geom = {featureGeomType}";
             return new GeometryValidationResult(this, _layer, EGeometryValidationType.GeometrytypeMismatchAccordingToLayer, remarks);
         }
 
@@ -242,7 +242,7 @@ public class OgctFeature : IOgctFeature
         }
         catch (Exception)
         {
-            return null;
+            return null!;
         }
         var isValidOp = new IsValidOp(nktGeometry);
 
@@ -260,7 +260,7 @@ public class OgctFeature : IOgctFeature
     {
         if (_feature.IsFieldNull(fieldDef.Name))
         {
-            return null;
+            return null!;
         }
 
         switch (fieldDef.Type)
@@ -415,7 +415,7 @@ public class OgctFeature : IOgctFeature
     /// <returns></returns>
     private dynamic ConvertValueType(dynamic value, FieldDefnInfo field, FeatureFieldWriteResult writeResult)
     {
-        if (value == null) return null;
+        if (value == null) return null!;
 
         switch (field.Type)
         {
@@ -523,7 +523,7 @@ public class OgctFeature : IOgctFeature
                     if (strValue.Length > field.Width)
                     {
                         writeResult.ResultValidationType = EFieldWriteErrorType.StringLengthExceedsTargetTypeLength;
-                        return null;
+                        return null!;
                     }
                     return strValue;
                 }
@@ -536,7 +536,7 @@ public class OgctFeature : IOgctFeature
                 throw new InvalidCastException($"Cast missing for field {field.Name}, type {field.Type}");
 
         }
-        return null;
+        return null!;
     }
 
     public string GetFieldAsString(string fieldName)

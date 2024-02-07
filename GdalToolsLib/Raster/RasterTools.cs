@@ -142,13 +142,13 @@ public class RasterTools : IRasterTools
     /// <summary>
     /// Creates Polygons from Raster. For pixels that should not be polygonized use 0!
     /// </summary>
-    public void PolygonizeToLayer(string tifPath, IOgctDataSource targetDataSource, string newLayerName,
+    public void PolygonizeToLayer(string tifPath, IOgctDataSource targetDataSource, string? newLayerName,
         int bandNumber = 1, ESpatialRefWkt spatialRef = ESpatialRefWkt.CH1903plus_LV95)
     {
         using var rasterDs = Gdal.OpenShared(tifPath, Access.GA_ReadOnly);
         using var band = rasterDs.GetRasterBand(bandNumber);
 
-        string tempLayerName = "temp";
+        string? tempLayerName = "temp";
         using var inMemoryDs = _geoDataSourceAccessor.CreateAndOpenInMemoryDatasource();
         using var inMemoryLayer =
             inMemoryDs.CreateAndOpenLayer(tempLayerName, spatialRef, wkbGeometryType.wkbMultiPolygon);
@@ -160,13 +160,13 @@ public class RasterTools : IRasterTools
         inMemoryLayer.CopyToLayer(targetDataSource, newLayerName, true);
     }
 
-    public void PolygonizeAndDissolveToLayer(string tifPath, IOgctDataSource targetDataSource, string newLayerName,
+    public void PolygonizeAndDissolveToLayer(string tifPath, IOgctDataSource targetDataSource, string? newLayerName,
         int bandNumber = 1, ESpatialRefWkt spatialRef = ESpatialRefWkt.CH1903plus_LV95)
     {
         using var rasterDs = Gdal.OpenShared(tifPath, Access.GA_ReadOnly);
         using var band = rasterDs.GetRasterBand(bandNumber);
 
-        string tempLayerName = "temp";
+        string? tempLayerName = "temp";
         using var inMemoryDs = _geoDataSourceAccessor.CreateAndOpenInMemoryDatasource();
         using var inMemoryLayer =
             inMemoryDs.CreateAndOpenLayer(tempLayerName, spatialRef, wkbGeometryType.wkbMultiPolygon);

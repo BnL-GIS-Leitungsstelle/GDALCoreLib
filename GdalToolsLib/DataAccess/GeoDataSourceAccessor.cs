@@ -17,7 +17,7 @@ namespace GdalToolsLib.DataAccess;
 /// vector-formats: FGDB and GPKG mainly. sometimes shp..
 /// raster-formats: tif
 /// 
-/// for new GDAL-Version 3.6.4 with FGDb-write-access
+/// for new GDAL-Version >3.7.x with FGDb-write-access
 /// </summary>
 public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 {
@@ -87,7 +87,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     /// <param name="geometryType">only on creation of SHP-file</param>
 
     /// <returns></returns>
-    public OgctDataSource OpenDatasource(string path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
+    public OgctDataSource OpenDatasource(string? path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
     {
         var supportedDatasource = SupportedDatasource.GetSupportedDatasource(path);
         OgctDataSource dataSource = null;
@@ -129,7 +129,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     }
 
 
-    public OgctDataSource CreateAndOpenDatasource(string path, ESpatialRefWkt spatialRef,
+    public OgctDataSource CreateAndOpenDatasource(string? path, ESpatialRefWkt spatialRef,
         wkbGeometryType geometryType = wkbGeometryType.wkbNone)
     {
         return CreateDatasource(path, new SpatialReference(spatialRef.GetEnumDescription(typeof(ESpatialRefWkt))), geometryType);
@@ -142,7 +142,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     /// <param name="spatialRef">must be defined, when creating a shapefile</param>
     /// <param name="geometryType">must be defined, when creating a shapefile</param>
     /// <returns></returns>
-    public OgctDataSource CreateDatasource(string pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
+    public OgctDataSource CreateDatasource(string? pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
     {
         var supportedDs = SupportedDatasource.GetSupportedDatasource(pathAndFilename);
 
@@ -227,7 +227,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     /// <param name="outDir"></param>
     /// <param name="outputFilename"></param>
     /// <returns>targetFullpath</returns>
-    public string CopyDatasource(string inputFile, string outDir, string outputFilename)
+    public string CopyDatasource(string? inputFile, string outDir, string outputFilename)
     {
         var dataSourceType = SupportedDatasource.GetSupportedDatasource(inputFile);
 
@@ -302,7 +302,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     /// eg. shp consists of many files, that needs all to be deleted.
     /// </summary>
     /// <param name="path"></param>
-    public void DeleteDatasource(string path)
+    public void DeleteDatasource(string? path)
     {
         var dataSourceType = SupportedDatasource.GetSupportedDatasource(path);
 
@@ -344,7 +344,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
 
 
-    public int GetVectorLayerCount(string file)
+    public int GetVectorLayerCount(string? file)
     {
         using (var ds = OpenDatasource(file))
         {

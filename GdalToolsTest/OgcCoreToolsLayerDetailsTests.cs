@@ -1,4 +1,5 @@
-﻿using GdalCoreTest.Helper;
+﻿using System.Collections.Generic;
+using GdalCoreTest.Helper;
 using GdalToolsLib;
 using GdalToolsLib.DataAccess;
 using OSGeo.OGR;

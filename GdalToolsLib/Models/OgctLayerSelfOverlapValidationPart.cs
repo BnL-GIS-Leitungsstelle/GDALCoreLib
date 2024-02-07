@@ -26,7 +26,7 @@ public partial class OgctLayer
         if (!task.GeomA.Intersects(task.GeomB))
         {
             task.Dispose();
-            return null;
+            return null!;
         }
 
         using var intersection = task.GeomA.GetAndOpenIntersection(task.GeomB);
@@ -39,7 +39,7 @@ public partial class OgctLayer
 
 
         task.Dispose();
-        return null;
+        return null!;
     }
 
     private async Task EnqueueSelfOverlapTasksForFeatureWithComparisons(long baseFeatureId, List<long> featureIdsToAnalyze, ConcurrentBag<Task<SelfOverlapErrorResult>> tasks, CancellationToken? cancellationToken = null)

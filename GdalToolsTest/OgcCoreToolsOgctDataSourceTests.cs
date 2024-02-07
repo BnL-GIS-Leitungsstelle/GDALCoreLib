@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using GdalCoreTest.Helper;
 using GdalCoreTest.SqlStatements;
@@ -62,7 +63,7 @@ namespace GdalCoreTest
                     }
                     catch (Exception e)
                     {
-                        //  Assert.Fail($"dialect= {OgcConstants.OgrSqlDialect}: Message= {e.Message}  ");
+                         Assert.Fail($"dialect= {OgcConstants.OgrSqlDialect}: Message= {e.Message}  ");
                     }
                 }
 
@@ -135,7 +136,7 @@ namespace GdalCoreTest
                     }
                     catch (Exception e)
                     {
-                        //  Assert.Fail($"dialect= {OgcConstants.OgrSqlDialect}: Message= {e.Message}  ");
+                        Assert.Fail($"dialect= {OgcConstants.OgrSqlDialect}: Message= {e.Message}  ");
                     }
                 }
 

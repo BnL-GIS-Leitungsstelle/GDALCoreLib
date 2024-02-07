@@ -10,8 +10,8 @@ namespace GdalToolsLib.Models;
 public interface IOgctFeature : IDisposable
 {
     long FID { get; }
-    string ObjNumber { get; }
-    string ObjName { get; }
+    string? ObjNumber { get; }
+    string? ObjName { get; }
     IOgctGeometry OpenGeometry();
 
     wkbGeometryType GetGeomType();

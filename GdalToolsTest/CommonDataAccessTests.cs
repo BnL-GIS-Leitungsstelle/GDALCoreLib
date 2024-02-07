@@ -1,8 +1,6 @@
 using System.IO;
 using GdalCoreTest.Helper;
-using GdalToolsLib;
 using GdalToolsLib.DataAccess;
-using GdalToolsTest;
 using OSGeo.OGR;
 using Xunit;
 using Xunit.Abstractions;

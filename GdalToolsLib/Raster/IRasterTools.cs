@@ -26,10 +26,10 @@ public interface IRasterTools
     /// <summary>
     /// Creates Polygons from Raster. For pixels that should not be polygonized use 0!
     /// </summary>
-    void PolygonizeToLayer(string tifPath, IOgctDataSource targetDataSource, string newLayerName,
+    void PolygonizeToLayer(string tifPath, IOgctDataSource targetDataSource, string? newLayerName,
         int bandNumber = 1, ESpatialRefWkt spatialRef = ESpatialRefWkt.CH1903plus_LV95);
 
-    void PolygonizeAndDissolveToLayer(string tifPath, IOgctDataSource targetDataSource, string newLayerName,
+    void PolygonizeAndDissolveToLayer(string tifPath, IOgctDataSource targetDataSource, string? newLayerName,
         int bandNumber = 1, ESpatialRefWkt spatialRef = ESpatialRefWkt.CH1903plus_LV95);
 
     /// <summary>

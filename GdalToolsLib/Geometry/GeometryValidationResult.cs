@@ -16,16 +16,16 @@ public class GeometryValidationResult
     public long FeatureFid { get; set; }
 
 
-    public string ObjNummer { get; set; }
-    public string Name { get; set; }
+    public string? ObjNummer { get; set; }
+    public string? Name { get; set; }
 
-    public string Remarks { get; set; }
+    public string? Remarks { get; set; }
 
     private GeometryValidationResult()
     { }
 
 
-    public GeometryValidationResult(OgctFeature feature, OgctLayer layer, EGeometryValidationType validationType, string remarks = default)
+    public GeometryValidationResult(OgctFeature feature, OgctLayer layer, EGeometryValidationType validationType, string? remarks = default)
     {
         Valid = validationType == EGeometryValidationType.IsValid;
         FeatureFid = feature.FID;
