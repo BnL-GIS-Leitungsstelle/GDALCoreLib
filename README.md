@@ -1,8 +1,8 @@
-# GDALCoreTestApp
+# GDALTools_new
 
 ## Synopsis
 
-This project is a proof-of-concept to investigate the amount of functionality of new the GDAL/OGR C#-wrapper for .NET 6, former -NET.Core). It continues to migrate functions from the Repo OgcTools, which is running on the old official GDAL/OGR Net-Framework Wrapper provided by nuget. The aim is to get a fully migrated library with GDAL-functionality  running in .NET 6.
+This project is a proof-of-concept to investigate the amount of functionality of new the GDAL/OGR C#-wrapper for .NET 8). It continues to migrate functions from the Repo OgcTools, which is running on the old official GDAL/OGR Net-Framework Wrapper provided by nuget. The aim is to get a fully migrated library with GDAL-functionality  running in .NET 8.
 First questions: How much is working with shape (SHP), geopackage (GPKG) and esri-filegeodatabase (FGDB) ? What functionality is included ?
 The project is intended to be used as a library-project.
 It is inspired by the project/repo "OgcTools".
@@ -10,7 +10,7 @@ As of Version GDAL-Core-Lib 3.7.2 in FGDB read/write-actions are supported (form
 
 ## Motivation
 
-The Project exists, because of the change from .NET-Framwork to .NET 6, driven by microsoft. The library-project OgcTools should get migrated to .NET 6 to stay in an modern environment to enable the use of modern techniques, like Web-API, Blazor, running on linux, etc. 
+The Project exists, because of the change from .NET-Framwork to .NET 8, driven by microsoft. The library-project OgcTools should get migrated to .NET 8 to stay in an modern environment to enable the use of modern techniques, like Web-API, Blazor, running on linux, etc. 
 
 ## Roadmap
 
@@ -19,12 +19,13 @@ The following ideas will show the directions and options of future enhancements 
 * feature-wise comparison and editing attributes, supported by SQL
 * geometry-comparison of two geometries
 * editing vector-layer in FGDB
+* option for more intense geometry-checker
 
 
 
 ## Architecture
 
-So far, starting the the geodata-storage-formats, the first access-level deals with the basic handling of these.
+So far, starting with the geodata-storage-formats, the first access-level deals with the basic handling of these.
 The second level handles and extracts the geographical layers for further processing in the next level..
 
 
