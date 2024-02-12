@@ -17,17 +17,17 @@ public class Program
 
         IConfigurationRoot configuration = builder.Build();
 
-        var FullPathFOfFgdb = configuration["profiles:ConsoleApp:commandLineArgs"];
-        Console.WriteLine($"Environment: {FullPathFOfFgdb}");
+        var FullPathFOfGdb = configuration["profiles:ConsoleApp:commandLineArgs"];
+        Console.WriteLine($"Environment: {FullPathFOfGdb}");
 
 
         var excelContents = new List<ExcelContent>();
 
-        Console.WriteLine("Read data of all layers in a Geodatabase into a collection of data-rows.");
+        Console.WriteLine("Read data of all layers in a Geodatabase (FGDB, GPKG) into a collection of data-rows.");
         Console.WriteLine("and write the content into excel-files with the layers name.");
 
 
-        using var ds = new GeoDataSourceAccessor().OpenDatasource(FullPathFOfFgdb);
+        using var ds = new GeoDataSourceAccessor().OpenDatasource(FullPathFOfGdb);
         var layerNameList = ds.GetLayerNames();
 
         foreach (var layerName in layerNameList)
