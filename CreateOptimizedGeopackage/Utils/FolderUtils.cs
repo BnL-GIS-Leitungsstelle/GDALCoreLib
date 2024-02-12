@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace CreateOptimizedGeopackage.Utils
+namespace CreateOptimizedGeopackage.Utils;
+
+internal static class FolderUtils
 {
-    internal static class FolderUtils
+    public static IEnumerable<string> GetFilesFromFolder(string folder, string extension)
     {
-        public static IEnumerable<string> GetFilesFromFolder(string folder, string extension)
-        {
             return Directory.GetFiles(folder, $"*{extension}");
         }
 
-        public static void CreateDirectoryIfNotExists(string directory)
-        {
+    public static void CreateDirectoryIfNotExists(string directory)
+    {
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
         }
 
-        public static void DeleteDirectory(string directory, bool recursive = true)
-        {
+    public static void DeleteDirectory(string directory, bool recursive = true)
+    {
             try
             {
                 if (Directory.Exists(directory))
@@ -30,5 +30,4 @@ namespace CreateOptimizedGeopackage.Utils
             }
             catch (Exception) { }
         }
-    }
 }

@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GdalToolsLib", "GdalToolsLi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BnL.ExtractMetadataFromFGDBs", "BnL.ExtraxtMetadataFromFGDBs\BnL.ExtractMetadataFromFGDBs.csproj", "{1915DB08-8780-476A-80A5-B4E052888DF8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateOptimizedGeopackage", "CreateOptimizedGeopackage\CreateOptimizedGeopackage.csproj", "{09BA26DA-BE1E-4806-B316-25FB251CBD05}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadLayerDataIntoExcel", "ReadLayerDataIntoExcel\ReadLayerDataIntoExcel.csproj", "{0D577300-64F2-4063-9920-AD972D329353}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{1915DB08-8780-476A-80A5-B4E052888DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1915DB08-8780-476A-80A5-B4E052888DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1915DB08-8780-476A-80A5-B4E052888DF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09BA26DA-BE1E-4806-B316-25FB251CBD05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09BA26DA-BE1E-4806-B316-25FB251CBD05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09BA26DA-BE1E-4806-B316-25FB251CBD05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09BA26DA-BE1E-4806-B316-25FB251CBD05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D577300-64F2-4063-9920-AD972D329353}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D577300-64F2-4063-9920-AD972D329353}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D577300-64F2-4063-9920-AD972D329353}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D577300-64F2-4063-9920-AD972D329353}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
