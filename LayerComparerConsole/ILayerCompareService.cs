@@ -2,5 +2,5 @@
 
 public interface ILayerCompareService
 {
-    void Run(string[] args);
+    void Compare(string[] args);
 }

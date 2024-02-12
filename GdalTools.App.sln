@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateOptimizedGeopackage",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadLayerDataIntoExcel", "ReadLayerDataIntoExcel\ReadLayerDataIntoExcel.csproj", "{0D577300-64F2-4063-9920-AD972D329353}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LayerComparerConsole", "LayerComparerConsole\LayerComparerConsole.csproj", "{65D9AC3F-9F15-4589-82B1-8911157FEEDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{0D577300-64F2-4063-9920-AD972D329353}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D577300-64F2-4063-9920-AD972D329353}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D577300-64F2-4063-9920-AD972D329353}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D9AC3F-9F15-4589-82B1-8911157FEEDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D9AC3F-9F15-4589-82B1-8911157FEEDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D9AC3F-9F15-4589-82B1-8911157FEEDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D9AC3F-9F15-4589-82B1-8911157FEEDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
