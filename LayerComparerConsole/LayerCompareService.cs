@@ -33,24 +33,25 @@ public class LayerCompareService : ILayerCompareService
     {
         get
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            var companyName = fvi.CompanyName;
-            var productName = fvi.ProductName;
-            var productVersion = fvi.ProductVersion;
+            var assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             var lines = new List<string>
             {
-                $"{productName} Version: {productVersion} ",
-                $"Author: {companyName}",
+                $"{fvi.ProductName} by {fvi.CompanyName}",
+                $"Version: {fvi.FileVersion} ({fvi.LegalCopyright})",
                 "",
-                "OGR/GDAL-based tool to validate geodata regarding OGC-Geometry-Error definitions",
-                "(https://www.opengeospatial.org/standards/sfa)",
+                "OGR/GDAL-based tool to compare two layers that are expected to be similar.",
+                "The comparison includes: ",
+                " 1. Layer-comparison: number of records, geometry-type, layer-type, projection, extent",
+                " 2. Schema-comparison (excl. oid, Shape_length, Shape_area)",
+                " 3. Feature-comparison: attribute-values, geometry",
                 "",
                 @"Log-files at:'C:\temp\LayerCompareConsole.[log|json]' ",
                 "","",
             };
             return lines;
+
         }
     }
 
@@ -88,17 +89,18 @@ public class LayerCompareService : ILayerCompareService
     }
 
 
-    public void Compare(string[] args)
+    public void Compare(string file1, string layer1, string file2, string layer2)
     {
+        _file1= file1;
+        _layer1= layer1;
+        _file2= file2;
+        _layer2= layer2;
+
         for (int i = 0; i < _config.GetValue<int>("LoopTimes"); i++)
         {
             // log the numbers
             _log.LogWarning("Compare number {runNumber}", i);  // structured logger stores var-ame and value extra
         }
-
-        ShowAbout();
-
-        ReadArgs(args);
 
         CompareLayer();
     }
@@ -114,25 +116,7 @@ public class LayerCompareService : ILayerCompareService
             Environment.Exit(0);
         }
 
-        foreach (string argument in args)
-        {
-            if (argument.StartsWith("/file1="))
-            {
-                _file1 = argument.Remove(0, 7).Replace(@"\\", @"\");
-            }
-            if (argument.StartsWith("/layer1="))
-            {
-                _layer1 = argument.Remove(0, 8).Replace(@"\\", @"\");
-            }
-            if (argument.StartsWith("/file2="))
-            {
-                _file2 = argument.Remove(0, 7).Replace(@"\\", @"\");
-            }
-            if (argument.StartsWith("/layer2="))
-            {
-                _layer2 = argument.Remove(0, 8).Replace(@"\\", @"\");
-            }
-        }
+
     }
 
 
@@ -217,7 +201,7 @@ public class LayerCompareService : ILayerCompareService
     }
 
 
-    private void ShowAbout()
+    public void ShowAbout()
     {
         foreach (var line in About) _log.LogInformation(line);
     }

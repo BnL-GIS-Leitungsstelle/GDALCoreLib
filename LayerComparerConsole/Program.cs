@@ -3,13 +3,7 @@ using System.IO;
 using Cocona;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Extensions.Logging;
-using Serilog.Sinks.SystemConsole;
-using Serilog.Enrichers;
-using Serilog.Sinks.File;
-using Serilog.Settings.Configuration;
 
 namespace LayerComparerConsole;
 
@@ -32,7 +26,7 @@ class Program
             .WriteTo.Console()
             .CreateLogger();
 
-        Log.Logger.Information("Application starting");
+       // Log.Logger.Information("Application starting");
 
 
         var builder = CoconaApp.CreateBuilder();
@@ -43,8 +37,8 @@ class Program
 
         var app = builder.Build();
 
-        // Definieren Sie einen Command, der ILayerCompareService verwendet
-        app.AddCommand("compare", (
+        // Definieren Sie einen anonymen Command (kein name), der ILayerCompareService als default-command verwendet
+        app.AddCommand((
             [Argument(Description = @"path to master GDB, e.g. G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\Auengebiete.gdb")]
             string masterGdbPath,
             [Argument(Description = "name of master layer to compare, e.g. N2017_Revision_Auengebiete_Anhang2_20171101")]
@@ -55,11 +49,9 @@ class Program
             string candidateLayer,
             ILayerCompareService layerCompareService) => // DI für ILayerCompareService
         {
+            layerCompareService.ShowAbout();
 
-            Console.WriteLine($"Running.. ");
-            // Verwenden Sie die Argumente und den Service, um die Logik auszuführen
-            //layerCompareService.Compare(args);
-            layerCompareService.Compare(new string[] { masterGdbPath, masterLayer, candidateGdbPath, candidateLayer });
+            layerCompareService.Compare( masterGdbPath, masterLayer, candidateGdbPath, candidateLayer );
 
             Console.WriteLine("Vergleich durchgeführt.");
 
