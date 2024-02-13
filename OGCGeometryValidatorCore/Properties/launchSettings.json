@@ -2,7 +2,7 @@
   "profiles": {
     "OGCGeometryValidatorCore": {
       "commandName": "Project",
-      "commandLineArgs": "/path=D:\\Analyse\\Flaechenstatistik_Generiert_OGR20220704_094301"
+      "commandLineArgs": "/path=G:\\BnL\\Daten\\Ablage\\Kantone\\GL-Biotop-Prototyp\\GL_Daten\\dataRepaired /attemptRepair=true"
     }
   }
 }

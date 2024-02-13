@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace OGCGeometryValidatorCore
+namespace OGCGeometryValidatorCore;
+
+public interface IGeometryValidatorService
 {
-    public interface IGeometryValidatorService
-    {
-        Task Run(string[] args);
-    }
+    Task Run(string[] args);
 }

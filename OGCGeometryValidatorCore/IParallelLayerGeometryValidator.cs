@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using OGCToolsNetCoreLib.Geometry;
+using GdalToolsLib.Geometry;
 
 namespace OGCGeometryValidatorCore;
 
