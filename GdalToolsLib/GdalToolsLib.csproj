@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GDAL" Version="3.8.1" />
-    <PackageReference Include="GDAL.Native" Version="3.8.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageReference Include="GDAL" Version="3.9.1" />
+    <PackageReference Include="GDAL.Native" Version="3.9.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
   </ItemGroup>
 

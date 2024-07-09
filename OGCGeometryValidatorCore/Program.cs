@@ -40,6 +40,14 @@ class Program
         // start the service in the host
         var svc = ActivatorUtilities.CreateInstance<GeometryValidatorService>(host.Services);
         await svc.Run(args);
+
+        Console.WriteLine("Prüfung durchgeführt.");
+
+        Console.WriteLine();
+        Console.WriteLine("Press ENTER to end..");
+        Console.ReadLine();
+
+
     }
 
     /// <summary>

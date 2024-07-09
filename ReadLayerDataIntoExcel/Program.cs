@@ -9,6 +9,8 @@ namespace ReadLayerDataIntoExcel;
 
 public class Program
 {
+    //       "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\Kantone\\GL-Biotop-Prototyp\\GL_Daten\\data\\checked_20240216_biotopflaechen_geometriekorrigiert_ktgl.gpkg"
+
     public static async Task Main(string[] args)
     {
         var builder = new ConfigurationBuilder()

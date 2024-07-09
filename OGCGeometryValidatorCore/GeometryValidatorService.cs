@@ -35,16 +35,13 @@ public class GeometryValidatorService : IGeometryValidatorService
     {
         get
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-            var companyName = fvi.CompanyName;
-            var productName = fvi.ProductName;
-            var productVersion = fvi.ProductVersion;
+            var assembly = Assembly.GetExecutingAssembly();
+            var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             var lines = new List<string>
             {
-                $"{productName} Version: {productVersion} ",
-                $"Author: {companyName}",
+                $"{fvi.ProductName} by {fvi.CompanyName}",
+                $"Version: {fvi.FileVersion} ({fvi.LegalCopyright})",
                 "",
                 "OGR/GDAL-based tool to validate geodata regarding OGC-Geometry-Error definitions",
                 "(https://www.opengeospatial.org/standards/sfa)",

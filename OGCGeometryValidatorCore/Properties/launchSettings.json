@@ -2,7 +2,7 @@
   "profiles": {
     "OGCGeometryValidatorCore": {
       "commandName": "Project",
-      "commandLineArgs": "/path=G:\\BnL\\Daten\\Ablage\\Kantone\\GL-Biotop-Prototyp\\GL_Daten\\dataRepaired /attemptRepair=true"
+      "commandLineArgs": "/path=G:\\BnL\\Daten\\Ablage\\Kantone\\GL-Biotop-Prototyp\\GL_Daten\\data /attemptRepair=false"
     }
   }
 }

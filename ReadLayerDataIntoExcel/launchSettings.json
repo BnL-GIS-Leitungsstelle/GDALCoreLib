@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Fauna\\KARCH\\Amphibienzugstellen\\Zugstellen2023\\inputKARCH\\Konfliktstelle_20231207.gpkg"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Fauna\\KARCH\\priorisierteStreckenEntlangDerEisenbahnlinienFuerDieReptilien\\data\\ZugverkehrReptilienkonflikte.gdb"
     }
   }
 }
