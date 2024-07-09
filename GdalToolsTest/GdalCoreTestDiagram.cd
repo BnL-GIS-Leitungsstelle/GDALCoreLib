@@ -10,56 +10,50 @@
   <Class Name="GdalCoreTest.CommonDataInfoTests">
     <Position X="8" Y="0.5" Width="3" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAIAAAAAAAAAAAAABAAAAAAAAAEAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAEAAAIAAAAgAAAAAAAABAAAAAAAAAEAAAAAAAAAAA=</HashCode>
       <FileName>CommonDataInfoTests.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GdalCoreTest.OgcCoreToolsDataAccessTests">
     <Position X="11.25" Y="0.5" Width="3.5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAAAAAAAAAgAAAAAAAgCAAAAAAAAAAAIAAABAA=</HashCode>
+      <HashCode>AAAEAAAAAAAAIAAgAAAAAAAgCAAAAEAAAAAAIAAABAA=</HashCode>
       <FileName>OgcCoreToolsDataAccessTests.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="GdalCoreTest.OgcCoreToolsLayerAccessTests">
-    <Position X="11.25" Y="3.25" Width="3.5" />
+    <Position X="10.5" Y="3.75" Width="4.25" />
     <TypeIdentifier>
-      <HashCode>AAAFAAAEAAAAAAAAAAAAAAAAQABAAAAgAAAFAAAAAAA=</HashCode>
+      <HashCode>AAAFAACEAAAAAAAAAACAAAAAQABAAAAgAAAFAAAAAAA=</HashCode>
       <FileName>OgcCoreToolsLayerAccessTests.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="GdalCoreTest.OgcCoreToolsTests">
-    <Position X="0.5" Y="0.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>OgcCoreToolsTests.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="GdalCoreTest.OgcCoreToolsCheckGeometryTests">
-    <Position X="2.75" Y="2.75" Width="5" />
+    <Position X="0.5" Y="3.5" Width="5" />
     <TypeIdentifier>
-      <HashCode>AAAEAAAIAFAAAAAAACAAAAAAAAAABAAAAAgAAAAACAA=</HashCode>
+      <HashCode>AAAEAAQIAFAAAAAAACAAAAAAAAAgBAAAAAgAAAAACAA=</HashCode>
       <FileName>OgcCoreToolsCheckGeometryTests.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GdalCoreTest.Helper.TestDataPathProvider">
-    <Position X="0.5" Y="2.5" Width="2" />
+    <Position X="0.5" Y="0.5" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAgBAAAAAAAAAAAgAAEIQAIAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAgBAAAAAACAAAAgAAEIQAIAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Helper\TestDataPathProvider.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GdalCoreTest.OgcCoreToolsOgctLayerTests">
-    <Position X="8" Y="2.75" Width="3" />
+    <Position X="5.75" Y="3" Width="4" />
     <TypeIdentifier>
       <HashCode>AAAEAAAIAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>OgcCoreToolsOgctLayerTests.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="GdalCoreTest.OgcCoreToolsLayerProcessorTests">
-    <Position X="8" Y="5" Width="3" />
+    <Position X="5.75" Y="5" Width="4" />
     <TypeIdentifier>
-      <HashCode>AAAEgBAAQABAAAAQAIAAAQAAAQAQBAAAAAAACgABAAA=</HashCode>
+      <HashCode>AAAEgBAAQABAAAAQEIAAAQAAAQAQBAAAAAAACgABAAA=</HashCode>
       <FileName>OgcCoreToolsLayerProcessorTests.cs</FileName>
     </TypeIdentifier>
   </Class>
