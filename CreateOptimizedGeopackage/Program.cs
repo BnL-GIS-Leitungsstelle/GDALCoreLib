@@ -16,7 +16,7 @@ public class Program
         gpkgDef.Path = @"C:\temp";
 
         using var ds =
-            new GeoDataSourceAccessor().CreateDatasource(Path.Combine(gpkgDef.Path, gpkgDef.Name + ".gpkg"), null);
+            new GeoDataSourceAccessor().CreateAndOpenDatasource(Path.Combine(gpkgDef.Path, gpkgDef.Name + ".gpkg"), null);
 
         foreach (var layerDef in gpkgDef.LayersDetailsList)
         {

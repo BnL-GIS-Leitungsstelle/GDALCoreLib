@@ -8,14 +8,6 @@ namespace GdalToolsLib.DataAccess;
 
 public interface IGeoDataSourceAccessor
 {
-    List<string> GetGdalVersionInfo();
-
-    /// <summary>
-    /// Version 3.3.3 of MaxRef.Gdal.Core provides more drivers ans retired some old
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    List<string> GetAvailableDrivers();
 
     /// <summary>
     /// valid dataformats are Geopackage, Filegeodatabase (ReadOnly) and Shape TODO: explain folder vs file.
@@ -27,12 +19,12 @@ public interface IGeoDataSourceAccessor
     /// <param name="geometryType">only on creation of SHP-file</param>
 
     /// <returns></returns>
-    OgctDataSource OpenDatasource(string? path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
+    OgctDataSource OpenDatasource(string? path, EAccessLevel accessLevel = EAccessLevel.ReadOnly, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
 
     public OgctDataSource CreateAndOpenInMemoryDatasource();
 
-    OgctDataSource CreateAndOpenDatasource(string? path, ESpatialRefWkt spatialRef,
+    OgctDataSource CreateAndOpenDatasource(string? pathAndFilename, ESpatialRefWkt spatialRefEnum,
         wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
     /// <summary>
@@ -42,7 +34,7 @@ public interface IGeoDataSourceAccessor
     /// <param name="spatialRef">must be defined, when creating a shapefile</param>
     /// <param name="geometryType">must be defined, when creating a shapefile</param>
     /// <returns></returns>
-    OgctDataSource CreateDatasource(string? pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
+    OgctDataSource CreateAndOpenDatasource(string? pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone);
 
     /// <summary>
     /// the methods uses standard .net methods to copy the datasource. No gdal-functionality is used.
@@ -64,7 +56,7 @@ public interface IGeoDataSourceAccessor
     void DeleteDatasource(string? path);
 
     int GetVectorLayerCount(string? file);
-    IEnumerable<object[]> GetSupportedVectorData(string directory, bool ignoreShpFolder);
+    IEnumerable<object[]> GetPathNamesOfSupportedVectordataFormats(string directory, bool ignoreShpFolder);
 
     /// <summary>
     /// 

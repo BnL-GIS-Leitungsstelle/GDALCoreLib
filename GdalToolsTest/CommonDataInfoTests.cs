@@ -1,5 +1,6 @@
 using GdalCoreTest.Helper;
 using GdalToolsLib;
+using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using OSGeo.GDAL;
 using OSGeo.OGR;
@@ -21,16 +22,7 @@ namespace GdalCoreTest
             GdalConfiguration.ConfigureGdal();
         }
 
-        [Fact]
-        public void GdalInfoTest()
-        {
-            var dataAccessor = new GeoDataSourceAccessor();
 
-            foreach (var info in dataAccessor.GetGdalVersionInfo())
-            {
-                _outputHelper.WriteLine(info);
-            }
-        }
 
 
         [Theory]

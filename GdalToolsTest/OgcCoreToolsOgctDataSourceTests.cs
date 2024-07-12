@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using GdalCoreTest.Helper;
 using GdalCoreTest.SqlStatements;
@@ -193,7 +192,7 @@ namespace GdalCoreTest
 
             string layerName = String.Empty;
 
-            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true))
+            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
             {
                 var layernames = dataSource.GetLayerNames();
 
@@ -216,7 +215,7 @@ namespace GdalCoreTest
                 dataSource.RenameLayerGpkg(layerName, $"{layerName}ToBeDeleted");
             }
 
-            using (var dataSourceReopened = new GeoDataSourceAccessor().OpenDatasource(file, true))
+            using (var dataSourceReopened = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
             {
                 Assert.True(dataSourceReopened.HasLayer($"{layerName}ToBeDeleted"));
                 Assert.False(dataSourceReopened.HasLayer(layerName));
@@ -257,7 +256,7 @@ namespace GdalCoreTest
             string firstLayerName = String.Empty;
             int layerCountExpected = 0;
 
-            using (var ds = new GeoDataSourceAccessor().OpenDatasource(file, true))
+            using (var ds = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
             {
                 var layernames = ds.GetLayerNames();
 
@@ -287,7 +286,7 @@ namespace GdalCoreTest
             }
 
 
-            using (var dsReOpened = new GeoDataSourceAccessor().OpenDatasource(file, true))
+            using (var dsReOpened = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
             {
                 Assert.True(dsReOpened.HasLayer($"{firstLayerName}Renamed"));
                 Assert.False(dsReOpened.HasLayer(firstLayerName));
@@ -295,7 +294,7 @@ namespace GdalCoreTest
                 dsReOpened.RenameLayerGpkg($"{firstLayerName}Backup", firstLayerName);
             }
 
-            using (var dsReOpened = new GeoDataSourceAccessor().OpenDatasource(file, true))
+            using (var dsReOpened = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
             {
                 Assert.True(dsReOpened.HasLayer(firstLayerName));
                 Assert.False(dsReOpened.HasLayer($"{firstLayerName}Backup"));

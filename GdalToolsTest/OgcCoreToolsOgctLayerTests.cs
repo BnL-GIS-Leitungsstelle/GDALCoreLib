@@ -43,7 +43,7 @@ namespace GdalCoreTest
                 return;
             }
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true);
+            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -132,7 +132,7 @@ namespace GdalCoreTest
                 return;
             }
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true);
+            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)

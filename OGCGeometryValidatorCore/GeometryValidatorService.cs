@@ -124,7 +124,7 @@ public class GeometryValidatorService : IGeometryValidatorService
     {
         _log.LogInformation("Examine file {file}", fileName);  // structured logger stores var-name and value extra
 
-        using var dataSource = new GeoDataSourceAccessor().OpenDatasource(fileName, attemptRepair);
+        using var dataSource = new GeoDataSourceAccessor().OpenDatasource(fileName, EAccessLevel.Full);
         var layerNames = dataSource.GetLayerNames();
 
         foreach (var layerName in layerNames)
@@ -192,7 +192,7 @@ public class GeometryValidatorService : IGeometryValidatorService
 
     private void GetSupportedVectorDataFilesInDirectory()
     {
-        foreach (var fileItem in new GeoDataSourceAccessor().GetSupportedVectorData(_startpath, true))
+        foreach (var fileItem in new GeoDataSourceAccessor().GetPathNamesOfSupportedVectordataFormats(_startpath, true))
         {
             _fileList.Add(fileItem[0] as string);
         }

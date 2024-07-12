@@ -124,7 +124,7 @@ namespace GdalCoreTest
 
             if (supportedDatasource.Access == EAccessLevel.Full)
             {
-                using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true, true, ESpatialRefWkt.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
+                using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
 
                 if (supportedDatasource.Type == EDataSourceType.SHP)
                 {
@@ -163,13 +163,13 @@ namespace GdalCoreTest
             {
                 Assert.Throws<DataSourceReadOnlyException>(() =>
                 {
-                    using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true, true, ESpatialRefWkt.CH1903plus_LV95,
+                    using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95,
                             wkbGeometryType.wkbPolygon);
                 });
                 return;
             }
 
-            using var source = new GeoDataSourceAccessor().OpenDatasource(file, true, true, ESpatialRefWkt.CH1903plus_LV95,
+            using var source = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95,
                 wkbGeometryType.wkbPolygon);
 
             if (supportedDatasource.Type == EDataSourceType.SHP)
@@ -221,7 +221,7 @@ namespace GdalCoreTest
 
 
 
-                using var targetDataSource = new GeoDataSourceAccessor().OpenDatasource(fileOut, true, true, ESpatialRefWkt.CH1903plus_LV95);
+                using var targetDataSource = new GeoDataSourceAccessor().OpenDatasource(fileOut, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95);
 
                 using var targetLayer = targetDataSource.OpenLayer(targetDataSource.GetLayerNames().First());
                 if (hasBinaryField || hasTooLongFieldNamesThatAreIndistinguishableWhenShortened)
@@ -280,7 +280,7 @@ namespace GdalCoreTest
 
                     string outputFile = Path.Combine(outputdirectory, outputFileName);
 
-                    using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, true, true, ESpatialRefWkt.CH1903plus_LV95);
+                    using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95);
 
                     layer.CopyToLayer(outputDatasource, layerInfo.Name,
                         recordsLimitToCopy * i, recordsLimitToCopy * (i - 1));
@@ -316,7 +316,7 @@ namespace GdalCoreTest
 
                 sourceLayer.CopyToLayer(dataSource, layerInfo.Name + "_copy");
 
-                using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(file, true, false, ESpatialRefWkt.CH1903plus_LV95);
+                using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full, false, ESpatialRefWkt.CH1903plus_LV95);
                 sourceLayer.CopyToLayer(outputDatasource, layerInfo.Name + "_copy_Output");
 
 
@@ -358,7 +358,7 @@ namespace GdalCoreTest
 
                     string outputFile = Path.Combine(outputdirectory, outputFileName);
 
-                    using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, true, true, ESpatialRefWkt.CH1903plus_LV95);
+                    using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95);
 
                     layer.CopyToLayer(outputDatasource, layerInfo.Name,
                         recordsLimitToCopy * i, recordsLimitToCopy * (i - 1));

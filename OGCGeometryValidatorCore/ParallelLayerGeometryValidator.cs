@@ -91,7 +91,6 @@ internal class ParallelLayerGeometryValidator : IParallelLayerGeometryValidator
     /// </summary>
     /// <param name="fileName"></param>
     /// <param name="layerName"></param>
-    /// <param name="limit">number of records per chunk-file</param>
     /// <returns>the list of separate part-files</returns>
     /// <exception cref="NotImplementedException"></exception>
     private List<(string fileName, string layerName)> ChunkLargeLayerIntoFilesByRecords(string fileName, string layerName)
@@ -120,7 +119,7 @@ internal class ParallelLayerGeometryValidator : IParallelLayerGeometryValidator
 
             if (File.Exists(outputFile) == false) // don't overwrite existing files
             {
-                using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, true, true);
+                using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, EAccessLevel.Full, true);
                 _log.LogInformation(" --  write chunk file {file} ({limit} records, starting at {offset}) in {folder}", outputFileName, _limit, offset, tempDirectory);
                 layer.CopyToLayer(outputDatasource, layerInfo.Name,
                     _limit, offset);

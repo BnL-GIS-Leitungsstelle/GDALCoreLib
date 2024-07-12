@@ -222,7 +222,7 @@ namespace GdalCoreTest
             var workSourceName = $"{Guid.NewGuid()}.gpkg";
             var workPath =
                 new GeoDataSourceAccessor().CopyDatasource(masterPath, basePath, workSourceName);
-            var dataSource = new GeoDataSourceAccessor().OpenDatasource(workPath,true);
+            var dataSource = new GeoDataSourceAccessor().OpenDatasource(workPath, EAccessLevel.Full);
             var layer = dataSource.OpenLayer("GeometryErrorRingSelfIntersects45_SpRefLV03_epsg_rec");
             var result = await layer.ValidateGeometryAsync();
             result.IsValid.Should().BeFalse();

@@ -425,7 +425,7 @@ namespace GdalCoreTest
 
                     var dataSourceType = SupportedDatasource.GetSupportedDatasource(resultFile);
 
-                    using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true);
+                    using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
 
                     var layerNames = dataSource.GetLayerNames();
 
@@ -609,7 +609,7 @@ namespace GdalCoreTest
             if (supportedDatasource.Access == EAccessLevel.ReadOnly)
                 return;
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true);
+            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
 
             var layerNames = dataSource.GetLayerNames();
 
@@ -750,7 +750,7 @@ namespace GdalCoreTest
             if (file.EndsWith("GeoprocessingTestData.gpkg") == false) return;
 
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, true);
+            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
 

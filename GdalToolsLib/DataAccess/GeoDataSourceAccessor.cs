@@ -31,56 +31,12 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
         }
     }
 
-    public List<string> GetGdalVersionInfo()
-    {
-        var gdalInfo = new GdalInfo();
-        var info = new List<string>
-        {
-            "GDAL configured:",
-            $"WorkDir= {gdalInfo.WorkingDirectory}",
-            $"Package-Version= {gdalInfo.PackageVersion}",
-            $"Gdal   -Version= {gdalInfo.Version}",
-            $"Gdal   -Info= {gdalInfo.Version}",
-            $"Currently supported drivers"
-        };
-
-        foreach (var source in SupportedDatasource.Datasources)
-        {
-            info.Add($"{source.OgrDriverName,15} Access: {source.Access} Type: {source.Type}");
-        }
-
-        return info;
-    }
-
-
-    #region drivers installed
-
-    /// <summary>
-    /// Version 3.3.3 of MaxRef.Gdal.Core provides more drivers ans retired some old
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public List<string> GetAvailableDrivers()
-    {
-        var driversImplemented = new List<string>();
-
-        for (int i = 0; i < Gdal.GetDriverCount(); i++)
-        {
-            var driver = Gdal.GetDriver(i);
-            driversImplemented.Add(driver.ShortName);
-        }
-
-        return driversImplemented;
-    }
-
-
-    #endregion
-
 
     #region Open
 
     /// <summary>
-    /// valid dataformats are Geopackage, Filegeodatabase (ReadOnly) and Shape TODO: explain folder vs file.
+    /// valid dataformats are Geopackage, Filegeodatabase and Shape
+    /// TODO: SHP-> explain folder vs file.
     /// </summary>
     /// <param name="path"></param>
     /// <param name="writePermissions"></param>
@@ -89,39 +45,36 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     /// <param name="geometryType">only on creation of SHP-file</param>
 
     /// <returns></returns>
-    public OgctDataSource OpenDatasource(string? path, bool writePermissions = false, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
+    public OgctDataSource OpenDatasource(string? path,EAccessLevel accessLevel = EAccessLevel.ReadOnly, bool createIfNotExist = false, ESpatialRefWkt spRef = ESpatialRefWkt.None, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
     {
         var supportedDatasource = SupportedDatasource.GetSupportedDatasource(path);
+        
         OgctDataSource dataSource = null;
-        if (SupportedDatasource.Exists(supportedDatasource, path) == false)
-        {
-            if (createIfNotExist == false) // open, but is missing
-            {
-                throw new Exception($"datasource does not exist, {path}");
-            }
 
+        bool dataSourceExists = SupportedDatasource.Exists(supportedDatasource, path);
+
+        if (dataSourceExists == false)
+        {
+            if (!createIfNotExist) throw new Exception($"datasource does not exist, {path}");
+            
+            // create, if not exists
             if (supportedDatasource.Type == EDataSourceType.SHP)
             {
-                dataSource = CreateDatasource(path, new SpatialReference(spRef.GetEnumDescription(typeof(ESpatialRefWkt))),
+                return CreateAndOpenDatasource(path, new SpatialReference(spRef.GetEnumDescription(typeof(ESpatialRefWkt))),
                     geometryType);
             }
-            else
-            {
-                dataSource = CreateDatasource(path, null);
-            }
+
+            return CreateAndOpenDatasource(path, null);
         }
 
-        if (dataSource != null)
-        {
-            return dataSource;
-        }
-        var ds = Ogr.Open(path, writePermissions ? 1 : 0);
+
+        var ds = Ogr.Open(path, accessLevel == EAccessLevel.Full ? 1 : 0);
+        
         if (ds == null)  // fgdb is empty or contains only raster-files
         {
-            Console.WriteLine("Could not open the FGDB: its empty, broken or contains only raster-featureclasses");
-            return null;
+            throw new NotSupportedException("Cannot open empty FGDB: its broken or contains only raster-featureclasses");
         }
-        
+
         return new OgctDataSource(ds);
     }
 
@@ -130,25 +83,35 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
     {
         using OSGeo.OGR.Driver inMemoryDriver = Ogr.GetDriverByName("Memory");
 
-        return new OgctDataSource(inMemoryDriver.CreateDataSource(Guid.NewGuid() + ".inMemory", new string[0]));
+        return new OgctDataSource(inMemoryDriver.CreateDataSource(Guid.NewGuid() + ".inMemory", []));
 
     }
 
 
-    public OgctDataSource CreateAndOpenDatasource(string? path, ESpatialRefWkt spatialRef,
+    /// <summary>
+    /// valid dataformats are Geopackage, Filegeodatabase and Shape.
+    /// Deletes an existing datasource!
+    /// </summary>
+    /// <param name="pathAndFilename"></param>
+    /// <param name="spatialRefEnum">must be defined, when creating a shapefile</param>
+    /// <param name="geometryType">must be defined, when creating a shapefile</param>
+    /// <returns></returns>
+    public OgctDataSource CreateAndOpenDatasource(string? pathAndFilename, ESpatialRefWkt spatialRefEnum,
         wkbGeometryType geometryType = wkbGeometryType.wkbNone)
     {
-        return CreateDatasource(path, new SpatialReference(spatialRef.GetEnumDescription(typeof(ESpatialRefWkt))), geometryType);
+        return CreateAndOpenDatasource(pathAndFilename, new SpatialReference(spatialRefEnum.GetEnumDescription(typeof(ESpatialRefWkt))), geometryType);
     }
 
     /// <summary>
     /// valid dataformats are Geopackage, Filegeodatabase and Shape.
+    /// Deletes an existing datasource!
     /// </summary>
     /// <param name="pathAndFilename"></param>
     /// <param name="spatialRef">must be defined, when creating a shapefile</param>
     /// <param name="geometryType">must be defined, when creating a shapefile</param>
     /// <returns></returns>
-    public OgctDataSource CreateDatasource(string? pathAndFilename, SpatialReference spatialRef, wkbGeometryType geometryType = wkbGeometryType.wkbNone)
+    public OgctDataSource CreateAndOpenDatasource(string? pathAndFilename, SpatialReference spatialRef, 
+        wkbGeometryType geometryType = wkbGeometryType.wkbNone)
     {
         var supportedDs = SupportedDatasource.GetSupportedDatasource(pathAndFilename);
 
@@ -157,27 +120,28 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
             throw new DataSourceReadOnlyException($"no create method implemented for this format: {supportedDs.Type}");
         }
 
-        //   string outputPath = Path.GetDirectoryName(pathAndFilename);
-
-
         switch (supportedDs.FileType)
         {
             case EFileType.Folder when supportedDs.Type is EDataSourceType.SHP_FOLDER:
 
                 var shpDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
                 var shpLayerName = Path.GetFileNameWithoutExtension(pathAndFilename);
-                //pathAndFilename = Path.Combine(pathAndFilename, shpLayerName+".shp");
-                var dsDataSource = new OgctDataSource(shpDriver.CreateDataSource(pathAndFilename, new string[] { }));
 
-                dsDataSource.OgrDataSource.CreateLayer(shpLayerName, spatialRef, geometryType, new string[] { }).Dispose();
+                if (Directory.Exists(pathAndFilename)) Directory.Delete(pathAndFilename);  // delete, if exists
+
+                var dsDataSource = new OgctDataSource(shpDriver.CreateDataSource(pathAndFilename, []));
+
+                dsDataSource.OgrDataSource.CreateLayer(shpLayerName, spatialRef, geometryType, []).Dispose();
 
                 return dsDataSource;
 
 
             case EFileType.Folder when supportedDs.Type is EDataSourceType.OpenFGDB:
-                if (Directory.Exists(pathAndFilename)) Directory.Delete(pathAndFilename);  // deletes the fgdb
+                
+                if (Directory.Exists(pathAndFilename)) Directory.Delete(pathAndFilename);  // delete, if exists
 
                 var gdbDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
+
                 return new OgctDataSource(gdbDriver.CreateDataSource(pathAndFilename, new string[] { }));
 
 
@@ -190,10 +154,10 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
                 if (Directory.Exists(Path.GetDirectoryName(pathAndFilename)) == false)
                     Directory.CreateDirectory(Path.GetDirectoryName(pathAndFilename));
 
-                if (File.Exists(pathAndFilename)) File.Delete(pathAndFilename); // deletes the gpkg 
+                if (File.Exists(pathAndFilename)) File.Delete(pathAndFilename); // deletes the gpkg, if exists
 
                 var gpkgDriver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
-                return new OgctDataSource(gpkgDriver.CreateDataSource(pathAndFilename, new string[] { }));
+                return new OgctDataSource(gpkgDriver.CreateDataSource(pathAndFilename, []));
 
 
             case EFileType.MultiFile:
@@ -204,18 +168,18 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
                 if (Directory.Exists(Path.GetDirectoryName(pathAndFilename)) == false)
                     Directory.CreateDirectory(Path.GetDirectoryName(pathAndFilename));
+
                 DeleteDatasource(pathAndFilename); // delete all known shape-file sub-formats, if shp already exists
 
                 var driver = Ogr.GetDriverByName(supportedDs.OgrDriverName);
                 var dataSource = new OgctDataSource(driver.CreateDataSource(pathAndFilename, new string[] { }));
                 var layerName = Path.GetFileNameWithoutExtension(pathAndFilename);
 
-                using (var layer = dataSource.OgrDataSource.CreateLayer(layerName, spatialRef, geometryType,
-                           new string[] { }))
+                using (var layer = dataSource.OgrDataSource.CreateLayer(layerName, spatialRef, geometryType, []))
                 {
 
                 }
-                    
+
                 return dataSource;
 
             default:
@@ -225,7 +189,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
 
     /// <summary>
-    /// the methods uses standard .net methods to copy the datasource. No gdal-functionality is used.
+    /// the methods uses standard .net methods to copy the datasource. N= gdal-functionality is used.
     /// depending on the filetype of the datasource, the copy-process is adopted to the special needs,
     /// eg. shp consists of many files, that needs all to be copied.
     /// </summary>
@@ -239,11 +203,9 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
         string dir = Path.GetDirectoryName(inputFile);
 
-        // create new dir for outputDir, i case it does not exist
-        if (Directory.Exists(outDir) == false)
-        {
+        if (Directory.Exists(outDir) == false) // create outputDir, if not exists
             Directory.CreateDirectory(outDir);
-        }
+        
 
         switch (dataSourceType.FileType)
         {
@@ -352,21 +314,19 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
     public int GetVectorLayerCount(string? file)
     {
-        using (var ds = OpenDatasource(file))
-        {
-            return ds.GetLayerCount();
-        }
+        using var ds = OpenDatasource(file);
+        return ds.GetLayerCount();
     }
 
     #endregion
 
     /// <summary>
-    /// 
+    /// sed to scan whole directories to find datasources that can be processed
     /// </summary>
     /// <param name="directory"></param>
     /// <param name="ignoreShpFolder"></param>
     /// <returns></returns>
-    public IEnumerable<object[]> GetSupportedVectorData(string directory, bool ignoreShpFolder = false)
+    public IEnumerable<object[]> GetPathNamesOfSupportedVectordataFormats(string directory, bool ignoreShpFolder = false)
     {
         var names = new List<object>();
 
@@ -388,7 +348,7 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
 
     /// <summary>
-    /// 
+    /// gets the projection of a datasource as string in a specific format used in Gdal
     /// </summary>
     /// <param name="file"></param>
     /// <returns></returns>
@@ -398,14 +358,18 @@ public class GeoDataSourceAccessor : IGeoDataSourceAccessor
 
         string wkt = dataset.GetProjection();
 
-        using var spatialReference = new OSGeo.OSR.SpatialReference(wkt);
+        using var spatialReference = new SpatialReference(wkt);
 
         spatialReference.ExportToProj4(out string projString);
 
         return projString;
     }
 
-
+    /// <summary>
+    /// return information on raster data of a datasource 
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
     public string GetGdalInfoRaster(string file)
     {
         using var inputDataset = Gdal.Open(file, Access.GA_ReadOnly);
