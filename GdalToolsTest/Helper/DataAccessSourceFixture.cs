@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using GdalCoreTest.Helper;
 
@@ -19,20 +20,25 @@ namespace GdalToolsTest.Helper;
 /// </summary>
 public class DataAccessSourceFixture : IDisposable
 {
-    public string PathToCleanup { get; private set; }
+    public List<string> PathesToCleanup { get; private set; } = new();
 
 
     public DataAccessSourceFixture()
     {
         string testDataFolder = TestDataPathProvider.GetTestDataFolder(TestDataPathProvider.TestDataFolderVector);
 
-        SetPathToCleanup(testDataFolder);
+        var subfolders = new List<string>() {"created", "copied", "copy_and_delete"};
+
+        SetPathToCleanup(testDataFolder, subfolders);
     }
 
 
-    private void SetPathToCleanup(string testDataFolder)
+    private void SetPathToCleanup(string testDataFolder, List<string> subfolders)
     {
-        PathToCleanup = Path.Combine(testDataFolder, "created");
+        foreach (var subfolder in subfolders)
+        {
+            PathesToCleanup.Add(Path.Combine(testDataFolder, subfolder));
+        }
     }
 
     /// <summary>
@@ -40,9 +46,12 @@ public class DataAccessSourceFixture : IDisposable
     /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(PathToCleanup))
+        foreach (var path in PathesToCleanup)
         {
-            Directory.Delete(PathToCleanup,true);
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path,true);
+            }
         }
     }
 }

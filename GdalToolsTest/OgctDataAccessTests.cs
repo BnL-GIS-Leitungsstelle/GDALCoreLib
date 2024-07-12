@@ -87,9 +87,10 @@ public class OgctDataAccessTests : IClassFixture<DataAccessSourceFixture>
 
         Assert.True(File.Exists(resultFile) || Directory.Exists(resultFile));
 
-        var dataSource = new GeoDataSourceAccessor().OpenDatasource(resultFile);
-
-        Assert.NotNull(dataSource);
+        using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(resultFile))
+        {
+             Assert.NotNull(dataSource);
+        }
     }
 
     [Theory]
