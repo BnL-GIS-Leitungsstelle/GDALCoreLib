@@ -12,6 +12,8 @@ public class LayerDetails
 
     public wkbGeometryType GeomType { get; private set; }
 
+    public string FidColumnName  { get; private set; } 
+
     public ELayerType LayerType { get; private set; }
 
 
@@ -99,6 +101,7 @@ public class LayerDetails
     {
         var ogrLayer = ((OgctLayer)layer).OgrLayer;
         GeomType = ogrLayer.GetLayerDefn().GetGeomType();
+        FidColumnName =ogrLayer.GetFIDColumn();
         SetLayerType();
         //SpatialRef = layer.GetSpatialRef();
         Projection = new LayerSpatialRef(ogrLayer);

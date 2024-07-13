@@ -22,7 +22,7 @@ public class LayerTestFixture : IDisposable
     {
         string testDataFolder = TestDataPathProvider.GetTestDataFolder(TestDataPathProvider.TestDataFolderVector);
 
-        var subfolders = new List<string>() {"copiedLayer", "copiedLayers", "copiedPartedLayer", "copiedLayerToShp"};
+        var subfolders = new List<string>() {"copiedLayer", "copiedLayers", "copiedLayerToFgdb", "copiedLayerToGpkg", "copiedLayerToShp"};
 
         SetPathToCleanup(testDataFolder, subfolders);
     }

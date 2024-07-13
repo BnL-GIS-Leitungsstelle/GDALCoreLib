@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Xml.XPath;
 using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Exceptions;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
 using OSGeo.OGR;
+using OSGeo.OSR;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
@@ -44,61 +46,60 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
         var outputFullFilename = Path.Combine(outputdir, $"{memberLayerName}.shp");
 
         var supportedDatasource = SupportedDatasource.GetSupportedDatasource(outputFullFilename);
-        
 
         _output.WriteLine($"Copy layer {memberLayerName} in {Path.GetFileName(file)} to shp-file {Path.GetFileName(outputFullFilename)}.");
 
         switch (supportedDatasource.Access)
         {
             case EAccessLevel.Full:
-            {
-                using var memberLayer = memberDataSource.OpenLayer(memberLayerName);
-
-                // check for data structures, that are not supported by shapefile-output
-                var hasBinaryField =
-                    memberLayer.LayerDetails.Schema.FieldList.Any(field => field.Type == FieldType.OFTBinary);
-
-                //var listShortenedFieldnames = memberLayer.LayerDetails.Schema.FieldList
-                //    .Select(field => field.Name.Substring(0, Math.Min(10, field.Name.Length))).Distinct();
-
-                //var hasTooLongFieldNamesThatAreIndistinguishableWhenShortened =
-                //    listShortenedFieldnames.Count() != memberLayer.LayerDetails.Schema.FieldList.Count;
-
-                if(memberLayer.IsGeometryType() == false)
                 {
-                    Assert.Throws<NotSupportedException>(() =>
+                    using var memberLayer = memberDataSource.OpenLayer(memberLayerName);
+
+                    // check for data structures, that are not supported by shapefile-output
+                    var hasBinaryField =
+                        memberLayer.LayerDetails.Schema.FieldList.Any(field => field.Type == FieldType.OFTBinary);
+
+                    //var listShortenedFieldnames = memberLayer.LayerDetails.Schema.FieldList
+                    //    .Select(field => field.Name.Substring(0, Math.Min(10, field.Name.Length))).Distinct();
+
+                    //var hasTooLongFieldNamesThatAreIndistinguishableWhenShortened =
+                    //    listShortenedFieldnames.Count() != memberLayer.LayerDetails.Schema.FieldList.Count;
+
+                    if (memberLayer.IsGeometryType() == false)
                     {
-                        using var targetDataSource = new OgctDataSourceAccessor().
-                            OpenOrCreateDatasource(outputFullFilename, EAccessLevel.Full, true, 
-                                memberLayer.GetSpatialRef(), memberLayer.LayerDetails.GeomType);
-                    });
+                        Assert.Throws<NotSupportedException>(() =>
+                        {
+                            using var targetDataSource = new OgctDataSourceAccessor().
+                                OpenOrCreateDatasource(outputFullFilename, EAccessLevel.Full, true,
+                                    memberLayer.GetSpatialRef(), memberLayer.LayerDetails.GeomType);
+                        });
+
+                        break;
+                    }
+
+
+                    using var targetDataSource = new OgctDataSourceAccessor().
+                        OpenOrCreateDatasource(outputFullFilename, EAccessLevel.Full, true,
+                            memberLayer.GetSpatialRef(), memberLayer.LayerDetails.GeomType);
+
+                    using var targetLayer = targetDataSource.OpenLayer(targetDataSource.GetLayerNames().First());
+                    if (hasBinaryField) // || hasTooLongFieldNamesThatAreIndistinguishableWhenShortened)
+                    {
+                        Assert.Throws<ApplicationException>(() => memberLayer.CopyToLayer(targetLayer));
+                    }
+                    else if (targetLayer.DataSource.SupportInfo.Type == EDataSourceType.SHP && targetLayer.IsGeometryType() == false)
+                    {
+                        Assert.Throws<NotSupportedException>(() => memberLayer.CopyToLayer(targetLayer));
+                    }
+                    else
+                    {
+                        memberLayer.CopyToLayer(targetLayer);  //oft leer in arcgis: "could not find spatial index at -1"
+                    }
+                    Assert.True(true); // dummy to ensure, no exception is thrown
+
 
                     break;
                 }
-                    
-
-                using var targetDataSource = new OgctDataSourceAccessor().
-                    OpenOrCreateDatasource(outputFullFilename, EAccessLevel.Full, true, 
-                        memberLayer.GetSpatialRef(), memberLayer.LayerDetails.GeomType);
-
-                using var targetLayer = targetDataSource.OpenLayer(targetDataSource.GetLayerNames().First());
-                if (hasBinaryField) // || hasTooLongFieldNamesThatAreIndistinguishableWhenShortened)
-                {
-                    Assert.Throws<ApplicationException>(() => memberLayer.CopyToLayer(targetLayer));
-                }
-                else if(targetLayer.DataSource.SupportInfo.Type == EDataSourceType.SHP && targetLayer.IsGeometryType() == false)
-                {
-                    Assert.Throws<NotSupportedException>(() => memberLayer.CopyToLayer(targetLayer));
-                }
-                else
-                {
-                    memberLayer.CopyToLayer(targetLayer);  //oft leer in arcgis: "could not find spatial index at -1"
-                }
-                Assert.True(true); // dummy to ensure, no exception is thrown
-
-
-                break;
-            }
 
             case EAccessLevel.ReadOnly:
                 Assert.Throws<DataSourceReadOnlyException>(() =>
@@ -120,38 +121,65 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
     /// <param name="file"></param>
     [Theory]
     [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
-    public void CopyLayerByRecordFilter_WithValidFiles_toGpkg_IsWorking(string file)
+    public void CopyLayer2Gpkg_WithValidFiles_IsWorking(string file)
     {
-        string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "copiedPartedLayer");
+        var memberDatasource = SupportedDatasource.GetSupportedDatasource(file);
 
-        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
+        string outputdir = Path.Combine(Path.GetDirectoryName(file), "copiedLayerToGpkg");
 
-        var layerNames = dataSource.GetLayerNames();
+        string outputFullFilename = String.Empty;
 
-        foreach (var layerName in layerNames)
+        switch (memberDatasource.Type)
         {
-            using var layer = dataSource.OpenLayer(layerName);
-            var layerInfo = layer.LayerDetails;
+            case EDataSourceType.SHP:
+                var gdbName = Path.GetFileNameWithoutExtension(file);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gpkg");
+                break;
 
-            if (layerInfo.FeatureCount < 100) continue;
+            case EDataSourceType.GPKG:
+                gdbName = Path.GetFileNameWithoutExtension(file);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gpkg");
+                break;
+
+            case EDataSourceType.SHP_FOLDER:
+                // get name of last subdirectory
+                DirectoryInfo directoryInfo = new DirectoryInfo(file);
+
+                gdbName = directoryInfo.Name.Substring(0, directoryInfo.Name.Length - 6);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gpkg");
+                break;
+
+            case EDataSourceType.OpenFGDB:
+                // get name of last subdirectory
+                directoryInfo = new DirectoryInfo(file);
+
+                gdbName = directoryInfo.Name.Substring(0, directoryInfo.Name.Length - 4);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gpkg");
+                break;
+
+            default:
+
+                throw new NotImplementedException();
+        }
 
 
-            // copy parts of in-layer into different out-layer
-            int recordsLimitToCopy = 25;
+        using (var memberDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file))
+        {
+            Assert.NotNull(memberDataSource);
 
-            long numberOfParts = layerInfo.FeatureCount / recordsLimitToCopy;
+            var memberLayerNames = memberDataSource.GetLayerNames();
 
-            for (int i = 1; i <= numberOfParts; i++)
+            foreach (var layerName in memberLayerNames)
             {
-                var outputFileName = $"{Path.GetFileNameWithoutExtension(file)}_{i}.gpkg";
 
-                string outputFile = Path.Combine(outputdirectory, outputFileName);
+                _output.WriteLine($"Copy layer {layerName} in {Path.GetFileName(file)} to FGDB {Path.GetFileName(outputFullFilename)}.");
 
-                using var outputDatasource = new OgctDataSourceAccessor().OpenOrCreateDatasource(outputFile, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95);
+                using var layer = memberDataSource.OpenLayer(layerName);
+                var layerInfo = layer.LayerDetails;
 
-                layer.CopyToLayer(outputDatasource, layerInfo.Name,
-                    recordsLimitToCopy * i, recordsLimitToCopy * (i - 1));
+                using var outputDatasource = new OgctDataSourceAccessor().OpenOrCreateDatasource(outputFullFilename, EAccessLevel.Full, true, layerInfo.Projection.SpRef);
 
+                layer.CopyToLayer(outputDatasource, layerInfo.Name);
             }
         }
     }
@@ -164,7 +192,7 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
     [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
     public void CopyLayers_WithinFgdb_IsWorking(string file)
     {
-        string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "copiedLayers");
+
 
         // only fgdbs are allowed in test
         if (file.EndsWith(".gdb") == false)
@@ -192,39 +220,74 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
     /// <param name="file"></param>
     [Theory]
     [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
-    public void CopyLayerByRecordFilter_WithValidFiles_toFgdb_IsWorking(string file)
+    public void CopyLayer2Fgdb_WithValidFiles_IsWorking(string file)
     {
-        string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "copiedPartedLayer");
+        var memberDatasource = SupportedDatasource.GetSupportedDatasource(file);
 
-        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
+        string outputdir = Path.Combine(Path.GetDirectoryName(file), "copiedLayerToFgdb");
 
-        var layerNames = dataSource.GetLayerNames();
-
-        foreach (var layerName in layerNames)
+        if (Directory.Exists(outputdir) == false)
         {
-            using var layer = dataSource.OpenLayer(layerName);
-            var layerInfo = layer.LayerDetails;
+            Directory.CreateDirectory(outputdir);
+        }
 
-            if (layerInfo.FeatureCount < 100) continue;
+        string outputFullFilename = String.Empty;
+
+        switch (memberDatasource.Type)
+        {
+            case EDataSourceType.SHP:
+                var gdbName = Path.GetFileNameWithoutExtension(file);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gdb");
+                break;
+
+            case EDataSourceType.GPKG:
+                gdbName = Path.GetFileNameWithoutExtension(file);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gdb");
+                break;
+
+            case EDataSourceType.SHP_FOLDER:
+                // get name of last subdirectory
+                DirectoryInfo directoryInfo = new DirectoryInfo(file);
+
+                gdbName = directoryInfo.Name.Substring(0, directoryInfo.Name.Length - 6);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gdb");
+                break;
+
+            case EDataSourceType.OpenFGDB:
+                // get name of last subdirectory
+                directoryInfo = new DirectoryInfo(file);
+
+                gdbName = directoryInfo.Name.Substring(0, directoryInfo.Name.Length - 4);
+                outputFullFilename = Path.Combine(outputdir, $"{gdbName}_created.gdb");
+                break;
+
+            default:
+
+                throw new NotImplementedException();
+        }
 
 
-            // copy parts of in-layer into different out-layer
-            int recordsLimitToCopy = 25;
+        using (var memberDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file))
+        {
+            Assert.NotNull(memberDataSource);
 
-            long numberOfParts = layerInfo.FeatureCount / recordsLimitToCopy;
+            var memberLayerNames = memberDataSource.GetLayerNames();
 
-            for (int i = 1; i <= numberOfParts; i++)
+            foreach (var layerName in memberLayerNames)
             {
-                var outputFileName = $"{Path.GetFileNameWithoutExtension(file)}_{i}.gdb";
 
-                string outputFile = Path.Combine(outputdirectory, outputFileName);
+                _output.WriteLine($"Copy layer {layerName} in {Path.GetFileName(file)} to FGDB {Path.GetFileName(outputFullFilename)}.");
 
-                using var outputDatasource = new OgctDataSourceAccessor().OpenOrCreateDatasource(outputFile, EAccessLevel.Full, true, ESpatialRefWkt.CH1903plus_LV95);
+                using var layer = memberDataSource.OpenLayer(layerName);
+                var layerInfo = layer.LayerDetails;
 
-                layer.CopyToLayer(outputDatasource, layerInfo.Name,
-                    recordsLimitToCopy * i, recordsLimitToCopy * (i - 1));
+                using var outputDatasource = new OgctDataSourceAccessor().OpenOrCreateDatasource(outputFullFilename, EAccessLevel.Full, true, layerInfo.Projection.SpRef);
 
+                layer.CopyToLayer(outputDatasource, layerInfo.Name);
             }
         }
+
+
+
     }
 }

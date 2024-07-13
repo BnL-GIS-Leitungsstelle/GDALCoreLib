@@ -1,4 +1,5 @@
-﻿using OSGeo.OGR;
+﻿using System.Collections.Generic;
+using OSGeo.OGR;
 
 namespace GdalToolsLib.Extensions;
 
@@ -45,9 +46,17 @@ public static class FeatureExtensions
     /// <param name="targetFields"></param>
     /// <param name="sourceFields"></param>
     /// <param name="sourceFeature"></param>
+    /// <param name="targetFidColumnName"></param>
     /// <param name="inGeom">if not the geometry of the source-targetFeature</param>
+    /// <param name="sourceFidColumnName"></param>
     /// <returns></returns>
-    public static void CreateFromOther(this OSGeo.OGR.Feature targetFeature, FeatureDefn targetFields, FeatureDefn sourceFields, OSGeo.OGR.Feature sourceFeature, OSGeo.OGR.Geometry inGeom = null)
+    public static void CreateFromOther(this OSGeo.OGR.Feature targetFeature, 
+        FeatureDefn targetFields, 
+        FeatureDefn sourceFields, 
+        OSGeo.OGR.Feature sourceFeature, 
+        string sourceFidColumnName,
+        string targetFidColumnName,
+        OSGeo.OGR.Geometry inGeom = null)
     {
         var fid = sourceFeature.GetFID();
 
@@ -106,68 +115,113 @@ public static class FeatureExtensions
         inGeom.Dispose();
 
         targetFeature.SetFID(fid);
-        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature);
+        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature, sourceFidColumnName, targetFidColumnName);
     }
+
+    public static void CreateTableRecordFromOther(this OSGeo.OGR.Feature targetFeature, 
+        FeatureDefn targetFields, 
+        FeatureDefn sourceFields, 
+        OSGeo.OGR.Feature sourceFeature, 
+        string sourceFidColumnName,
+        string targetFidColumnName)
+    {
+        var fid = sourceFeature.GetFID();
+        
+        targetFeature.SetFID(fid);
+        
+        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature, sourceFidColumnName, targetFidColumnName);
+    }
+
+
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="feature"></param>
     /// <param name="targetFields"></param>
+    /// <param name="sourceFields"></param>
     /// <param name="sourceFeature"></param>
-    private static void CopyFieldContent(this OSGeo.OGR.Feature feature, FeatureDefn targetFields, FeatureDefn sourceFields, OSGeo.OGR.Feature sourceFeature)
+    private static void CopyFieldContent(this OSGeo.OGR.Feature feature, 
+        FeatureDefn targetFields, 
+        FeatureDefn sourceFields, 
+        OSGeo.OGR.Feature sourceFeature,
+        string sourceFidColumnName,
+        string targetFidColumnName)
     {
-        // Set targetFields for copied feature
+        var sourceFieldlist = new Dictionary<int, string>();
+
+        var targetFieldlist = new Dictionary<int, string>();
+
+        for (int j = 0; j < sourceFields.GetFieldCount(); j++)
+        {
+            FieldDefn sourceField = sourceFields.GetFieldDefn(j);
+            sourceFieldlist.Add(j, sourceField.GetName());
+        }
+
         for (int j = 0; j < targetFields.GetFieldCount(); j++)
         {
             FieldDefn targetField = targetFields.GetFieldDefn(j);
-            string targetFieldName = targetField.GetName();
+            targetFieldlist.Add(j, targetField.GetName());
+        }
 
-
-
-            FieldDefn sourceField = sourceFields.GetFieldDefn(j);
-            string sourceFieldName = sourceField.GetName();
-
-            var type = targetField.GetFieldType();
-
-            //if (fieldName == "Shape_Area" || fieldName == "Shape_Length")
-            //{
-            //    continue;
-            //}
-
-            switch (targetField.GetFieldType())
+        foreach (var kvpSource in sourceFieldlist)
+        {
+            foreach (var kvpTarget in targetFieldlist)
             {
-                case FieldType.OFTInteger:
-                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsInteger(sourceFieldName));
-                    break;
+                if (kvpSource.Value == kvpTarget.Value )
+                {
+                    FieldDefn targetField = targetFields.GetFieldDefn(kvpTarget.Key);
 
-                case FieldType.OFTInteger64:
-                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsInteger64(sourceFieldName));
-                    break;
-
-                case FieldType.OFTReal:
-                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsDouble(sourceFieldName));
-                    break;
-
-                case FieldType.OFTDateTime:
-                    sourceFeature.GetFieldAsDateTime(sourceFieldName, out var year, out var month, out var day, out var hour,
-                        out var minute, out var second, out var tzflag);
-
-                    // update content, if date is valid (not <null>)
-                    if (year != 0 && month != 0 && day != 0)
+                    switch (targetField.GetFieldType())
                     {
-                        feature.SetField(sourceFieldName, year, month, day, hour, minute, second, tzflag);
+                        case FieldType.OFTInteger:
+                            feature.SetField(kvpTarget.Value, sourceFeature.GetFieldAsInteger(kvpSource.Value));
+                            break;
+
+                        case FieldType.OFTInteger64:
+                            feature.SetField(kvpTarget.Value, sourceFeature.GetFieldAsInteger64(kvpSource.Value));
+                            break;
+
+                        case FieldType.OFTReal:
+                            feature.SetField(kvpTarget.Value, sourceFeature.GetFieldAsDouble(kvpSource.Value));
+                            break;
+
+                        case FieldType.OFTDateTime:
+                            sourceFeature.GetFieldAsDateTime(kvpSource.Value, out var year, out var month, out var day, out var hour,
+                                out var minute, out var second, out var tzflag);
+
+                            // update content, if date is valid (not <null>)
+                            if (year != 0 && month != 0 && day != 0)
+                            {
+                                feature.SetField(kvpSource.Value, year, month, day, hour, minute, second, tzflag);
+                            }
+                            break;
+
+                        case FieldType.OFTString:
+                            feature.SetField(kvpTarget.Value, sourceFeature.GetFieldAsString(kvpSource.Value));
+                            break;
+
+                        default:
+                            feature.SetField(kvpTarget.Value, sourceFeature.GetFieldAsString(kvpSource.Value));
+                            break;
                     }
-                    break;
-
-                case FieldType.OFTString:
-                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsString(sourceFieldName));
-                    break;
-
-                default:
-                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsString(sourceFieldName));
-                    break;
+                }
             }
+        }
+
+
+        // Set targetFields for copied feature
+        for (int j = 0; j < targetFields.GetFieldCount(); j++)
+        {
+            //FieldDefn sourceField = sourceFields.GetFieldDefn(j);
+            //string sourceFieldName = sourceField.GetName();
+       
+
+            //FieldDefn targetField = targetFields.GetFieldDefn(j);
+            //string targetFieldName = targetField.GetName();
+
+         
+
         }
     }
 }
