@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.XPath;
@@ -172,7 +173,7 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
             foreach (var layerName in memberLayerNames)
             {
 
-                _output.WriteLine($"Copy layer {layerName} in {Path.GetFileName(file)} to FGDB {Path.GetFileName(outputFullFilename)}.");
+                _output.WriteLine($"Copy layer {layerName} in {Path.GetFileName(file)} to GPKG {Path.GetFileName(outputFullFilename)}.");
 
                 using var layer = memberDataSource.OpenLayer(layerName);
                 var layerInfo = layer.LayerDetails;
@@ -192,13 +193,15 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
     [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
     public void CopyLayers_WithinFgdb_IsWorking(string file)
     {
-
-
-        // only fgdbs are allowed in test
+        // only fgdbs are used in test
         if (file.EndsWith(".gdb") == false)
             return;
 
-        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
+        _output.WriteLine($"Copy layer within {Path.GetFileName(file)}.");
+
+        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
+
+        var copiedLayerNames = new List<string>();
 
         var layerNames = dataSource.GetLayerNames();
 
@@ -207,10 +210,22 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
             using var sourceLayer = dataSource.OpenLayer(layerName);
             var layerInfo = sourceLayer.LayerDetails;
 
-            sourceLayer.CopyToLayer(dataSource, layerInfo.Name + "_copy");
+            var copiedLayerName = layerInfo.Name + "_copy";
 
-            using var outputDatasource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full, false, ESpatialRefWkt.CH1903plus_LV95);
-            sourceLayer.CopyToLayer(outputDatasource, layerInfo.Name + "_copy_Output");
+            _output.WriteLine($"Copy layer {layerName} to {copiedLayerName} within {Path.GetFileName(file)}.");
+
+            sourceLayer.CopyToLayer(dataSource, copiedLayerName);
+
+            copiedLayerNames.Add(copiedLayerName);
+        }
+
+        // cleanup
+        foreach (string copiedLayerName in copiedLayerNames)
+        {
+            if (dataSource.HasLayer(copiedLayerName))
+            {
+               dataSource.DeleteLayer(copiedLayerName);
+            }
         }
     }
 
