@@ -77,10 +77,10 @@ public partial class OgctLayer : IOgctLayer
         var ogctTargetLayer = (OgctLayer)targetLayer;
         FeatureDefn fields = ogctTargetLayer._layer.GetLayerDefn();
         OSGeo.OGR.Feature sourceFeature;
+        FeatureDefn sourceFields = _layer.GetLayerDefn();
 
         var layerFeatureCount = LayerDetails.FeatureCount;
         var copiedFeatures = 0L;
-
 
         var newFeatureIndex = targetLayer.LayerDetails.FeatureCount;
 
@@ -90,7 +90,7 @@ public partial class OgctLayer : IOgctLayer
         {
             // Console.WriteLine($" - Copy Feature {sourceFeature.GetFID()}");
             using OSGeo.OGR.Feature newFeature = new OSGeo.OGR.Feature(fields);
-            newFeature.CreateFromOther(fields, sourceFeature);
+            newFeature.CreateFromOther(fields, sourceFields, sourceFeature);
             if (generateNewFids)
             {
                 newFeature.SetFID(++newFeatureIndex);
@@ -132,9 +132,7 @@ public partial class OgctLayer : IOgctLayer
             new string[] { overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
         return new OgctLayer(layer, _dataSource);
     }*/
-
-
-
+    
     public long CopyToLayer(IOgctLayer targetLayer)
     {
         var ogctLayer = (OgctLayer)targetLayer;
@@ -162,11 +160,10 @@ public partial class OgctLayer : IOgctLayer
     }
 
     /// <summary>
-    /// Copies a named layer in the same or into other datasource (same: possible for gpkg).
+    /// Copies a named layer in the same or into other datasource (same: possible for gpkg, fgdb).
     /// Overwrites an already existing datasource or layer as well as an existing shapefile.
     /// </summary>
     /// <remarks>
-    /// Remark: FGDB is not implemented as target datasource due to missing write capabilities of the ogc-driver used.
     /// <list type="table">
     ///     <listheader>
     ///         <term>in / out</term>
@@ -178,7 +175,7 @@ public partial class OgctLayer : IOgctLayer
     ///     </item>
     ///     <item>
     ///         <term>out</term>
-    ///         <description> shp or gpkg </description> 
+    ///         <description> shp or gpkg or fgdb </description> 
     ///     </item> 
     /// </list>
     /// <param name="sqlRecordFilter">filters a record range like: SELECT * FROM layername LIMIT recLimit OFFSET recOffset </param>
@@ -230,7 +227,6 @@ public partial class OgctLayer : IOgctLayer
 
                 break;
 
-
             //throw new DataSourceReadOnlyException("FGDB is read-only");
 
             default:
@@ -244,7 +240,6 @@ public partial class OgctLayer : IOgctLayer
     /// Overwrites an already existing datasource or layer as well as an existing shapefile.
     /// </summary>
     /// <remarks>
-    /// Remark: FGDB is not implemented as target datasource due to missing write capabilities of the ogc-driver used.
     /// <list type="table">
     ///     <listheader>
     ///         <term>in / out</term>
@@ -252,11 +247,11 @@ public partial class OgctLayer : IOgctLayer
     ///     </listheader>
     ///     <item>
     ///         <term>in</term>
-    ///         <description> shp or gpkg</description> 
+    ///         <description> shp or gpkg or fgdb</description> 
     ///     </item>
     ///     <item>
     ///         <term>out</term>
-    ///         <description> shp or gpkg </description> 
+    ///         <description> shp or gpkg or fgdb</description> 
     ///     </item> 
     /// </list>
     /// <param name="fieldsUsedForDissolve">Dissolves the layer by the given list of fields like:
@@ -276,7 +271,6 @@ public partial class OgctLayer : IOgctLayer
         var dissolveCondition = GetDissolveCondition(fieldsUsedForDissolve);
 
 
-
         // create outputLayer
         IOgctLayer outputLayer = null!;
         OgctDataSource outputDataSource = null!;
@@ -287,7 +281,7 @@ public partial class OgctLayer : IOgctLayer
         switch (dataSource.SupportInfo.Type)
         {
             case EDataSourceType.SHP:
-                var outputDsAccessor = new GeoDataSourceAccessor();
+                var outputDsAccessor = new OgctDataSourceAccessor();
 
                 string? outputDsPath = dataSource.Name.Replace(LayerDetails.Name, outputLayerName);
 
@@ -407,7 +401,7 @@ public partial class OgctLayer : IOgctLayer
         switch (dataSource.SupportInfo.Type)
         {
             case EDataSourceType.SHP:
-                var outputDsAccessor = new GeoDataSourceAccessor();
+                var outputDsAccessor = new OgctDataSourceAccessor();
 
                 string? outputDsPath = dataSource.Name.Replace(LayerDetails.Name, outputLayerName);
 
@@ -1020,7 +1014,7 @@ public partial class OgctLayer : IOgctLayer
 
     private void GeoprocessingInSingleGpkg(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
     {
-        using var tempInMemoryDataset = new GeoDataSourceAccessor().CreateAndOpenInMemoryDatasource();
+        using var tempInMemoryDataset = new OgctDataSourceAccessor().CreateAndOpenInMemoryDatasource();
 
         using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(resultLayerName, GetSpatialRef(), LayerDetails.GeomType,
                                                             LayerDetails.Schema.FieldList, false);

@@ -1,5 +1,4 @@
-﻿using GdalCoreTest.Helper;
-using OSGeo.OGR;
+﻿using OSGeo.OGR;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +10,8 @@ using GdalToolsLib.Feature;
 using GdalToolsLib.GeoProcessor;
 using GdalToolsLib.Helpers;
 using GdalToolsLib.Layer;
+using GdalToolsLib.Models;
+using GdalToolsTest.Helper;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -421,11 +422,11 @@ namespace GdalCoreTest
                 {
                     _outputHelper.WriteLine($"Copy datasource of file: {Path.GetFileName(file)}");
 
-                    var resultFile = new GeoDataSourceAccessor().CopyDatasource(file, outputdirectory, Path.GetFileName(file));
+                    var resultFile = new OgctDataSourceAccessor().CopyDatasource(file, outputdirectory, Path.GetFileName(file));
 
                     var dataSourceType = SupportedDatasource.GetSupportedDatasource(resultFile);
 
-                    using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
+                    using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
 
                     var layerNames = dataSource.GetLayerNames();
 
@@ -609,7 +610,7 @@ namespace GdalCoreTest
             if (supportedDatasource.Access == EAccessLevel.ReadOnly)
                 return;
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
 
             var layerNames = dataSource.GetLayerNames();
 
@@ -644,7 +645,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public void SetAttributeFilter_AllRecords_SelectedRecords_IsWorking(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -718,7 +719,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public void ReadRows_WithValidFiles_IsWorking(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -750,7 +751,7 @@ namespace GdalCoreTest
             if (file.EndsWith("GeoprocessingTestData.gpkg") == false) return;
 
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
 

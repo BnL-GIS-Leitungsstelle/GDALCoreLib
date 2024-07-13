@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using GdalToolsLib.DataAccess;
+using GdalToolsLib.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace ReadLayerDataIntoExcel;
@@ -29,7 +30,7 @@ public class Program
         Console.WriteLine("and write the content into excel-files with the layers name.");
 
 
-        using var ds = new GeoDataSourceAccessor().OpenDatasource(FullPathFOfGdb);
+        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(FullPathFOfGdb);
         var layerNameList = ds.GetLayerNames();
 
         foreach (var layerName in layerNameList)

@@ -82,12 +82,12 @@ public class OgctDataSource : IOgctDataSource
     /// </summary>
     /// <param name="layerName"></param>
     /// <returns></returns>
-    [Obsolete("LayerExists is deprecated, please use HasLayer(layername) instead.")]
-    public bool LayerExists(string layerName)
-    {
-        OSGeo.OGR.Layer result = _dataSource.GetLayerByName(layerName);
-        return result != null;
-    }
+    //[Obsolete("LayerExists is deprecated, please use HasLayer(layername) instead.")]
+    //public bool LayerExists(string layerName)
+    //{
+    //    OSGeo.OGR.Layer result = _dataSource.GetLayerByName(layerName);
+    //    return result != null;
+    //}
 
 
     public bool HasLayer(string? layerName)
@@ -289,7 +289,7 @@ public class OgctDataSource : IOgctDataSource
         return layer;
     }
 
-    public void CopyAllLayersTo(IOgctDataSource outputDataSource)
+    public void CopyAllLayersToOtherDataSource(IOgctDataSource outputDataSource)
     {
         foreach (var layerName in GetLayerNames())
         {

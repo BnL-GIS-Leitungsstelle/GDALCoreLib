@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GdalCoreTest.Helper;
 using GdalToolsLib;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
+using GdalToolsTest.Helper;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -43,7 +43,7 @@ namespace GdalCoreTest
                 return;
             }
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -68,7 +68,7 @@ namespace GdalCoreTest
                 }
                 else   // SHP
                 {
-                    outputDataSource = new GeoDataSourceAccessor().OpenDatasource(file.Replace(layerName, outputLayerName));
+                    outputDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file.Replace(layerName, outputLayerName));
                     outputlayer = outputDataSource.OpenLayer(outputLayerName);
                 }
 
@@ -107,7 +107,7 @@ namespace GdalCoreTest
                 if (sourceType.Type == EDataSourceType.SHP)
                 {
                     var outputFilename = file.Replace(layerName, outputLayerName);
-                    new GeoDataSourceAccessor().DeleteDatasource(outputFilename);
+                    new OgctDataSourceAccessor().DeleteDatasource(outputFilename);
                     return;
                 }
             }
@@ -132,7 +132,7 @@ namespace GdalCoreTest
                 return;
             }
 
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -155,7 +155,7 @@ namespace GdalCoreTest
                     }
                     else   // SHP
                     {
-                        outputDataSource = new GeoDataSourceAccessor().OpenDatasource(file.Replace(layerName, outputLayerName));
+                        outputDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file.Replace(layerName, outputLayerName));
                         outputlayer = outputDataSource.OpenLayer(outputLayerName);
                     }
 
@@ -188,7 +188,7 @@ namespace GdalCoreTest
                     if (sourceType.Type == EDataSourceType.SHP)
                     {
                         var outputFilename = file.Replace(layerName, outputLayerName);
-                        new GeoDataSourceAccessor().DeleteDatasource(outputFilename);
+                        new OgctDataSourceAccessor().DeleteDatasource(outputFilename);
                         return;
                     }
 

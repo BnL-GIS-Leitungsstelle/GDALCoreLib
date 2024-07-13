@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using GdalCoreTest.Helper;
 using GdalToolsLib;
 using GdalToolsLib.DataAccess;
+using GdalToolsLib.Models;
+using GdalToolsTest.Helper;
 using OSGeo.OGR;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,7 +28,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public void GetDetailsOfLayer_WithValidFiles_IsWorking(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)

@@ -1,4 +1,4 @@
-﻿using GdalToolsLib.DataAccess;
+﻿using GdalToolsLib.Models;
 using GdalToolsLib.Raster;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +8,7 @@ public static class ServiceCollectionExtensions
 {
     public static void AddOgcTools(this IServiceCollection services)
     {
-        services.AddSingleton<IGeoDataSourceAccessor, GeoDataSourceAccessor>();
+        services.AddSingleton<IOgctSourceAccessor, OgctDataSourceAccessor>();
         services.AddScoped<IRasterTools, RasterTools>();
     }
 }

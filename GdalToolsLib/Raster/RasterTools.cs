@@ -6,7 +6,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GdalToolsLib.Common;
-using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
 using OSGeo.GDAL;
 using OSGeo.OGR;
@@ -15,11 +14,11 @@ namespace GdalToolsLib.Raster;
 
 public class RasterTools : IRasterTools
 {
-    private readonly IGeoDataSourceAccessor _geoDataSourceAccessor;
+    private readonly IOgctSourceAccessor _ogctSourceAccessor;
 
-    public RasterTools(IGeoDataSourceAccessor geoDataSourceAccessor)
+    public RasterTools(IOgctSourceAccessor ogctSourceAccessor)
     {
-        _geoDataSourceAccessor = geoDataSourceAccessor;
+        _ogctSourceAccessor = ogctSourceAccessor;
         if (Ogr.GetDriverCount() == 0)
         {
             Ogr.RegisterAll();
@@ -149,7 +148,7 @@ public class RasterTools : IRasterTools
         using var band = rasterDs.GetRasterBand(bandNumber);
 
         string? tempLayerName = "temp";
-        using var inMemoryDs = _geoDataSourceAccessor.CreateAndOpenInMemoryDatasource();
+        using var inMemoryDs = _ogctSourceAccessor.CreateAndOpenInMemoryDatasource();
         using var inMemoryLayer =
             inMemoryDs.CreateAndOpenLayer(tempLayerName, spatialRef, wkbGeometryType.wkbMultiPolygon);
 
@@ -167,7 +166,7 @@ public class RasterTools : IRasterTools
         using var band = rasterDs.GetRasterBand(bandNumber);
 
         string? tempLayerName = "temp";
-        using var inMemoryDs = _geoDataSourceAccessor.CreateAndOpenInMemoryDatasource();
+        using var inMemoryDs = _ogctSourceAccessor.CreateAndOpenInMemoryDatasource();
         using var inMemoryLayer =
             inMemoryDs.CreateAndOpenLayer(tempLayerName, spatialRef, wkbGeometryType.wkbMultiPolygon);
 

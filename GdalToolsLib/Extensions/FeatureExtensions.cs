@@ -38,15 +38,16 @@ public static class FeatureExtensions
 
 
     /// <summary>
-    /// creates a full copy from a given feature incl. the content of fields with equal names.
+    /// creates a full copy from a given targetFeature incl. the content of targetFields with equal names.
     /// the geometry can be exchanges (e.g. to save the results of geometric processes)
     /// </summary>
-    /// <param name="feature">must be initialized with FieldDefn from source feature</param>
-    /// <param name="fields"></param>
+    /// <param name="targetFeature">must be initialized with FieldDefn from source targetFeature</param>
+    /// <param name="targetFields"></param>
+    /// <param name="sourceFields"></param>
     /// <param name="sourceFeature"></param>
-    /// <param name="inGeom">if not the geometry of the source-feature</param>
+    /// <param name="inGeom">if not the geometry of the source-targetFeature</param>
     /// <returns></returns>
-    public static void CreateFromOther(this OSGeo.OGR.Feature feature, FeatureDefn fields, OSGeo.OGR.Feature sourceFeature, OSGeo.OGR.Geometry inGeom = null)
+    public static void CreateFromOther(this OSGeo.OGR.Feature targetFeature, FeatureDefn targetFields, FeatureDefn sourceFields, OSGeo.OGR.Feature sourceFeature, OSGeo.OGR.Geometry inGeom = null)
     {
         var fid = sourceFeature.GetFID();
 
@@ -92,73 +93,79 @@ public static class FeatureExtensions
         if (outGeom != null)
         {
             wkbGeometryType outGeomType = outGeomClean.GetGeometryType();
-            feature.SetGeometry(outGeomClean);
+            targetFeature.SetGeometry(outGeomClean);
             outGeomClean.Dispose();
             outGeomValid.Dispose();
             outGeom.Dispose();
         }
         else
         {
-            feature.SetGeometry(inGeom);
+            targetFeature.SetGeometry(inGeom);
         }
 
         inGeom.Dispose();
 
-        feature.SetFID(fid);
-        feature.CopyFieldContent(fields, sourceFeature);
+        targetFeature.SetFID(fid);
+        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature);
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="feature"></param>
-    /// <param name="fields"></param>
+    /// <param name="targetFields"></param>
     /// <param name="sourceFeature"></param>
-    private static void CopyFieldContent(this OSGeo.OGR.Feature feature, FeatureDefn fields, OSGeo.OGR.Feature sourceFeature)
+    private static void CopyFieldContent(this OSGeo.OGR.Feature feature, FeatureDefn targetFields, FeatureDefn sourceFields, OSGeo.OGR.Feature sourceFeature)
     {
-        // Set fields for copied feature
-        for (int j = 0; j < fields.GetFieldCount(); j++)
+        // Set targetFields for copied feature
+        for (int j = 0; j < targetFields.GetFieldCount(); j++)
         {
-            FieldDefn field = fields.GetFieldDefn(j);
-            string fieldName = field.GetName();
-            var type = field.GetFieldType();
+            FieldDefn targetField = targetFields.GetFieldDefn(j);
+            string targetFieldName = targetField.GetName();
+
+
+
+            FieldDefn sourceField = sourceFields.GetFieldDefn(j);
+            string sourceFieldName = sourceField.GetName();
+
+            var type = targetField.GetFieldType();
 
             //if (fieldName == "Shape_Area" || fieldName == "Shape_Length")
             //{
             //    continue;
             //}
 
-            switch (field.GetFieldType())
+            switch (targetField.GetFieldType())
             {
                 case FieldType.OFTInteger:
-                    feature.SetField(fieldName, sourceFeature.GetFieldAsInteger(fieldName));
+                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsInteger(sourceFieldName));
                     break;
 
                 case FieldType.OFTInteger64:
-                    feature.SetField(fieldName, sourceFeature.GetFieldAsInteger64(fieldName));
+                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsInteger64(sourceFieldName));
                     break;
 
                 case FieldType.OFTReal:
-                    feature.SetField(fieldName, sourceFeature.GetFieldAsDouble(fieldName));
+                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsDouble(sourceFieldName));
                     break;
 
                 case FieldType.OFTDateTime:
-                    sourceFeature.GetFieldAsDateTime(fieldName, out var year, out var month, out var day, out var hour,
+                    sourceFeature.GetFieldAsDateTime(sourceFieldName, out var year, out var month, out var day, out var hour,
                         out var minute, out var second, out var tzflag);
 
                     // update content, if date is valid (not <null>)
                     if (year != 0 && month != 0 && day != 0)
                     {
-                        feature.SetField(fieldName, year, month, day, hour, minute, second, tzflag);
+                        feature.SetField(sourceFieldName, year, month, day, hour, minute, second, tzflag);
                     }
                     break;
 
                 case FieldType.OFTString:
-                    feature.SetField(fieldName, sourceFeature.GetFieldAsString(fieldName));
+                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsString(sourceFieldName));
                     break;
 
                 default:
-                    feature.SetField(fieldName, sourceFeature.GetFieldAsString(fieldName));
+                    feature.SetField(targetFieldName, sourceFeature.GetFieldAsString(sourceFieldName));
                     break;
             }
         }

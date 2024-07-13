@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Geometry;
+using GdalToolsLib.Models;
 using Microsoft.Extensions.Logging;
 
 namespace OGCGeometryValidatorCore;
@@ -47,7 +48,7 @@ internal class ParallelLayerGeometryValidator : IParallelLayerGeometryValidator
     public bool SwitchToParallelProcessing(string file, string layerName)
     {
         _log.LogInformation(" --  start examination to switch to parallel processing for layer {layer}", layerName);
-        using var ds = new GeoDataSourceAccessor().OpenDatasource(file);
+        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
         using var layer = ds.OpenLayer(layerName);
         return layer.LayerDetails.FeatureCount >= _limit;
     }
@@ -75,7 +76,7 @@ internal class ParallelLayerGeometryValidator : IParallelLayerGeometryValidator
         Parallel.ForEach(layerToProcess,
             async item =>
             {
-                using var ds = new GeoDataSourceAccessor().OpenDatasource(item.fileName);
+                using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(item.fileName);
                 using var layer = ds.OpenLayer(item.layerName);
                 bag.Add(await layer.ValidateGeometryAsync());
             });
@@ -97,7 +98,7 @@ internal class ParallelLayerGeometryValidator : IParallelLayerGeometryValidator
     {
         var chunkLayers = new List<(string fileName, string layerName)>();
 
-        using var ds = new GeoDataSourceAccessor().OpenDatasource(fileName);
+        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(fileName);
         using var layer = ds.OpenLayer(layerName);
 
         var layerInfo = layer.LayerDetails;
@@ -119,7 +120,7 @@ internal class ParallelLayerGeometryValidator : IParallelLayerGeometryValidator
 
             if (File.Exists(outputFile) == false) // don't overwrite existing files
             {
-                using var outputDatasource = new GeoDataSourceAccessor().OpenDatasource(outputFile, EAccessLevel.Full, true);
+                using var outputDatasource = new OgctDataSourceAccessor().OpenOrCreateDatasource(outputFile, EAccessLevel.Full, true);
                 _log.LogInformation(" --  write chunk file {file} ({limit} records, starting at {offset}) in {folder}", outputFileName, _limit, offset, tempDirectory);
                 layer.CopyToLayer(outputDatasource, layerInfo.Name,
                     _limit, offset);

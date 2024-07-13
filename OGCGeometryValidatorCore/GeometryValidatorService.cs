@@ -10,6 +10,7 @@ using GdalToolsLib.DataAccess;
 using GdalToolsLib.Extensions;
 using GdalToolsLib.Feature;
 using GdalToolsLib.Geometry;
+using GdalToolsLib.Models;
 
 namespace OGCGeometryValidatorCore;
 
@@ -124,7 +125,7 @@ public class GeometryValidatorService : IGeometryValidatorService
     {
         _log.LogInformation("Examine file {file}", fileName);  // structured logger stores var-name and value extra
 
-        using var dataSource = new GeoDataSourceAccessor().OpenDatasource(fileName, EAccessLevel.Full);
+        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(fileName, EAccessLevel.Full);
         var layerNames = dataSource.GetLayerNames();
 
         foreach (var layerName in layerNames)
@@ -192,7 +193,7 @@ public class GeometryValidatorService : IGeometryValidatorService
 
     private void GetSupportedVectorDataFilesInDirectory()
     {
-        foreach (var fileItem in new GeoDataSourceAccessor().GetPathNamesOfSupportedVectordataFormats(_startpath, true))
+        foreach (var fileItem in new OgctDataSourceAccessor().GetPathNamesOfSupportedVectordataFormats(_startpath, true))
         {
             _fileList.Add(fileItem[0] as string);
         }

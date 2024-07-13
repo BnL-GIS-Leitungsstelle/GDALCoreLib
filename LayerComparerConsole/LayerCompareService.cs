@@ -5,6 +5,7 @@ using System.Reflection;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Feature;
 using GdalToolsLib.Layer;
+using GdalToolsLib.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -125,8 +126,8 @@ public class LayerCompareService : ILayerCompareService
         _log.LogInformation("Compare MASTER file {file}, layer {layer}, ", _file1, _layer1);  // structured logger stores var-name and value extra
         _log.LogInformation("with CANDIDATE file {file}, layer {layer}, ", _file2, _layer2);
 
-        using var masterDataSource = new GeoDataSourceAccessor().OpenDatasource(_file1);
-        using var candidateDataSource = new GeoDataSourceAccessor().OpenDatasource(_file2);
+        using var masterDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(_file1);
+        using var candidateDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(_file2);
 
         using var masterLayer = masterDataSource.OpenLayer(_layer1);
         using var candidateLayer = candidateDataSource.OpenLayer(_layer2);

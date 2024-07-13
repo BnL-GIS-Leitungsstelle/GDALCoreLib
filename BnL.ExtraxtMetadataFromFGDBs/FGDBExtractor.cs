@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using GdalToolsLib.DataAccess;
+using GdalToolsLib.Models;
 using Newtonsoft.Json;
 using GdalConfiguration = GdalToolsLib.GdalConfiguration;
 
@@ -62,7 +63,7 @@ public class FgdbExtractor
         {
             Console.WriteLine($"Extract FDGB = {fgdbPath}.");
 
-            using var ds = new GeoDataSourceAccessor().OpenDatasource(fgdbPath);
+            using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(fgdbPath);
             if (ds == null)
             {
                 continue;

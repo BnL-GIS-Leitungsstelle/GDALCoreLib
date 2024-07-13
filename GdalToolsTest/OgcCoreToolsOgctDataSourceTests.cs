@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
-using GdalCoreTest.Helper;
 using GdalCoreTest.SqlStatements;
 using GdalToolsLib;
 using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
+using GdalToolsLib.Models;
+using GdalToolsTest.Helper;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -35,14 +36,14 @@ namespace GdalCoreTest
 
             string layerName = "Wildruhezone";
 
-            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+            using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
             {
                 Assert.True(dataSource.HasLayer(layerName), $"Layer {layerName} not found");
             }
 
             foreach (var statement in SqlStatementProvider.BuildList())
             {
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -66,7 +67,7 @@ namespace GdalCoreTest
                     }
                 }
 
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -78,7 +79,7 @@ namespace GdalCoreTest
                     }
                 }
 
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -90,7 +91,7 @@ namespace GdalCoreTest
                     }
                 }
 
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -117,14 +118,14 @@ namespace GdalCoreTest
 
             string layerName = "Wildruhezone";
 
-            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+            using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
             {
                 Assert.True(dataSource.HasLayer(layerName), $"Layer {layerName} not found");
             }
 
             foreach (var statement in SqlStatementProvider.BuildList())
             {
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -139,7 +140,7 @@ namespace GdalCoreTest
                     }
                 }
 
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -151,7 +152,7 @@ namespace GdalCoreTest
                     }
                 }
 
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -163,7 +164,7 @@ namespace GdalCoreTest
                     }
                 }
 
-                using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(wrzFile))
+                using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wrzFile))
                 {
                     try
                     {
@@ -192,7 +193,7 @@ namespace GdalCoreTest
 
             string layerName = String.Empty;
 
-            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
+            using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full))
             {
                 var layernames = dataSource.GetLayerNames();
 
@@ -215,7 +216,7 @@ namespace GdalCoreTest
                 dataSource.RenameLayerGpkg(layerName, $"{layerName}ToBeDeleted");
             }
 
-            using (var dataSourceReopened = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
+            using (var dataSourceReopened = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full))
             {
                 Assert.True(dataSourceReopened.HasLayer($"{layerName}ToBeDeleted"));
                 Assert.False(dataSourceReopened.HasLayer(layerName));
@@ -256,7 +257,7 @@ namespace GdalCoreTest
             string firstLayerName = String.Empty;
             int layerCountExpected = 0;
 
-            using (var ds = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
+            using (var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full))
             {
                 var layernames = ds.GetLayerNames();
 
@@ -286,7 +287,7 @@ namespace GdalCoreTest
             }
 
 
-            using (var dsReOpened = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
+            using (var dsReOpened = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full))
             {
                 Assert.True(dsReOpened.HasLayer($"{firstLayerName}Renamed"));
                 Assert.False(dsReOpened.HasLayer(firstLayerName));
@@ -294,7 +295,7 @@ namespace GdalCoreTest
                 dsReOpened.RenameLayerGpkg($"{firstLayerName}Backup", firstLayerName);
             }
 
-            using (var dsReOpened = new GeoDataSourceAccessor().OpenDatasource(file, EAccessLevel.Full))
+            using (var dsReOpened = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full))
             {
                 Assert.True(dsReOpened.HasLayer(firstLayerName));
                 Assert.False(dsReOpened.HasLayer($"{firstLayerName}Backup"));
@@ -319,17 +320,17 @@ namespace GdalCoreTest
 
             _outputHelper.WriteLine($"Copy datasource of file: {Path.GetFileName(file)}");
 
-            var resultFile = new GeoDataSourceAccessor().CopyDatasource(file, outputdirectory, Path.GetFileName(file));
+            var resultFile = new OgctDataSourceAccessor().CopyDatasource(file, outputdirectory, Path.GetFileName(file));
 
             Assert.True(File.Exists(resultFile) || Directory.Exists(resultFile));
 
-            using (var dataSource = new GeoDataSourceAccessor().OpenDatasource(resultFile))
+            using (var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(resultFile))
             {
                 Assert.NotNull(dataSource);
             }
 
             // cleanup
-            new GeoDataSourceAccessor().DeleteDatasource(resultFile);
+            new OgctDataSourceAccessor().DeleteDatasource(resultFile);
 
             if (Directory.Exists(outputdirectory))
                 Directory.Delete(outputdirectory, true);
@@ -343,10 +344,10 @@ namespace GdalCoreTest
 
             _outputHelper.WriteLine($"Copy datasource of file: {Path.GetFileName(file)}");
 
-            var resultFile = new GeoDataSourceAccessor().CopyDatasource(file, outputdirectory, Path.GetFileName(file));
+            var resultFile = new OgctDataSourceAccessor().CopyDatasource(file, outputdirectory, Path.GetFileName(file));
 
 
-            new GeoDataSourceAccessor().DeleteDatasource(resultFile);
+            new OgctDataSourceAccessor().DeleteDatasource(resultFile);
 
             bool isExpectedAsFile = SupportedDatasource.GetSupportedDatasource(resultFile).FileType == EFileType.File;
 

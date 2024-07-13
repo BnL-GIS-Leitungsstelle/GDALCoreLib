@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using GdalCoreTest.Helper;
 using GdalToolsLib;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Geometry;
-using OSGeo.GDAL;
+using GdalToolsLib.Models;
+using GdalToolsTest.Helper;
 using OSGeo.OGR;
 using Xunit;
 using Xunit.Abstractions;
@@ -35,7 +34,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public async Task CheckGeom_DataShouldContain_RingSelfintersection(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
 
@@ -65,7 +64,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public async Task CheckGeom_DataShouldContain_GeometrytypeMismatchAccordingToLayer(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -93,7 +92,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public async Task CheckGeom_DataShouldContain_FeatureToLayerMultiSurfaceTypeMismatch(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -121,7 +120,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public async Task CheckGeom_DataShouldContain_NoGeometry_MissingTestData(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -150,7 +149,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public async Task CheckGeom_DataShouldContain_GeometryCounterZero_MissingTestData(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -178,7 +177,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public async Task CheckGeom_DataShouldContain_InvalidGeometryUnspecifiedReason(string file)
         {
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(file);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file);
             var layerNames = dataSource.GetLayerNames();
 
             foreach (var layerName in layerNames)
@@ -207,7 +206,7 @@ namespace GdalCoreTest
         {
             var basePath = TestDataPathProvider.GetTestDataFolder(TestDataPathProvider.TestDataFolderSpecific);
             var wildruhezonenPath = Path.Combine(basePath, "ValidateGeometry.gdb");
-            using var dataSource = new GeoDataSourceAccessor().OpenDatasource(wildruhezonenPath);
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(wildruhezonenPath);
             using var layer = dataSource.OpenLayer("LayerSelfOverlapError1_polygon_SpRefLV95_epsg2056_4rec");
             var result = await layer.ValidateSelfOverlapAsync();
             result.Count.Should().Be(1);
@@ -221,8 +220,8 @@ namespace GdalCoreTest
 
             var workSourceName = $"{Guid.NewGuid()}.gpkg";
             var workPath =
-                new GeoDataSourceAccessor().CopyDatasource(masterPath, basePath, workSourceName);
-            var dataSource = new GeoDataSourceAccessor().OpenDatasource(workPath, EAccessLevel.Full);
+                new OgctDataSourceAccessor().CopyDatasource(masterPath, basePath, workSourceName);
+            var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(workPath, EAccessLevel.Full);
             var layer = dataSource.OpenLayer("GeometryErrorRingSelfIntersects45_SpRefLV03_epsg_rec");
             var result = await layer.ValidateGeometryAsync();
             result.IsValid.Should().BeFalse();
@@ -234,7 +233,7 @@ namespace GdalCoreTest
             result.IsValid.Should().BeTrue();
             layer.Dispose();
             dataSource.Dispose();
-            new GeoDataSourceAccessor().DeleteDatasource(workPath);
+            new OgctDataSourceAccessor().DeleteDatasource(workPath);
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using GdalToolsLib.DataAccess;
+using GdalToolsLib.Models;
 
 namespace CreateOptimizedGeopackage;
 
@@ -16,7 +17,7 @@ public class Program
         gpkgDef.Path = @"C:\temp";
 
         using var ds =
-            new GeoDataSourceAccessor().CreateAndOpenDatasource(Path.Combine(gpkgDef.Path, gpkgDef.Name + ".gpkg"), null);
+            new OgctDataSourceAccessor().CreateAndOpenDatasource(Path.Combine(gpkgDef.Path, gpkgDef.Name + ".gpkg"), null);
 
         foreach (var layerDef in gpkgDef.LayersDetailsList)
         {

@@ -49,7 +49,7 @@ public class LayerDetails
     /// <param name="attributeFilter">a kind of WHERE-clause</param>
     public LayerDetails(string? file, string? layerName, string? attributeFilter = default!)
     {
-        using (var ds = new GeoDataSourceAccessor().OpenDatasource(file))
+        using (var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(file))
         {
             using (var layer = ds.OpenLayer(layerName))
             {

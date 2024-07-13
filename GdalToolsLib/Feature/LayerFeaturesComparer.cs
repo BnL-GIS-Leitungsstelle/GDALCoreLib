@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Layer;
+using GdalToolsLib.Models;
 
 namespace GdalToolsLib.Feature;
 
@@ -40,10 +41,10 @@ public class LayerFeaturesComparer
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void RunCompareAttributeValues()
     {
-        using var masterDataSource = new GeoDataSourceAccessor().OpenDatasource(MasterInfo.DataSourceFileName);
+        using var masterDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(MasterInfo.DataSourceFileName);
         using var masterLayer = masterDataSource.OpenLayer(MasterInfo.Name, OrderByField.Name);
 
-        using var candidateDataSource = new GeoDataSourceAccessor().OpenDatasource(CandidateInfo.DataSourceFileName);
+        using var candidateDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(CandidateInfo.DataSourceFileName);
         using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByField.Name);
 
         for (int i = 0; i < MasterInfo.FeatureCount; i++)
@@ -76,10 +77,10 @@ public class LayerFeaturesComparer
     /// </summary>
     public void RunCompareGeometries()
     {
-        using var masterDataSource = new GeoDataSourceAccessor().OpenDatasource(MasterInfo.DataSourceFileName);
+        using var masterDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(MasterInfo.DataSourceFileName);
         using var masterLayer = masterDataSource.OpenLayer(MasterInfo.Name, OrderByField.Name);
 
-        using var candidateDataSource = new GeoDataSourceAccessor().OpenDatasource(CandidateInfo.DataSourceFileName);
+        using var candidateDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(CandidateInfo.DataSourceFileName);
         using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByField.Name);
 
         for (int i = 0; i < MasterInfo.FeatureCount; i++)
