@@ -33,7 +33,6 @@ Intended architecture:
 ![Architecture](https://user-images.githubusercontent.com/9255514/148600464-78823074-0bcd-479f-9e5b-0940bc905838.png)
 
 LayerAccessor: Options to use CopyLayer - Method
-![CopyLayer-Options](https://user-images.githubusercontent.com/9255514/128594122-9fd6ab65-70ae-4b01-bacb-5f32b6f59245.png)
 ![CopyLayer-Options](https://github.com/user-attachments/assets/f049c87e-f9be-4a5a-aa22-9c3df3b534b3)
 
 ## Installation Instructions
