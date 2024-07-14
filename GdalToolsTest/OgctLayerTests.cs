@@ -229,6 +229,51 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
         }
     }
 
+
+    /// <summary>
+    /// copy layers within GPKG
+    /// </summary>
+    /// <param name="file"></param>
+    [Theory]
+    [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
+    public void CopyLayers_WithinGpkg_IsWorking(string file)
+    {
+        // only fgdbs are used in test
+        if (file.EndsWith(".gpkg") == false)
+            return;
+
+        _output.WriteLine($"Copy layer within {Path.GetFileName(file)}.");
+
+        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
+
+        var copiedLayerNames = new List<string>();
+
+        var layerNames = dataSource.GetLayerNames();
+
+        foreach (var layerName in layerNames)
+        {
+            using var sourceLayer = dataSource.OpenLayer(layerName);
+            var layerInfo = sourceLayer.LayerDetails;
+
+            var copiedLayerName = layerInfo.Name + "_copy";
+
+            _output.WriteLine($"Copy layer {layerName} to {copiedLayerName} within {Path.GetFileName(file)}.");
+
+            sourceLayer.CopyToLayer(dataSource, copiedLayerName);
+
+            copiedLayerNames.Add(copiedLayerName);
+        }
+
+        // cleanup
+        foreach (string copiedLayerName in copiedLayerNames)
+        {
+            if (dataSource.HasLayer(copiedLayerName))
+            {
+                dataSource.DeleteLayer(copiedLayerName);
+            }
+        }
+    }
+
     /// <summary>
     /// creates new layers with spRef = LV95 and of polygon-Featuretype
     /// </summary>

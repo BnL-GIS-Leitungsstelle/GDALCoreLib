@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using GdalToolsLib.DataAccess;
+using GdalToolsLib.Layer;
 using OSGeo.OGR;
 
 namespace GdalToolsLib.Extensions;
@@ -46,16 +48,14 @@ public static class FeatureExtensions
     /// <param name="targetFields"></param>
     /// <param name="sourceFields"></param>
     /// <param name="sourceFeature"></param>
-    /// <param name="targetFidColumnName"></param>
+    /// <param name="targetDatasourceType"></param>
     /// <param name="inGeom">if not the geometry of the source-targetFeature</param>
-    /// <param name="sourceFidColumnName"></param>
     /// <returns></returns>
     public static void CreateFromOther(this OSGeo.OGR.Feature targetFeature, 
         FeatureDefn targetFields, 
         FeatureDefn sourceFields, 
         OSGeo.OGR.Feature sourceFeature, 
-        string sourceFidColumnName,
-        string targetFidColumnName,
+        EDataSourceType targetDatasourceType,
         OSGeo.OGR.Geometry inGeom = null)
     {
         var fid = sourceFeature.GetFID();
@@ -115,21 +115,19 @@ public static class FeatureExtensions
         inGeom.Dispose();
 
         targetFeature.SetFID(fid);
-        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature, sourceFidColumnName, targetFidColumnName);
+        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature, targetDatasourceType);
     }
 
     public static void CreateTableRecordFromOther(this OSGeo.OGR.Feature targetFeature, 
         FeatureDefn targetFields, 
         FeatureDefn sourceFields, 
-        OSGeo.OGR.Feature sourceFeature, 
-        string sourceFidColumnName,
-        string targetFidColumnName)
+        OSGeo.OGR.Feature sourceFeature)
     {
         var fid = sourceFeature.GetFID();
         
         targetFeature.SetFID(fid);
         
-        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature, sourceFidColumnName, targetFidColumnName);
+        targetFeature.CopyFieldContent(targetFields, sourceFields, sourceFeature, EDataSourceType.InMemory);
     }
 
 
@@ -145,8 +143,7 @@ public static class FeatureExtensions
         FeatureDefn targetFields, 
         FeatureDefn sourceFields, 
         OSGeo.OGR.Feature sourceFeature,
-        string sourceFidColumnName,
-        string targetFidColumnName)
+        EDataSourceType targetDatasourceType)
     {
         var sourceFieldlist = new Dictionary<int, string>();
 
@@ -168,7 +165,14 @@ public static class FeatureExtensions
         {
             foreach (var kvpTarget in targetFieldlist)
             {
-                if (kvpSource.Value == kvpTarget.Value )
+                string sourceFieldName = kvpSource.Value;
+
+                if (targetDatasourceType == EDataSourceType.SHP && sourceFieldName.Length > 10)  //if targettype is shp
+                {
+                    sourceFieldName = sourceFieldName.Substring(0, 10);
+                }
+
+                if (sourceFieldName == kvpTarget.Value )
                 {
                     FieldDefn targetField = targetFields.GetFieldDefn(kvpTarget.Key);
 
@@ -193,7 +197,7 @@ public static class FeatureExtensions
                             // update content, if date is valid (not <null>)
                             if (year != 0 && month != 0 && day != 0)
                             {
-                                feature.SetField(kvpSource.Value, year, month, day, hour, minute, second, tzflag);
+                                feature.SetField(kvpTarget.Value, year, month, day, hour, minute, second, tzflag);
                             }
                             break;
 
