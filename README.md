@@ -1,4 +1,4 @@
-# GDALTools_With FGDB-support
+# GDALTools with FGDB-support
 
 ## Synopsis
 
