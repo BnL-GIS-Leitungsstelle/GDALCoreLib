@@ -2,7 +2,7 @@
 
 namespace GdalToolsLib.Common;
 
-public interface IGdalInfo
+public interface IOgctGdalInfo
 {
     List<string> ShowSupportedDatasources();
 

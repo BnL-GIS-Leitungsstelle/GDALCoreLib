@@ -7,7 +7,7 @@ using OSGeo.OGR;
 
 namespace GdalToolsLib.Common;
 
-public class OgctGdalInfo : IGdalInfo
+public class OgctGdalInfo : IOgctGdalInfo
 {
     public string PackageVersion { get; } = Assembly.GetAssembly(typeof(Ogr))!
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
