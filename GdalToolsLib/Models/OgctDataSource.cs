@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Schema;
 using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Exceptions;
@@ -53,7 +54,8 @@ public class OgctDataSource : IOgctDataSource
                     DeleteLayer(layerName);
                 }
 
-                var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, new string[] { overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
+
+                var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, new string[] { "DOCUMENTATION = 'test' ", overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
 
                 if (layer == null) throw new Exception("Could not create new LayerName " + layerName + " in " + _dataSource.name);
 
@@ -76,6 +78,10 @@ public class OgctDataSource : IOgctDataSource
     {
         return _dataSource.GetLayerCount();
     }
+
+
+
+
 
     /// <summary>
     ///
@@ -363,12 +369,35 @@ public class OgctDataSource : IOgctDataSource
             return;
         _dataSource.StartTransaction(1);
 
-        var sqlDdl = $"ALTER TABLE {layerName} RENAME TO {newLayerName};"; 
+        var sqlDdl = $"ALTER TABLE {layerName} RENAME TO {newLayerName};";
         _ = ExecuteSQL(sqlDdl);
 
         _dataSource.SyncToDisk();
         _dataSource.CommitTransaction();
     }
+
+
+    /// <summary>
+    /// only for FGDB and GPKG
+    /// </summary>
+    /// <returns></returns>
+    public void ExecuteSqlCompress()
+    {
+        switch (SupportInfo.Type)
+        {
+            case EDataSourceType.GPKG:
+                _dataSource.ExecuteSQL($"VACUUM", null, OgcConstants.GpkgSqlDialect);
+                break;
+
+            case EDataSourceType.OpenFGDB:
+                _dataSource.ExecuteSQL($"REPACK", null, OgcConstants.OgrSqlDialect);
+                break;
+
+            default:
+                throw new DataSourceMethodNotImplementedException("Unknown Datasource for SQL - compress");
+        }
+    }
+
 
     public void Dispose()
     {
