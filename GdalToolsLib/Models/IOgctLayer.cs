@@ -52,6 +52,8 @@ public interface IOgctLayer : IDisposable
     void UnifyInSingleGpkg(IOgctLayer otherLayer, string? resultLayerName, string[] unionProcessOptions);
 
     IOgctFeature CreateAndOpenFeature(long fid);
+
+    IOgctFeature CreateAndOpenFeature();
     int CreateField(FieldDefnInfo newFieldInfo);
     int DeleteField(FieldDefnInfo field);
 

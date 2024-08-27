@@ -55,7 +55,10 @@ public class OgctDataSource : IOgctDataSource
                 }
 
 
-                var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, new string[] { "DOCUMENTATION = 'test TBD' ", overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
+                //var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, new string[] { "DOCUMENTATION = 'test TBD' ", overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
+
+                var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, new string[] { overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
+
 
                 if (layer == null) throw new Exception("Could not create new LayerName " + layerName + " in " + _dataSource.name);
 

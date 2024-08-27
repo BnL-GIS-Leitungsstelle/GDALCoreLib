@@ -149,43 +149,47 @@ public class OgctDataAccessTests : IClassFixture<DataAccessTestFixture>
     [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
     public void CreateLayer_WithValidFiles_IsWorking(string file)
     {
-        string outputdirectory = Path.Combine(Path.GetDirectoryName(file), "createdLayer");
+        // prepare test-infrastructure
+        var outputDir = Path.Combine(Path.GetDirectoryName(file), "createLayerFolder");
+        if (Path.Exists(outputDir) == false)
+        {
+            Directory.CreateDirectory(outputDir);
+        }
+        var outputFile = Path.Combine(outputDir, Path.GetFileName(file));
 
-        file = Path.Combine(outputdirectory, Path.GetFileName(file));
-
-        _output.WriteLine($"CreateTest datasource of file: {Path.GetFileName(file)}");
-
-        var supportedDatasource = SupportedDatasource.GetSupportedDatasource(file);
-
-        // fields to add
+        string createdLayerName = "createLayer";
+        
+        // two fields to add in the created layer
         var fieldList = new List<FieldDefnInfo>
         {
             new("ID_CH", FieldType.OFTString, 15, false, true),
             new("Canton", FieldType.OFTString, 2, false, false)
         };
 
-        if (supportedDatasource.Access == EAccessLevel.Full)
+        // check, if datasource supports creation (else ignore)
+        var supportedDatasource = SupportedDatasource.GetSupportedDatasource(outputFile);
+        if (supportedDatasource.Access != EAccessLevel.Full) return;
+
+        using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(outputFile, EAccessLevel.Full, true,
+            ESpatialRefWkt.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
+
+        // test the creation of a layer
+        if (supportedDatasource.Type == EDataSourceType.SHP)
         {
-            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full, true,
-                ESpatialRefWkt.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
-
-            if (supportedDatasource.Type == EDataSourceType.SHP)
-            {
-                using var layer = dataSource.OpenLayer(dataSource.GetLayerNames().First());
-            }
-            else
-            {
-                using var layer = dataSource.CreateAndOpenLayer("createdLayer", ESpatialRefWkt.CH1903plus_LV95,
-                    wkbGeometryType.wkbPolygon, fieldList);
-            }
-
-            var layerNames = dataSource.GetLayerNames();
-
-            var layerInfo = dataSource.GetLayerInfo(layerNames.First());
-            Assert.True(layerInfo.GeomType == wkbGeometryType.wkbPolygon ||
-                        layerInfo.GeomType == wkbGeometryType.wkbMultiPolygon);
-
+            using var layer = dataSource.OpenLayer(dataSource.GetLayerNames().First());
         }
+        else
+        {
+            using var layer = dataSource.CreateAndOpenLayer(createdLayerName, ESpatialRefWkt.CH1903plus_LV95,
+                wkbGeometryType.wkbPolygon, fieldList);
+        }
+
+        // verify the creation result
+        var layerNames = dataSource.GetLayerNames();
+
+        var layerInfo = dataSource.GetLayerInfo(layerNames.First());
+        Assert.True(layerInfo.GeomType == wkbGeometryType.wkbPolygon ||
+                    layerInfo.GeomType == wkbGeometryType.wkbMultiPolygon);
     }
 
 

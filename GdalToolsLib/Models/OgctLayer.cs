@@ -99,7 +99,7 @@ public partial class OgctLayer : IOgctLayer
             {
                 newFeature.CreateFromOther(fields, sourceFields, sourceFeature, ogctTargetLayer.DataSource.SupportInfo.Type);
             }
-            
+
 
             if (generateNewFids || targetLayer.DataSource.SupportInfo.Type == EDataSourceType.OpenFGDB)
             {
@@ -244,6 +244,7 @@ public partial class OgctLayer : IOgctLayer
         }
     }
 
+    #region Dissolve
 
     /// <summary>
     /// Dissolves a named layer in the same (same: possible for gpkg) or into another datasource .
@@ -264,32 +265,107 @@ public partial class OgctLayer : IOgctLayer
     ///         <description> shp or gpkg or fgdb</description> 
     ///     </item> 
     /// </list>
-    /// <param name="fieldsUsedForDissolve">Dissolves the layer by the given list of fields like:
+    /// <param name="fieldsForDissolve">Dissolves the layer by the given list of fields like:
     ///        SELECT [fieldsUsedForDissolve] FROM [layername] GROUPBY [fieldsUsedForDissolve].
-    /// if empty, all fields of the layer will be used for dissolved</param>
+    /// </param>
     ///  <param name="overwriteExisting">overwrites output-layer, if exists </param>      
     /// </remarks>
     /// <returns>name of the output layer</returns>
-    public string? DissolveToLayer(IOgctDataSource dataSource, List<FieldDefnInfo> fieldsUsedForDissolve, string outputLayerNameAppendix = "Dissolve", bool overwriteExisting = true)
+    public string DissolveToLayer(IOgctDataSource dataSource, List<FieldDefnInfo> fieldsForDissolve, string outputLayerNameAppendix = "Dissolve", bool overwriteExisting = true)
     {
-        string? outputLayerName = String.IsNullOrWhiteSpace(outputLayerNameAppendix) ? LayerDetails.Name + "Dissolve" : LayerDetails.Name + outputLayerNameAppendix.Trim();
+        string outputLayerName = GetOutputLayerName(outputLayerNameAppendix, overwriteExisting);
+        IOgctDataSource outputDatasource = dataSource ?? _dataSource;
+        var output = CreateAndOpenLayer(outputDatasource, outputLayerName, fieldsForDissolve);
 
-        if (fieldsUsedForDissolve.Count == 0)  // dissolve on all fields
+       // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
+        
+        var featureGroups = GroupFeaturesByFields(fieldsForDissolve);
+
+        ProcessFeatureGroups(output.Layer,output.GeomType, featureGroups, fieldsForDissolve);
+
+        output.Layer.Dispose();
+
+
+        if (output.DataSource != null)
         {
-            fieldsUsedForDissolve = LayerDetails.Schema.FieldList;
+            output.DataSource.Dispose();
         }
-        var dissolveCondition = GetDissolveCondition(fieldsUsedForDissolve);
+
+        return outputLayerName;
+    }
+
+    /// <summary>
+    /// Get new layername from current layername with an appendix and dynamical number,
+    /// if overwrite is not allowed
+    /// </summary>
+    /// <param name="nameAppendix"></param>
+    /// <param name="isOverwrite"></param>
+    /// <returns></returns>
+    private string GetOutputLayerName(string nameAppendix, bool isOverwrite)
+    {
+        var baseLayerName = LayerDetails.Name + nameAppendix.Trim();
+
+        if (isOverwrite) return baseLayerName;
+
+        int suffix = 1;
+        string outputLayerName = baseLayerName;
+
+        while (DataSource.HasLayer(outputLayerName))
+        {
+            outputLayerName = $"{baseLayerName}{suffix}";
+            suffix++;
+        }
+        return outputLayerName;
+    }
 
 
-        // create outputLayer
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="fieldsForDissolve"></param>
+    /// <returns></returns>
+    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
+    {
+        var featureGroups = new Dictionary<string, List<IOgctFeature>>();
+
+        _layer.ResetReading();
+
+        var feature = OpenNextFeature(); // feature needs dispose at the end
+
+        while (feature != null)
+        {
+            string key = "";
+            var contents = new List<string>();
+            foreach (var dissolveField in fieldsForDissolve)
+            {
+                key += $"{feature.GetFieldAsString(dissolveField.Name)}_";
+
+                contents.Add(feature.GetFieldAsString(dissolveField.Name));
+            }
+
+            if (featureGroups.ContainsKey(key) == false)
+            {
+                featureGroups[key] = new List<IOgctFeature>();
+            }
+            featureGroups[key].Add(feature);
+
+            feature = OpenNextFeature();
+        }
+
+        return featureGroups;
+    }
+
+
+    private (IOgctDataSource DataSource, IOgctLayer Layer, wkbGeometryType GeomType) CreateAndOpenLayer(IOgctDataSource dataSource, string outputLayerName, List<FieldDefnInfo> fieldsForDissolve)
+    {
         IOgctLayer outputLayer = null!;
-        OgctDataSource outputDataSource = null!;
+        IOgctDataSource outputDataSource = null!;
 
-        // dissolved layers contain usually multiparts
-        var multiGeomType = ForceMultiPartGeomType(LayerDetails.GeomType);
+        var multiGeomType = ForceMultiPartGeomType(LayerDetails.GeomType); // dissolved layers contain usually multiparts
 
         switch (dataSource.SupportInfo.Type)
         {
+            case EDataSourceType.SHP_FOLDER:
             case EDataSourceType.SHP:
                 var outputDsAccessor = new OgctDataSourceAccessor();
 
@@ -299,49 +375,51 @@ public partial class OgctLayer : IOgctLayer
                 outputLayer = outputDataSource.OpenLayer(outputLayerName);
                 break;
 
-            case EDataSourceType.SHP_FOLDER:
-            case EDataSourceType.GPKG:   // GPKG to GPKG
+            case EDataSourceType.OpenFGDB:
+            case EDataSourceType.GPKG:
 
-                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType);
+                ESpatialRefWkt spRef = GetSpatialRef();
+
+                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, spRef, multiGeomType, fieldsForDissolve);
+
+                var layer = _dataSource.CreateAndOpenLayer("createdLayer", ESpatialRefWkt.CH1903plus_LV95,
+                    wkbGeometryType.wkbPolygon, fieldsForDissolve);
+
+                layer.Dispose();
+
                 break;
 
-            case EDataSourceType.OpenFGDB:
-                throw new DataSourceReadOnlyException("FGDB is read-only");
             default:
                 throw new DataSourceMethodNotImplementedException("data source unknown");
         }
+        return (outputDataSource, outputLayer, multiGeomType);
+    }
 
-        CloneFieldSchema(outputLayer, fieldsUsedForDissolve);
-
-        long outputFeatureFid = 0;
-
-        foreach (var conditionGroup in dissolveCondition.DissolveGroups)
+    private void ProcessFeatureGroups(IOgctLayer outputLayer, wkbGeometryType geomType, Dictionary<string, List<IOgctFeature>> featureGroups, List<FieldDefnInfo> fieldsForDissolve)
+    {
+        foreach (var group in featureGroups)
         {
-            // Console.WriteLine($" --- filter group = {conditionGroup.ToSql()} ");
+            // calculate dissolved geometry
+            var geometryAndAttributes = DissolveGroupGeometry(group.Value, fieldsForDissolve);
 
-            FilterByAttributeOnlyRespectedInNextFeatureLoop(conditionGroup.ToSql());
+            var outputFeature = outputLayer.CreateAndOpenFeature();
 
-            var outputFeature = outputLayer.CreateAndOpenFeature(outputFeatureFid++);
-
-            var dissolvedGeom = GetDissolvedGeometryFromFilteredLayerAndOpen(outputLayer.LayerDetails.GeomType);
-
-            if (dissolvedGeom.Type.Contains(multiGeomType.ToString(), StringComparison.InvariantCultureIgnoreCase) == false)
+            if (geometryAndAttributes.Item1.Type.Contains(geomType.ToString(), StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                Console.WriteLine($" -- Dissolve - Geometrytype: {dissolvedGeom.Type} in layer {outputLayerName}: {multiGeomType}");
+                Console.WriteLine($" -- Dissolve - Geometrytype: {geometryAndAttributes.Item1.Type} in layer {outputLayer.Name}: {geomType}");
             }
 
 
-            // fill geometry and attribute values
-            outputFeature.SetGeometry(dissolvedGeom.CloneAndOpen());
+            // set dissolved geometry
+            outputFeature.SetGeometry(geometryAndAttributes.Item1.CloneAndOpen());
 
-            dissolvedGeom.Dispose();
+            geometryAndAttributes.Item1.Dispose();
 
-            foreach (var field in outputLayer.LayerDetails.Schema.FieldList)
+            //transfer attribute values
+            int fieldCounter = 0;
+            foreach (var dissolveField in fieldsForDissolve)
             {
-
-                var content = conditionGroup.FieldConditions.Find(x => x.Field.Name == field.Name).Content;
-
-                outputFeature.SetValue(field, content);
+                outputFeature.SetValue(dissolveField, geometryAndAttributes.Item2[fieldCounter++]);
             }
 
             outputFeature.ValidateSchemaConstraints();
@@ -350,16 +428,80 @@ public partial class OgctLayer : IOgctLayer
 
             outputFeature.Dispose();
         }
+    }
 
-        outputLayer.Dispose();
+    private (IOgctGeometry, List<string>) DissolveGroupGeometry(List<IOgctFeature> group, List<FieldDefnInfo> fieldsForDissolve)
+    {
+        IOgctGeometry dissolvedGeometry = null;
+        var attributeContents = new List<string>();
 
-        if (outputDataSource != null)
+        foreach (IOgctFeature f in group)
         {
-            outputDataSource.Dispose();
+            var geom = f.OpenGeometry();
+            if (dissolvedGeometry == null)  // init dissolve-geometry
+            {
+                dissolvedGeometry = geom.CloneAndOpen();
+                geom.Dispose();
+
+                foreach (var field in fieldsForDissolve)
+                {
+                    attributeContents.Add(f.GetFieldAsString(field.Name));
+                }
+            }
+            else
+            {
+                var geomUnion = dissolvedGeometry.GetAndOpenUnion(geom);
+                geom.Dispose();
+                dissolvedGeometry.Dispose();
+                dissolvedGeometry = geomUnion;
+            }
+
+            f.Dispose();
         }
 
-        return outputLayerName;
+        return (dissolvedGeometry,attributeContents);
     }
+
+
+    /// <summary>
+    /// obsolete, due to non-working SQL with GROUP BY.
+    /// As this is no longer working, the method is useless.
+    /// </summary>
+    /// <param name="fieldsToDissolve"></param>
+    /// <returns></returns>
+    private DissolveCondition GetDissolveCondition(List<FieldDefnInfo> fieldsToDissolve)
+    {
+        var dissolveCondition = new DissolveCondition();
+
+        string listOfDissolveFieldNames = string.Join(", ", fieldsToDissolve.Select(_ => _.Name));
+
+        var sqlGroupDissolveFieldsFilterQuery = $"SELECT {listOfDissolveFieldNames} FROM {LayerDetails.Name} GROUP BY {listOfDissolveFieldNames}";
+
+        sqlGroupDissolveFieldsFilterQuery = "SELECT ObjNummer FROM N2016_GeoIV_Park_Perimeter20160101 GROUP BY ObjNummer";
+
+        using (var groupedInputLayer = _dataSource.ExecuteSQL(sqlGroupDissolveFieldsFilterQuery, dialect: DataSource.SupportInfo.Type == EDataSourceType.GPKG ? OgcConstants.GpkgSqlDialect : OgcConstants.OgrSqlDialect))
+        {
+            var groupValueRowsToDissolve = groupedInputLayer.ReadRows(); // collect distinct values to use in later dissolve
+
+            foreach (var row in groupValueRowsToDissolve)
+            {
+                var group = new ConditionGroup();
+
+                for (int i = 0; i < fieldsToDissolve.Count; i++)
+                {
+                    group.AddFieldCondition(fieldsToDissolve[i], ECompareSign.IsEqual, row.Items[i].Value);
+                }
+                dissolveCondition.AddDissolveGroup(group);
+            }
+        }
+        _layer.ResetReading();
+
+        return dissolveCondition;
+    }
+
+
+    #endregion
+
 
     /// <summary>
     /// if a geomType is "single, like Point or Polygon, it will be converted to Multipoint / MultiPolygon
@@ -601,7 +743,9 @@ public partial class OgctLayer : IOgctLayer
 
         var sqlGroupDissolveFieldsFilterQuery = $"SELECT {listOfDissolveFieldNames} FROM {LayerDetails.Name} GROUP BY {listOfDissolveFieldNames}";
 
-        using (var groupedInputLayer = _dataSource.ExecuteSQL(sqlGroupDissolveFieldsFilterQuery))
+        //  null, SupportInfo.Type == EDataSourceType.GPKG ? OgcConstants.GpkgSqlDialect : OgcConstants.OgrSqlDialect
+
+        using (var groupedInputLayer = _dataSource.ExecuteSQL(sqlGroupDissolveFieldsFilterQuery, DataSource.SupportInfo.Type == EDataSourceType.GPKG ? OgcConstants.GpkgSqlDialect : OgcConstants.OgrSqlDialect))
         {
             var groupValueRowsToDissolve = groupedInputLayer.ReadRows(); // collect distinct values to use in later dissolve
 
@@ -626,34 +770,7 @@ public partial class OgctLayer : IOgctLayer
         return sqlWhereClauses;
     }
 
-    private DissolveCondition GetDissolveCondition(List<FieldDefnInfo> fieldsToDissolve)
-    {
-        var dissolveCondition = new DissolveCondition();
 
-        string listOfDissolveFieldNames = string.Join(",", fieldsToDissolve.Select(_ => _.Name));
-
-        var sqlGroupDissolveFieldsFilterQuery = $"SELECT {listOfDissolveFieldNames} FROM {LayerDetails.Name} GROUP BY {listOfDissolveFieldNames}";
-
-
-        using (var groupedInputLayer = _dataSource.ExecuteSQL(sqlGroupDissolveFieldsFilterQuery))
-        {
-            var groupValueRowsToDissolve = groupedInputLayer.ReadRows(); // collect distinct values to use in later dissolve
-
-            foreach (var row in groupValueRowsToDissolve)
-            {
-                var group = new ConditionGroup();
-
-                for (int i = 0; i < fieldsToDissolve.Count; i++)
-                {
-                    group.AddFieldCondition(fieldsToDissolve[i], ECompareSign.IsEqual, row.Items[i].Value);
-                }
-                dissolveCondition.AddDissolveGroup(group);
-            }
-        }
-        _layer.ResetReading();
-
-        return dissolveCondition;
-    }
 
     /// <summary>
     /// Clones the complete fieldlist of the layer into the targetLayer
@@ -904,6 +1021,19 @@ public partial class OgctLayer : IOgctLayer
     {
         var feature = new OSGeo.OGR.Feature(OgrLayer.GetLayerDefn());
         feature.SetFID(fid);
+
+        return new OgctFeature(feature, this);
+    }
+
+    /// <summary>
+    /// Creates an empty feature without content: no geometry, no attribute values
+    /// </summary>
+    /// <param name="layer"></param>
+    /// <param name="fid">required and unique, must be equal or greater than 0</param>
+    /// <returns></returns>
+    public IOgctFeature CreateAndOpenFeature()
+    {
+        var feature = new OSGeo.OGR.Feature(OgrLayer.GetLayerDefn());
 
         return new OgctFeature(feature, this);
     }

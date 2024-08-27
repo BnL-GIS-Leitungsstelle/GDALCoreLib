@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GdalToolsLib;
+using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
+using OSGeo.OGR;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -127,11 +129,6 @@ namespace GdalCoreTest
 
             _outputHelper.WriteLine(file);
             
-            if (sourceType.Type == EDataSourceType.OpenFGDB)
-            {
-                return;
-            }
-
             using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
             var layerNames = dataSource.GetLayerNames();
 
@@ -144,12 +141,33 @@ namespace GdalCoreTest
                     using var layer = dataSource.OpenLayer(layerName);
                     var inputLayerInfo = layer.LayerDetails;
                     var fieldsToDissolve = inputLayerInfo.Schema.FieldList.Where(f => f.Name =="ObjNummer" || f.Name.Contains("Name")).ToList();
-                    string outputLayerName = layer.DissolveToLayer(dataSource, fieldsToDissolve);
+                   
+                    // check, if datasource supports creation (else ignore)
+                    if (sourceType.Access != EAccessLevel.Full) return;
+
+                    using var dataSourcetest = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full, true,
+                        ESpatialRefWkt.CH1903plus_LV95, wkbGeometryType.wkbPolygon);
+
+                    // test the creation of a layer
+                    if (sourceType.Type == EDataSourceType.SHP)
+                    {
+                        using var testLayer = dataSource.OpenLayer(dataSource.GetLayerNames().First());
+                    }
+                    else
+                    {
+                        //using var testLayertest = dataSourcetest.CreateAndOpenLayer("N2016_GeoIV_ParkLayerTest", ESpatialRefWkt.CH1903plus_LV95,
+                        //    wkbGeometryType.wkbPolygon, fieldsToDissolve);
+                        //using var testLayer = dataSource.CreateAndOpenLayer("N2016_GeoIV_ParkTest", ESpatialRefWkt.CH1903plus_LV95,
+                        //    wkbGeometryType.wkbPolygon, fieldsToDissolve);
+                    }
+                    
+                    
+                    string outputLayerName = layer.DissolveToLayer(null, fieldsToDissolve);
 
                     OgctDataSource outputDataSource = null;
                     IOgctLayer outputlayer = null;
 
-                    if (dataSource.SupportInfo.Type == EDataSourceType.GPKG)
+                    if (dataSource.SupportInfo.Type == EDataSourceType.GPKG || dataSource.SupportInfo.Type == EDataSourceType.OpenFGDB)
                     {
                         outputlayer = dataSource.OpenLayer(outputLayerName);
                     }
