@@ -1,0 +1,6 @@
+// Buffer for GDB's
+// Format: {required layername part: LegalState} ; {required layername part: Theme} ; buffer radius to meet Area of 0.858 ha
+//
+Revision;amphibWanderobjekt;52.26
+Serie1;amphibWanderobjekt;52.26
+Serie2;amphibWanderobjekt;52.26

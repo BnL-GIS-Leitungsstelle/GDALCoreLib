@@ -1,0 +1,30 @@
+// Unions for GDB's
+// Format: {Year} ; {Legal State} ; {layer-name1} ; {layer-name2} 
+// Format: {result-layer-name} ; {Year} ; {Legal State} ; {layer-name}  
+// All lines (layers) with identical {result-layer-name} will be unified together
+//2001;Serie1;amphibLaichgebiet;amphibWanderobjekt
+//2003;Serie2;amphibLaichgebiet;amphibWanderobjekt
+//2007;Revision;amphibLaichgebiet;amphibWanderobjekt
+//2017;Revision;amphibLaichgebiet;amphibWanderobjekt
+//2014;Revision;WaldreservateProNatura;WaldreservateKantone
+//2016;Revision;WaldreservateProNatura;WaldreservateKantone
+//2018;Revision;WaldreservateProNatura;WaldreservateKantone
+//2020;Revision;WaldreservateProNatura;WaldreservateKantone
+N2001_Serie1_amphibLaichgebietUndWanderobjekte;2001;Serie1;amphibLaichgebiet
+N2001_Serie1_amphibLaichgebietUndWanderobjekte;2001;Serie1;amphibWanderobjekt
+N2003_Serie2_amphibLaichgebietUndWanderobjekte;2003;Serie2;amphibLaichgebiet
+N2003_Serie2_amphibLaichgebietUndWanderobjekte;2003;Serie2;amphibWanderobjekt
+N2007_Revision_amphibLaichgebietUndWanderobjekte;2007;Revision;amphibLaichgebiet
+N2007_Revision_amphibLaichgebietUndWanderobjekte;2007;Revision;amphibWanderobjekt
+N2017_Revision_amphibLaichgebietUndWanderobjekte;2017;Revision;amphibLaichgebiet
+N2017_Revision_amphibLaichgebietUndWanderobjekte;2017;Revision;amphibWanderobjekt
+N2014_Revision_WaldreservateKantoneUndProNatura;2014;Revision;WaldreservateProNatura
+N2014_Revision_WaldreservateKantoneUndProNatura;2014;Revision;WaldreservateKantone
+N2016_Revision_WaldreservateKantoneUndProNatura;2016;Revision;WaldreservateProNatura
+N2016_Revision_WaldreservateKantoneUndProNatura;2016;Revision;WaldreservateKantone
+N2018_Revision_WaldreservateKantoneUndProNatura;2018;Revision;WaldreservateProNatura
+N2018_Revision_WaldreservateKantoneUndProNatura;2018;Revision;WaldreservateKantone
+N2020_Revision_WaldreservateKantoneUndProNatura;2020;Revision;WaldreservateProNatura
+N2020_Revision_WaldreservateKantoneUndProNatura;2020;Revision;WaldreservateKantone
+N2022_Revision_WaldreservateKantoneUndProNatura;2022;Revision;WaldreservateProNatura
+N2022_Revision_WaldreservateKantoneUndProNatura;2022;Revision;WaldreservateKantone
