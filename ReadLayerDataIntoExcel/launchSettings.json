@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Fauna\\KARCH\\Amphibienzugstellen\\Zugstellen\\inputKARCH\\date20240821\\BekannteKonfliktstellen\\Karch_Input.gdb"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Fauna\\KARCH\\PotentielleAmphibienKonflikte\\2024\\inputKarch\\date20240827\\PotentielleAmphibienKonflikte.gdb"
     }
   }
 }
