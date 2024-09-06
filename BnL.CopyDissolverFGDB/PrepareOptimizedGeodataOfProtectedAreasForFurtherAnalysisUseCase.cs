@@ -116,33 +116,32 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
 
         AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
 
-        // copy the data into a processable format
-        ConvertGdbsIntoGPKGsOneOutputFolderMissingRepairGeometry();
+        CleanupLayersWithoutValidDissolveFields();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.GPKG));
+        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
 
         // Preprocessing before dissolving
         FilterAndBufferSomeLayers();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.GPKG));
+        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
 
         // to summarize data based on objNummer and Name
         DissolveLayers();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.GPKG));
+        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
 
         // Unify some (e.g.amphibien)
         UnifySomeLayers();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.GPKG));
+        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
 
         // Cleanup all non-dissolved or non-unified layers
         CleanupNonDissolvedAndNonUnifiedLayers();
@@ -218,7 +217,7 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
                         Console.WriteLine($" -- > Filter protected areas in {workLayer.LayerName}");
                         //TODO: überprüfen mit altem Ergebnis
 
-                        ds.RenameLayerGpkg(workLayer.LayerName, $"{workLayer.LayerName}ToBeDeleted");
+                        ds.RenameLayerOpenFgdb(workLayer.LayerName, $"{workLayer.LayerName}ToBeDeleted");
                     }
                 }
 
@@ -232,7 +231,7 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
                             newLayerName = workLayer.LayerName.Replace("_Park_", "_ParkKernzone_");
                         }
 
-                        ds.RenameLayerGpkg($"{workLayer.LayerName}Filtered", newLayerName);
+                        ds.RenameLayerOpenFgdb($"{workLayer.LayerName}Filtered", newLayerName);
                     }
                 }
             }
@@ -264,14 +263,14 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
 
                     layer.BufferToLayer(ds, buffer.BufferDistanceMeter);
 
-                    ds.RenameLayerGpkg(workLayer.LayerName, $"{workLayer.LayerName}ToBeDeleted");
+                    ds.RenameLayerOpenFgdb(workLayer.LayerName, $"{workLayer.LayerName}ToBeDeleted");
                 }
 
                 using (var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(workLayer.FileName, EAccessLevel.Full))
                 {
                     if (ds.HasLayer($"{workLayer.LayerName}Buffer"))
                     {
-                        ds.RenameLayerGpkg($"{workLayer.LayerName}Buffer", workLayer.LayerName);
+                        ds.RenameLayerOpenFgdb($"{workLayer.LayerName}Buffer", workLayer.LayerName);
                     }
                 }
             }
@@ -308,7 +307,7 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
                     Console.Write($" -- > Unify areas from {item.LayerName} and {item.LayerNameOther} ");
 
                     var outputLayerName = layer.GeoProcessWithLayer(EGeoProcess.Union, otherLayer, item.ResultLayerName);
-                    
+
                     Console.WriteLine($" into {outputLayerName}.");
                 }
             }
@@ -318,31 +317,31 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
 
     private void DissolveLayers()
     {
-        var gpkgs = Worklist.QueryWorkLayerToDissolve().Select(x => x.FileName).Distinct().ToList();
+        var gdbs = Worklist.QueryWorkLayerToDissolve().Select(x => x.FileName).Distinct().ToList();
 
-        //foreach (var gpkgPath in gpkgs)
+        //foreach (var gdpPath in gdbs)
         //{
-        //    var layerNames = Worklist.QueryWorkLayerToDissolve().Where(x => x.FileName == gpkgPath).Select(x => x.LayerName).ToList();
+        //    var layerNames = Worklist.QueryWorkLayerToDissolve().Where(x => x.FileName == gdpPath).Select(x => x.LayerName).ToList();
 
-        //    DissolveLayersPerGpkg(gpkgPath, layerNames);
+        //    DissolveLayersPerGdb(gdpPath, layerNames);
         //}
 
-        Parallel.ForEach(gpkgs, gpkgPath =>
+        Parallel.ForEach(gdbs, gdpPath =>
         {
-            var layerNames = Worklist.QueryWorkLayerToDissolve().Where(x => x.FileName == gpkgPath).Select(x => x.LayerName).ToList();
+            var layerNames = Worklist.QueryWorkLayerToDissolve().Where(x => x.FileName == gdpPath).Select(x => x.LayerName).ToList();
 
-            DissolveLayersPerGpkg(gpkgPath, layerNames);
+            DissolveLayersPerGdb(gdpPath, layerNames);
         });
     }
 
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="gpkgPath"></param>
+    /// <param name="gdbPath"></param>
     /// <param name="layerNames"></param>
-    private void DissolveLayersPerGpkg(string gpkgPath, List<string> layerNames)
+    private void DissolveLayersPerGdb(string gdbPath, List<string> layerNames)
     {
-        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(gpkgPath, EAccessLevel.Full);
+        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(gdbPath, EAccessLevel.Full);
 
         foreach (var layerName in layerNames)
         {
@@ -356,27 +355,34 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
         }
     }
 
-
-    private void ConvertGdbsIntoGPKGsOneOutputFolderMissingRepairGeometry()
+    private void CleanupLayersWithoutValidDissolveFields()
     {
-        var gdbList = Worklist.WorkLayers.Where(w => w.WorkState == EWorkState.ValidDissolveFields).Select(x => x.FileName).Distinct()
-            .ToList();
-        Console.WriteLine($"Convert {gdbList.Count} FGDB into GPKGs.\n");
+        var gdbsWithLayersToRemove = Worklist.WorkLayers
+            .Where(w => w.WorkState != EWorkState.ValidDissolveFields)
+            .Select(x => x.FileName)
+            .Distinct();
 
-        //foreach (string gdbPath in gdbList)
-        //{
-        //    var layerNameList = Worklist.WorkLayers.Where(w => w.FileName == gdbPath && w.WorkState == EWorkState.ValidDissolveFields).Select(x => x.LayerName).Distinct()
-        //        .ToList();
-        //    ConvertGdbToGpkg(gdbPath, layerNameList);
-        //}
-
-
-        Parallel.ForEach(gdbList, gdbPath =>
+        foreach (var gdbFileName in gdbsWithLayersToRemove)
         {
-            var layerNameList = Worklist.WorkLayers.Where(w => w.FileName == gdbPath && w.WorkState == EWorkState.ValidDissolveFields).Select(x => x.LayerName).Distinct()
-                .ToList();
-            ConvertGdbToGpkg(gdbPath, layerNameList);
-        });
+            var layersToRemove = Worklist.WorkLayers
+                .Where(w => w.FileName == gdbFileName && w.WorkState != EWorkState.ValidDissolveFields)
+                .Select(w => w.LayerName)
+                .Distinct()
+                .ToArray();
+
+            Console.WriteLine($"Remove {layersToRemove.Length} Layers with missing dissolve fields from GDB {gdbFileName}.");
+
+            using var gdb = new OgctDataSourceAccessor().OpenOrCreateDatasource(gdbFileName, EAccessLevel.Full);
+            foreach (var layer in layersToRemove) 
+            {
+                var success = gdb.DeleteLayer(layer);
+                
+                if (!success)
+                {
+                    throw new ApplicationException($"**error: Could not delete layer {layer} from file {gdbFileName}");
+                }
+            }
+        }
     }
 
     public static void WriteLine(String str, Boolean line = true)
@@ -393,37 +399,6 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
             }
         }
     }
-
-    /// <summary>
-    /// Convert a single FGDB (with given list of layers) to copy into a GPKG (same name as FGDB)
-    /// </summary>
-    /// <param name="gdbPath"></param>
-    /// <param name="layerNameList"></param>
-    private void ConvertGdbToGpkg(string gdbPath, List<string> layerNameList)
-    {
-        string outputGPKGPath = Path.Combine(Path.GetDirectoryName(gdbPath), Path.GetFileNameWithoutExtension(gdbPath) + ".gpkg");
-
-        if (File.Exists(outputGPKGPath)) File.Delete(outputGPKGPath);
-
-        using var targetDatasource = new OgctDataSourceAccessor().CreateAndOpenDatasource(outputGPKGPath, GdalToolsLib.Common.ESpatialRefWkt.CH1903plus_LV95);
-
-        using var dsGdb = new OgctDataSourceAccessor().OpenOrCreateDatasource(gdbPath);
-
-        foreach (var layerName in layerNameList)
-        {
-            using var layer = dsGdb.OpenLayer(layerName);
-
-            //await geometryValidationResult = layer.ValidateGeometryAsync();
-
-            long numberOfRecords = layer.CopyToLayer(targetDatasource, layerName);
-
-            WriteLine($"Convert {layerName} into {Path.GetFileNameWithoutExtension(gdbPath) + ".gpkg"} ({numberOfRecords} records)");
-        }
-    }
-
-
-
-
 
     /// <summary>
     /// report invalid layers to the user

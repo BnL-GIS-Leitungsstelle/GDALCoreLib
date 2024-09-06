@@ -372,7 +372,7 @@ public class OgctDataSource : IOgctDataSource
             return;
         _dataSource.StartTransaction(1);
 
-        var sqlDdl = $"ALTER TABLE {layerName} RENAME TO {newLayerName};";
+        var sqlDdl = $"ALTER TABLE {layerName} RENAME TO {newLayerName}";
         _ = ExecuteSQL(sqlDdl);
 
         _dataSource.SyncToDisk();

@@ -558,12 +558,11 @@ public partial class OgctLayer : IOgctLayer
 
             case EDataSourceType.SHP_FOLDER:
             case EDataSourceType.GPKG: // GPKG to GPKG
+            case EDataSourceType.OpenFGDB:
                 outputLayer =
                     _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), wkbGeometryType.wkbPolygon);
                 break;
 
-            case EDataSourceType.OpenFGDB:
-                throw new DataSourceReadOnlyException("FGDB is read-only");
             default:
                 throw new DataSourceMethodNotImplementedException("data source unknown");
         }
