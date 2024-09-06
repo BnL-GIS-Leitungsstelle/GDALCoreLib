@@ -377,7 +377,8 @@ public partial class OgctLayer : IOgctLayer
 
             case EDataSourceType.OpenFGDB:
             case EDataSourceType.GPKG:
-                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve, createAreaAndLengthFields: true);
+                var metadata = _dataSource.ExecuteSqlFgdbGetLayerMetadata(LayerDetails.Name);
+                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve, createAreaAndLengthFields: true, documentation: metadata);
                 break;
 
             default:

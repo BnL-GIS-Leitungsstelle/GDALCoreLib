@@ -32,7 +32,13 @@ public class OgctDataSource : IOgctDataSource
     private Exception CannotWriteException => new DataSourceMethodNotImplementedException($"Write operations are unsupported in this type of datasource");
 
     public IOgctLayer CreateAndOpenLayer(
-        string? layerName, ESpatialRefWkt eSpatialRef, wkbGeometryType geometryType, List<FieldDefnInfo> fieldDefnInfos = null, bool overwriteExisting = true, bool createAreaAndLengthFields = false)
+        string? layerName, 
+        ESpatialRefWkt eSpatialRef, 
+        wkbGeometryType geometryType,
+        List<FieldDefnInfo> fieldDefnInfos = null,
+        bool overwriteExisting = true, 
+        bool createAreaAndLengthFields = false,
+        string? documentation = null)
     {
         var supportedDatasource = SupportedDatasource.GetSupportedDatasource(Name);
 
@@ -55,13 +61,15 @@ public class OgctDataSource : IOgctDataSource
                 }
 
 
-                //var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, new string[] { "DOCUMENTATION = 'test TBD' ", overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo });
+                var layerOptions = new List<string>() 
+                {
+                    overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo,
+                    createAreaAndLengthFields ? OgcConstants.OptionCreateShapeAreaAndLengthFieldsYes : OgcConstants.OptionCreateShapeAreaAndLengthFieldsNo
+                };
+                if (!string.IsNullOrEmpty(documentation))
+                    layerOptions.Add($"{OgcConstants.OptionDocumentationPrefix}{documentation}");
 
-                var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, 
-                    [
-                        overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo,
-                        createAreaAndLengthFields ? OgcConstants.OptionCreateShapeAreaAndLengthFieldsYes : OgcConstants.OptionCreateShapeAreaAndLengthFieldsNo
-                    ]);
+                var layer = _dataSource.CreateLayer(layerName, spRef, geometryType, layerOptions.ToArray());
 
 
                 if (layer == null) throw new Exception("Could not create new LayerName " + layerName + " in " + _dataSource.name);
