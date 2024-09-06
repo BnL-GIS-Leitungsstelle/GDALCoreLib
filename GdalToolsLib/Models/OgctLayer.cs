@@ -279,7 +279,7 @@ public partial class OgctLayer : IOgctLayer
 
        // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
         
-        var featureGroups = GroupFeaturesByFields(output.Layer, fieldsForDissolve);
+        var featureGroups = GroupFeaturesByFields(fieldsForDissolve);
 
         ProcessFeatureGroups(output.Layer,output.GeomType, featureGroups, fieldsForDissolve);
 
@@ -324,13 +324,13 @@ public partial class OgctLayer : IOgctLayer
     /// </summary>
     /// <param name="fieldsForDissolve"></param>
     /// <returns></returns>
-    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(IOgctLayer layer, List<FieldDefnInfo> fieldsForDissolve)
+    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
     {
         var featureGroups = new Dictionary<string, List<IOgctFeature>>();
 
-        layer.ResetReading();
+        _layer.ResetReading();
         
-        var feature = layer.OpenNextFeature(); ; // feature needs dispose at the end
+        var feature = OpenNextFeature(); ; // feature needs dispose at the end
 
         while (feature != null)
         {
@@ -349,7 +349,7 @@ public partial class OgctLayer : IOgctLayer
             }
             featureGroups[key].Add(feature);
 
-            feature = layer.OpenNextFeature();
+            feature = OpenNextFeature();
         }
 
         return featureGroups;
@@ -400,10 +400,13 @@ public partial class OgctLayer : IOgctLayer
                 Console.WriteLine($" -- Dissolve - Geometrytype: {geometryAndAttributes.Item1.Type} in layer {outputLayer.Name}: {geomType}");
             }
 
-
             // set dissolved geometry
-            outputFeature.SetGeometry(geometryAndAttributes.Item1.CloneAndOpen());
+            var dissolvedGeometry = geometryAndAttributes.Item1.IsAMultiGeometryType()
+                ? geometryAndAttributes.Item1
+                : geometryAndAttributes.Item1.CreateMultipartGeometryAndOpen();
+            outputFeature.SetGeometry(dissolvedGeometry);
 
+            dissolvedGeometry.Dispose();
             geometryAndAttributes.Item1.Dispose();
 
             //transfer attribute values
@@ -659,7 +662,7 @@ public partial class OgctLayer : IOgctLayer
 
             if (dissolvedGeometry.IsAMultiGeometryType() == false)
             {
-                multiGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen(outputFeature.GetGeomType());
+                multiGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen();
                 dissolvedGeometry.Dispose();
             }
 
@@ -715,7 +718,7 @@ public partial class OgctLayer : IOgctLayer
 
         if (dissolvedGeometry.IsAMultiGeometryType() == false)
         {
-            multipartGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen(outputGeomType);
+            multipartGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen();
             dissolvedGeometry.Dispose();
             return multipartGeometry;
         }
