@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GDAL" Version="3.9.1" />
+    <PackageReference Include="GDAL.Native" Version="3.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GdalToolsLib\GdalToolsLib.csproj" />
   </ItemGroup>
 

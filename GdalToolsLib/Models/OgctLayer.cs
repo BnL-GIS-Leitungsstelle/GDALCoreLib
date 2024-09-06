@@ -279,7 +279,7 @@ public partial class OgctLayer : IOgctLayer
 
        // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
         
-        var featureGroups = GroupFeaturesByFields(fieldsForDissolve);
+        var featureGroups = GroupFeaturesByFields(output.Layer, fieldsForDissolve);
 
         ProcessFeatureGroups(output.Layer,output.GeomType, featureGroups, fieldsForDissolve);
 
@@ -324,13 +324,13 @@ public partial class OgctLayer : IOgctLayer
     /// </summary>
     /// <param name="fieldsForDissolve"></param>
     /// <returns></returns>
-    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
+    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(IOgctLayer layer, List<FieldDefnInfo> fieldsForDissolve)
     {
         var featureGroups = new Dictionary<string, List<IOgctFeature>>();
 
-        _layer.ResetReading();
-
-        var feature = OpenNextFeature(); // feature needs dispose at the end
+        layer.ResetReading();
+        
+        var feature = layer.OpenNextFeature(); ; // feature needs dispose at the end
 
         while (feature != null)
         {
@@ -349,7 +349,7 @@ public partial class OgctLayer : IOgctLayer
             }
             featureGroups[key].Add(feature);
 
-            feature = OpenNextFeature();
+            feature = layer.OpenNextFeature();
         }
 
         return featureGroups;
@@ -377,16 +377,7 @@ public partial class OgctLayer : IOgctLayer
 
             case EDataSourceType.OpenFGDB:
             case EDataSourceType.GPKG:
-
-                ESpatialRefWkt spRef = GetSpatialRef();
-
-                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, spRef, multiGeomType, fieldsForDissolve);
-
-                var layer = _dataSource.CreateAndOpenLayer("createdLayer", ESpatialRefWkt.CH1903plus_LV95,
-                    wkbGeometryType.wkbPolygon, fieldsForDissolve);
-
-                layer.Dispose();
-
+                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve);
                 break;
 
             default:
