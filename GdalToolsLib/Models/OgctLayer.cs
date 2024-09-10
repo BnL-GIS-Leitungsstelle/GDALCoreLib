@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -375,8 +376,11 @@ public partial class OgctLayer : IOgctLayer
                 outputLayer = outputDataSource.OpenLayer(outputLayerName);
                 break;
 
-            case EDataSourceType.OpenFGDB:
             case EDataSourceType.GPKG:
+                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve);
+                break;
+
+            case EDataSourceType.OpenFGDB:
                 var metadata = _dataSource.ExecuteSqlFgdbGetLayerMetadata(LayerDetails.Name);
                 outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve, createAreaAndLengthFields: true, documentation: metadata);
                 break;
