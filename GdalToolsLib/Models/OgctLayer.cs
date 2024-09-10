@@ -330,7 +330,7 @@ public partial class OgctLayer : IOgctLayer
 
         _layer.ResetReading();
         
-        var feature = OpenNextFeature(); ; // feature needs dispose at the end
+        var feature = OpenNextFeature(); // feature needs dispose at the end
 
         while (feature != null)
         {
