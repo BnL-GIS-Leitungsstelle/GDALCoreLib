@@ -41,9 +41,8 @@ public class OgctGeometry : IOgctGeometry
     /// Some geometrytypes are not stored correctly regarding standards of features or layers.
     /// E.g. if you want to store a polygon in a multipolygon-layer/feature
     /// </summary>
-    /// <param name="otherGeomType">the geomType of a layer or feature </param>
     /// <returns></returns>
-    public IOgctGeometry CreateMultipartGeometryAndOpen(wkbGeometryType otherGeomType)
+    public IOgctGeometry CreateMultipartGeometryAndOpen()
     {
         switch (this.OgrGeometry.GetGeometryType())
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -329,7 +330,7 @@ public partial class OgctLayer : IOgctLayer
         var featureGroups = new Dictionary<string, List<IOgctFeature>>();
 
         _layer.ResetReading();
-
+        
         var feature = OpenNextFeature(); // feature needs dispose at the end
 
         while (feature != null)
@@ -375,18 +376,13 @@ public partial class OgctLayer : IOgctLayer
                 outputLayer = outputDataSource.OpenLayer(outputLayerName);
                 break;
 
-            case EDataSourceType.OpenFGDB:
             case EDataSourceType.GPKG:
+                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve);
+                break;
 
-                ESpatialRefWkt spRef = GetSpatialRef();
-
-                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, spRef, multiGeomType, fieldsForDissolve);
-
-                var layer = _dataSource.CreateAndOpenLayer("createdLayer", ESpatialRefWkt.CH1903plus_LV95,
-                    wkbGeometryType.wkbPolygon, fieldsForDissolve);
-
-                layer.Dispose();
-
+            case EDataSourceType.OpenFGDB:
+                var metadata = _dataSource.ExecuteSqlFgdbGetLayerMetadata(LayerDetails.Name);
+                outputLayer = _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), multiGeomType, fieldsForDissolve, createAreaAndLengthFields: true, documentation: metadata);
                 break;
 
             default:
@@ -409,10 +405,13 @@ public partial class OgctLayer : IOgctLayer
                 Console.WriteLine($" -- Dissolve - Geometrytype: {geometryAndAttributes.Item1.Type} in layer {outputLayer.Name}: {geomType}");
             }
 
-
             // set dissolved geometry
-            outputFeature.SetGeometry(geometryAndAttributes.Item1.CloneAndOpen());
+            var dissolvedGeometry = geometryAndAttributes.Item1.IsAMultiGeometryType()
+                ? geometryAndAttributes.Item1
+                : geometryAndAttributes.Item1.CreateMultipartGeometryAndOpen();
+            outputFeature.SetGeometry(dissolvedGeometry);
 
+            dissolvedGeometry.Dispose();
             geometryAndAttributes.Item1.Dispose();
 
             //transfer attribute values
@@ -564,12 +563,11 @@ public partial class OgctLayer : IOgctLayer
 
             case EDataSourceType.SHP_FOLDER:
             case EDataSourceType.GPKG: // GPKG to GPKG
+            case EDataSourceType.OpenFGDB:
                 outputLayer =
                     _dataSource.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), wkbGeometryType.wkbPolygon);
                 break;
 
-            case EDataSourceType.OpenFGDB:
-                throw new DataSourceReadOnlyException("FGDB is read-only");
             default:
                 throw new DataSourceMethodNotImplementedException("data source unknown");
         }
@@ -614,7 +612,7 @@ public partial class OgctLayer : IOgctLayer
     {
         outputLayerName = outputLayerName == null ? $"{this.Name}{geoProcess}" : $"{outputLayerName}{geoProcess}";
 
-        GeoprocessingInSingleGpkg(geoProcess, otherLayer, outputLayerName);
+        GeoprocessingInSingleVectorFile(geoProcess, otherLayer, outputLayerName);
 
         return outputLayerName;
     }
@@ -668,7 +666,7 @@ public partial class OgctLayer : IOgctLayer
 
             if (dissolvedGeometry.IsAMultiGeometryType() == false)
             {
-                multiGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen(outputFeature.GetGeomType());
+                multiGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen();
                 dissolvedGeometry.Dispose();
             }
 
@@ -724,7 +722,7 @@ public partial class OgctLayer : IOgctLayer
 
         if (dissolvedGeometry.IsAMultiGeometryType() == false)
         {
-            multipartGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen(outputGeomType);
+            multipartGeometry = dissolvedGeometry.CreateMultipartGeometryAndOpen();
             dissolvedGeometry.Dispose();
             return multipartGeometry;
         }
@@ -1158,12 +1156,14 @@ public partial class OgctLayer : IOgctLayer
         return validationResult;
     }
 
-    private void GeoprocessingInSingleGpkg(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
+    private void GeoprocessingInSingleVectorFile(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
     {
         using var tempInMemoryDataset = new OgctDataSourceAccessor().CreateAndOpenInMemoryDatasource();
 
-        using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(resultLayerName, GetSpatialRef(), LayerDetails.GeomType,
-                                                            LayerDetails.Schema.FieldList, false);
+        // create field definitions using copy schema --> 
+        // otherwise shape_area and shape_length fields are not calculated in some cases
+        using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(resultLayerName, GetSpatialRef(), LayerDetails.GeomType, overwriteExisting: false);
+        CopySchema(tempInMemoryLayer);
 
         if (tempInMemoryLayer == null)
         {

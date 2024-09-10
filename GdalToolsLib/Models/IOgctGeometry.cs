@@ -25,7 +25,7 @@ public interface IOgctGeometry : IDisposable
 
     bool Intersects(IOgctGeometry candidate);
 
-    IOgctGeometry CreateMultipartGeometryAndOpen(wkbGeometryType otherGeomType);
+    IOgctGeometry CreateMultipartGeometryAndOpen();
     IOgctGeometry GetAndOpenIntersection(IOgctGeometry target);
     IOgctGeometry GetAndOpenUnion(IOgctGeometry target);
 

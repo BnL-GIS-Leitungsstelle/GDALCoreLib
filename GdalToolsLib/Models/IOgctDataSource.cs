@@ -11,7 +11,14 @@ public interface IOgctDataSource : IDisposable
 {
     SupportedDatasource SupportInfo { get; }
     string? Name { get; }
-    IOgctLayer CreateAndOpenLayer(string? layerName, ESpatialRefWkt eSpatialRef, wkbGeometryType geometryType, List<FieldDefnInfo> fieldDefnInfos = null, bool overwriteExisting = true);
+    IOgctLayer CreateAndOpenLayer(
+        string? layerName,
+        ESpatialRefWkt eSpatialRef,
+        wkbGeometryType geometryType,
+        List<FieldDefnInfo> fieldDefnInfos = null,
+        bool overwriteExisting = true,
+        bool createAreaAndLengthFields = false,
+        string? documentation = null);
     int GetLayerCount();
     
     //bool LayerExists(string layerName);
