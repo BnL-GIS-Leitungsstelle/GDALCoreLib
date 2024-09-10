@@ -608,7 +608,7 @@ public partial class OgctLayer : IOgctLayer
     {
         outputLayerName = outputLayerName == null ? $"{this.Name}{geoProcess}" : $"{outputLayerName}{geoProcess}";
 
-        GeoprocessingInSingleGpkg(geoProcess, otherLayer, outputLayerName);
+        GeoprocessingInSingleVectorFile(geoProcess, otherLayer, outputLayerName);
 
         return outputLayerName;
     }
@@ -1152,12 +1152,14 @@ public partial class OgctLayer : IOgctLayer
         return validationResult;
     }
 
-    private void GeoprocessingInSingleGpkg(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
+    private void GeoprocessingInSingleVectorFile(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
     {
         using var tempInMemoryDataset = new OgctDataSourceAccessor().CreateAndOpenInMemoryDatasource();
 
-        using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(resultLayerName, GetSpatialRef(), LayerDetails.GeomType,
-                                                            LayerDetails.Schema.FieldList, false);
+        // create field definitions using copy schema --> 
+        // otherwise shape_area and shape_length fields are not calculated in some cases
+        using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(resultLayerName, GetSpatialRef(), LayerDetails.GeomType, overwriteExisting: false);
+        CopySchema(tempInMemoryLayer);
 
         if (tempInMemoryLayer == null)
         {
