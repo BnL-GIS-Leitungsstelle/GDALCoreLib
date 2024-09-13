@@ -5,6 +5,7 @@ using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
+using MaxRev.Gdal.Core;
 using OSGeo.OGR;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,7 +20,7 @@ namespace GdalCoreTest
         public OgcCoreToolsOgctLayerTests(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
-            GdalConfiguration.ConfigureGdal();
+            GdalBase.ConfigureAll();
         }
 
 

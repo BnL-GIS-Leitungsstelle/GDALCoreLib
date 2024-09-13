@@ -8,6 +8,7 @@ using GdalToolsLib.DataAccess;
 using GdalToolsLib.Exceptions;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
+using MaxRev.Gdal.Core;
 using OSGeo.OGR;
 using OSGeo.OSR;
 using Xunit;
@@ -26,7 +27,7 @@ public class OgctLayerTests : IClassFixture<LayerTestFixture>
     public OgctLayerTests(ITestOutputHelper outputHelper, LayerTestFixture fixture)
     {
         _output = outputHelper;
-        GdalToolsLib.GdalConfiguration.ConfigureGdal();
+        GdalBase.ConfigureAll();
         _fixture = fixture;
     }
 

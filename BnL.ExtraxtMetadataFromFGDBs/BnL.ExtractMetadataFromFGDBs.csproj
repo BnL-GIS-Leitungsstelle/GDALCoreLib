@@ -13,8 +13,6 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Cocona" Version="2.2.0" />
-	  <PackageReference Include="GDAl" Version="3.9.1" />
-	  <PackageReference Include="GDAL.Native" Version="3.9.1" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 

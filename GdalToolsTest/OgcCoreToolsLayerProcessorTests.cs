@@ -14,6 +14,7 @@ using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
 using Xunit;
 using Xunit.Abstractions;
+using MaxRev.Gdal.Core;
 
 namespace GdalCoreTest
 {
@@ -25,7 +26,7 @@ namespace GdalCoreTest
         public OgcCoreToolsLayerProcessorTests(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
-            GdalConfiguration.ConfigureGdal();
+            GdalBase.ConfigureAll();
         }
 
         // 1. Update attribute and ValueCast

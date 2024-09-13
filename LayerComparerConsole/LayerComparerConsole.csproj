@@ -11,8 +11,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Cocona" Version="2.2.0" />
-		<PackageReference Include="GDAL" Version="3.9.1" />
-		<PackageReference Include="GDAL.Native" Version="3.9.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
 		<PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />

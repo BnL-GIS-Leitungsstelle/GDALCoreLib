@@ -1,5 +1,6 @@
 ﻿using GdalToolsLib.Common;
 using GdalToolsTest.Helper;
+using MaxRev.Gdal.Core;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using Xunit;
@@ -22,7 +23,7 @@ public class OgctGdalInfoTests
     public OgctGdalInfoTests(ITestOutputHelper output)
     {
         _output = output;
-        GdalConfiguration.ConfigureGdal();
+        GdalBase.ConfigureAll();
     }
 
 

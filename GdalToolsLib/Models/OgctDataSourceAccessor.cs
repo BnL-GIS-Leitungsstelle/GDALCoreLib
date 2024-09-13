@@ -6,6 +6,7 @@ using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Exceptions;
 using GdalToolsLib.Extensions;
+using MaxRev.Gdal.Core;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -23,7 +24,7 @@ public class OgctDataSourceAccessor : IOgctSourceAccessor
 {
     public OgctDataSourceAccessor()
     {
-        GdalConfiguration.ConfigureGdal();
+        GdalBase.ConfigureAll();
 
         if (Ogr.GetDriverCount() == 0)
         {

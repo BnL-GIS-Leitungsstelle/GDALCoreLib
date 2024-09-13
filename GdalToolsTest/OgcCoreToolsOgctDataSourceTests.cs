@@ -6,6 +6,7 @@ using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
+using MaxRev.Gdal.Core;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -20,7 +21,7 @@ namespace GdalCoreTest
         public OgcCoreToolsOgctDataSourceTests(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
-            GdalConfiguration.ConfigureGdal();
+            GdalBase.ConfigureAll();
         }
 
         /// <summary>

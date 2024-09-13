@@ -8,7 +8,6 @@ using System.Xml;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
 using Newtonsoft.Json;
-using GdalConfiguration = GdalToolsLib.GdalConfiguration;
 
 namespace BnL.ExtractMetadataFromFGDBs;
 

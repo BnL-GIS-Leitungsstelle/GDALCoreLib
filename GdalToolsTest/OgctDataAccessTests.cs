@@ -8,6 +8,7 @@ using GdalToolsLib.Extensions;
 using GdalToolsLib.Layer;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
+using MaxRev.Gdal.Core;
 using OSGeo.OGR;
 using OSGeo.OSR;
 using Xunit;
@@ -30,7 +31,7 @@ public class OgctDataAccessTests : IClassFixture<DataAccessTestFixture>
     public OgctDataAccessTests(ITestOutputHelper output, DataAccessTestFixture fixture)
     {
         _output = output;
-        GdalConfiguration.ConfigureGdal();
+        GdalBase.ConfigureAll();
         _fixture = fixture;
     }
 
