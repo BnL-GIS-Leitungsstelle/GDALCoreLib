@@ -56,32 +56,6 @@ public class LayerCompareService : ILayerCompareService
         }
     }
 
-    /// <summary>
-    /// Information on usage
-    /// </summary>
-    public IEnumerable<string> Usage
-    {
-        get
-        {
-            var lines = new List<string>
-            {
-                "",
-                "---------------- USAGE ---------------------------------------------------------",
-                "use LayerComparer with 4 required parameters: ",
-                string.Format(" /file1= master geo-database (Format: FGDB, GPKG, SHP)"),
-                string.Format(" /layer1= name of layer"),
-                string.Format(" /file2= candidate geo-database (Format: FGDB, GPKG, SHP)"),
-                string.Format(" /layer2= name of layer"),
-
-                string.Format(@" e.g. /file1=C:\Data\Tools\data.gdb /layer1=\Auengebiete ..."),
-                "",
-                "--------------------------------------------------------------------------------",
-                ""
-            };
-            return lines;
-        }
-    }
-
 
     public LayerCompareService(ILogger<LayerCompareService> log, IConfiguration config)
     {
@@ -104,20 +78,6 @@ public class LayerCompareService : ILayerCompareService
         }
 
         CompareLayer();
-    }
-
-
-    private void ReadArgs(string[] args)
-    {
-        if (args.Length == 0)
-        {
-            ShowUsage();
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
-            Environment.Exit(0);
-        }
-
-
     }
 
 
@@ -206,10 +166,4 @@ public class LayerCompareService : ILayerCompareService
     {
         foreach (var line in About) _log.LogInformation(line);
     }
-
-    private void ShowUsage()
-    {
-        foreach (var line in Usage) _log.LogInformation(line);
-    }
-
 }

@@ -37,8 +37,8 @@ class Program
 
         var app = builder.Build();
 
-        // Definieren Sie einen anonymen Command (kein name), der ILayerCompareService als default-command verwendet
-        app.AddCommand((
+        // Compare a single master layer with a candidate layer
+        app.AddCommand("single-layer-compare", (
             [Argument(Description = @"path to master GDB, e.g. G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\Auengebiete.gdb")]
             string masterGdbPath,
             [Argument(Description = "name of master layer to compare, e.g. N2017_Revision_Auengebiete_Anhang2_20171101")]
@@ -58,9 +58,30 @@ class Program
             Console.WriteLine();
             Console.WriteLine("Press ENTER to end..");
             Console.ReadLine();
+        })
+        .WithDescription("Compare a single master layer with a candidate layer.");
 
+        // Compare a list of master layers with candidate layers
+        app.AddCommand("multi-layer-compare", (
+            [Argument(Description = @"path to csv containing list with path to master GDB, name of master layer, path to candidate GDB and name of candidate layer (Format: MasterGdb;MasterLayer;CandidateGdb;CandidateLayer).")]
+            string masterCandidateCsv,
+            ILayerCompareService layerCompareService) => // DI für ILayerCompareService
+        {
+            layerCompareService.ShowAbout();
 
-        });
+            var records = CsvParser.ParseRecords<MultiLayerInputEntry>(masterCandidateCsv);
+            foreach (var record in records) 
+            {
+                layerCompareService.Compare(record.MasterGdb, record.MasterLayer, record.CandidateGdb, record.CandidateLayer);   
+            }
+
+            Console.WriteLine("Vergleich durchgeführt.");
+
+            Console.WriteLine();
+            Console.WriteLine("Press ENTER to end..");
+            Console.ReadLine();
+        })
+        .WithDescription("Compare a list of master layers with candidate layers");
 
         app.Run();
     }
