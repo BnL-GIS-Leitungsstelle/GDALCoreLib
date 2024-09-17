@@ -1,19 +1,19 @@
 // Filters for GDB's
 // Format: {Layer namenteil} ; {Year} ; {SQL Select Query}
 //
-Hochmoor;1988;"ELNO" IN (1,2,3,4,5,6,21,22,23,24,25,26) OR ("ObjNummer" = 572 AND "ELNO" = 12)
-Hochmoor;1991;Typ = 1 OR Typ = 2 OR (ObjNummer = 572 AND Typ = 4)
-Hochmoor;2000;"KE" IN (1,2,3,4,5,6,21,22,23,24,25,26) OR ("ObjNummer" = 572 AND "KE" = 12)
-Hochmoor;2003;Typ = 1 OR Typ = 2 OR (ObjNummer = 572 AND Typ = 4)
-Hochmoor;2007;Typ = 1 OR Typ = 2 OR (ObjNummer = 572 AND Typ = 4)
+Hochmoor;1988;ELNO IN (1,2,3,4,5,6,21,22,23,24,25,26) OR (ObjNummer = '572' AND ELNO = 12)
+Hochmoor;1991;Typ = 1 OR Typ = 2 OR (ObjNummer = '572' AND Typ = 4)
+Hochmoor;2000;HM_KE IN (1,2,3,4,5,6,21,22,23,24,25,26) OR (ObjNummer = '572' AND HM_KE = 12)
+Hochmoor;2003;Typ = 1 OR Typ = 2 OR (ObjNummer = '572' AND Typ = 4)
+Hochmoor;2007;Typ = 1 OR Typ = 2 OR (ObjNummer = '572' AND Typ = 4)
 Hochmoor;2017;Typ = 1 OR Typ = 2 OR (ObjNummer = '572' AND Typ = 4)
-Jagdbann;1992;"Typ" <> 30
-Jagdbann;2001;"Typ" <> 30
-Jagdbann;2004;"Typ" <> 30
-Jagdbann;2005;"Typ" <> 30
-Jagdbann;2010;"Typ" <> 30
-Jagdbann;2014;"Typ" <> 30
-Jagdbann;2023;"Typ" <> 30
+Jagdbann;1992;Typ <> 30
+Jagdbann;2001;Typ <> 30
+Jagdbann;2004;Typ <> 30
+Jagdbann;2005;Typ <> 30
+Jagdbann;2010;Typ <> 30
+Jagdbann;2014;Typ <> 30
+Jagdbann;2023;Typ <> 30
 WasserZugvogel;1988;(Schutzkategorie <> 50) OR (Schutzkategorie IS NULL)
 WasserZugvogel;1990;(Schutzkategorie <> 50) OR (Schutzkategorie IS NULL)
 WasserZugvogel;1991;(Schutzkategorie <> 50) OR (Schutzkategorie IS NULL)
