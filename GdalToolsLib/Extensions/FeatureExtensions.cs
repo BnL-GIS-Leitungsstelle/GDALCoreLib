@@ -81,6 +81,7 @@ public static class FeatureExtensions
         switch (inGeomType)
         {
             case wkbGeometryType.wkbGeometryCollection:
+            case wkbGeometryType.wkbGeometryCollection25D:
             case wkbGeometryType.wkbLineString:
             case wkbGeometryType.wkbPolygon:
                 outGeom = Ogr.ForceToMultiPolygon(inGeom);
