@@ -49,6 +49,8 @@ public interface IOgctLayer : IDisposable
 
     string? GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, string? outputLayerName = null);
 
+    void GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, IOgctLayer outputLayer);
+
     void UnifyInSingleGpkg(IOgctLayer otherLayer, string? resultLayerName, string[] unionProcessOptions);
 
     IOgctFeature CreateAndOpenFeature(long fid);

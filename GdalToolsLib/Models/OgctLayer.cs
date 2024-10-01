@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -602,7 +601,7 @@ public partial class OgctLayer : IOgctLayer
 
 
     /// <summary>
-    /// Geoprocessing in the same GPKG
+    /// Geoprocessing in the same Vector File
     /// </summary>
     /// <param name="geoProcess"></param>
     /// <param name="otherLayer"></param>
@@ -611,10 +610,60 @@ public partial class OgctLayer : IOgctLayer
     public string? GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, string? outputLayerName = null)
     {
         outputLayerName = outputLayerName == null ? $"{this.Name}{geoProcess}" : $"{outputLayerName}{geoProcess}";
+        using var tempInMemoryDataset = new OgctDataSourceAccessor().CreateAndOpenInMemoryDatasource();
 
-        GeoprocessingInSingleVectorFile(geoProcess, otherLayer, outputLayerName);
+        // create field definitions using copy schema --> 
+        // otherwise shape_area and shape_length fields are not calculated in some cases
+        using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(outputLayerName, GetSpatialRef(), LayerDetails.GeomType, overwriteExisting: false);
+        CopySchema(tempInMemoryLayer);
+
+        if (tempInMemoryLayer == null)
+        {
+            throw new ApplicationException($"Createlayer on {outputLayerName} failed");
+        }
+
+        GeoProcessWithLayer(geoProcess, otherLayer, tempInMemoryLayer);
+
+        long cnt = tempInMemoryLayer.CopyToLayer(DataSource, outputLayerName, true);
+        Console.WriteLine($"  -- result: copied {cnt} features into {outputLayerName} in {DataSource.Name}");
 
         return outputLayerName;
+    }
+
+    public void GeoProcessWithLayer(EGeoProcess geoProcess, IOgctLayer otherLayer, IOgctLayer outputLayer)
+    {
+        switch (geoProcess)
+        {
+            case EGeoProcess.Intersection:
+                _layer.Intersection(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Intersection");
+                break;
+            case EGeoProcess.Union:
+                //https://gdal.org/api/ogrlayer_cpp.html?highlight=union#_CPPv4N8OGRLayer5UnionEP8OGRLayerP8OGRLayerPPc16GDALProgressFuncPv
+                _layer.Union(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    UnionProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Union");
+                break;
+            case EGeoProcess.SymmetricalDifference:
+                _layer.SymDifference(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "SymDifference");
+                break;
+            case EGeoProcess.Identity:
+                _layer.Identity(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Identity");
+                break;
+            case EGeoProcess.Update:
+                _layer.Update(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Update");
+                break;
+            case EGeoProcess.Clip:
+                _layer.Clip(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Clip");
+                break;
+            case EGeoProcess.Erase:
+                _layer.Erase(((OgctLayer)otherLayer)._layer, ((OgctLayer)outputLayer)._layer,
+                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Erase");
+                break;
+        }
     }
 
     private IOgctFeature IterateAndOpenUnifiedFeature()
@@ -1154,58 +1203,6 @@ public partial class OgctLayer : IOgctLayer
         }
 
         return validationResult;
-    }
-
-    private void GeoprocessingInSingleVectorFile(EGeoProcess geoOperation, IOgctLayer otherLayer, string? resultLayerName)
-    {
-        using var tempInMemoryDataset = new OgctDataSourceAccessor().CreateAndOpenInMemoryDatasource();
-
-        // create field definitions using copy schema --> 
-        // otherwise shape_area and shape_length fields are not calculated in some cases
-        using var tempInMemoryLayer = tempInMemoryDataset.CreateAndOpenLayer(resultLayerName, GetSpatialRef(), LayerDetails.GeomType, overwriteExisting: false);
-        CopySchema(tempInMemoryLayer);
-
-        if (tempInMemoryLayer == null)
-        {
-            throw new ApplicationException($"Createlayer on {resultLayerName} failed");
-        }
-
-        switch (geoOperation)
-        {
-            case EGeoProcess.Intersection:
-                _layer.Intersection(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Intersection");
-                break;
-            case EGeoProcess.Union:
-                //https://gdal.org/api/ogrlayer_cpp.html?highlight=union#_CPPv4N8OGRLayer5UnionEP8OGRLayerP8OGRLayerPPc16GDALProgressFuncPv
-                _layer.Union(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    UnionProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Union");
-                break;
-            case EGeoProcess.SymmetricalDifference:
-                _layer.SymDifference(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "SymDifference");
-                break;
-            case EGeoProcess.Identity:
-                _layer.Identity(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Identity");
-                break;
-            case EGeoProcess.Update:
-                _layer.Update(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Update");
-                break;
-            case EGeoProcess.Clip:
-                _layer.Clip(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Clip");
-                break;
-            case EGeoProcess.Erase:
-                _layer.Erase(((OgctLayer)otherLayer)._layer, ((OgctLayer)tempInMemoryLayer)._layer,
-                    DefaultProcessOptions, new Ogr.GDALProgressFuncDelegate(ProgressFunc), "Erase");
-                break;
-        }
-
-        long cnt = tempInMemoryLayer.CopyToLayer(DataSource, resultLayerName, true);
-        Console.WriteLine($"  -- result: copied {cnt} features into {resultLayerName} in {DataSource.Name}");
-
     }
 
 
