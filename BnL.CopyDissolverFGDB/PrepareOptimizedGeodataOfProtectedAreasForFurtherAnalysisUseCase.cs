@@ -162,6 +162,8 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
 
         foreach (var fileName in filesToExamine)
         {
+            Console.WriteLine($" -- > Cleanup non dissolved and non unified layers in {Path.GetFileName(fileName)}");
+
             using (var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(fileName, EAccessLevel.Full))
             {
                 foreach (var layerName in ds.GetLayerNames(ELayerType.AllGeometry))
@@ -176,6 +178,8 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
                         throw new ApplicationException($"**error: Could not delete layer {layerName} from file {fileName}");
                     }
                 }
+
+                ds.ExecuteSqlCompress();
             }
         }
 

@@ -26,7 +26,9 @@ public interface IOgctDataSource : IDisposable
 
     IOgctLayer ExecuteSQL(string command);
     IOgctLayer ExecuteSQL(string command, string dialect);
-    
+    void ExecuteSqlCompress();
+
+
     void FlushCache();
     List<string?> GetLayerNames(ELayerType layerType = ELayerType.All);
     IOgctLayer GetLayerByName(string? layerName);
