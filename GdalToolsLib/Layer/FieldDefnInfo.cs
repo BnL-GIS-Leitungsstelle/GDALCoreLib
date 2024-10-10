@@ -131,4 +131,9 @@ public class FieldDefnInfo
     {
         return $"Field {Name}, Type {Type}, Width {Width}, Null {IsNullable}, Unique {IsUnique}";
     }
+
+    public FieldDefnInfo Clone()
+    {
+        return (FieldDefnInfo)MemberwiseClone();
+    }
 }
