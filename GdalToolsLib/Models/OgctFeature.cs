@@ -388,9 +388,10 @@ public FeatureFieldWriteResult SetValue(FieldDefnInfo field, dynamic value)
             case FieldType.OFTDate:
             case FieldType.OFTDateTime:
                 var dtValue = ConvertValueType(value, field, result);
-
-                OgrFeature.SetField(field.Name, dtValue.Year, dtValue.Month, dtValue.Day,
-                    dtValue.Hour, dtValue.Minute, dtValue.Second, flag);
+                
+                if (dtValue != null)
+                    OgrFeature.SetField(field.Name, dtValue.Year, dtValue.Month, dtValue.Day,
+                        dtValue.Hour, dtValue.Minute, dtValue.Second, flag);
                 break;
 
             default:
