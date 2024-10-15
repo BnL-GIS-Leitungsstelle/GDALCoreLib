@@ -382,7 +382,9 @@ public FeatureFieldWriteResult SetValue(FieldDefnInfo field, dynamic value)
             case FieldType.OFTInteger64:
             case FieldType.OFTReal:
             case FieldType.OFTString:
-                OgrFeature.SetField(field.Name, ConvertValueType(value, field, result));
+                var convertedValue = ConvertValueType(value, field, result);
+                if (convertedValue != null)
+                    OgrFeature.SetField(field.Name, convertedValue);
                 break;
 
             case FieldType.OFTDate:
