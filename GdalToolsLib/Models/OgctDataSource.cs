@@ -44,12 +44,9 @@ public class OgctDataSource : IOgctDataSource
 
         switch (supportedDatasource.Type)
         {
-
-            //case EDataSourceType.OpenFGDB:
-            //    throw CannotWriteException;
             case EDataSourceType.SHP:
-
-                throw new DataSourceMethodNotImplementedException("Cannot create layers on single shapefiles");
+                // SHP File only contains one Layer
+                return new OgctLayer(_dataSource.GetLayerByIndex(0), this);
             case EDataSourceType.SHP_FOLDER or EDataSourceType.GPKG or EDataSourceType.InMemory or EDataSourceType.OpenFGDB:
 
                 SpatialReference spRef;
