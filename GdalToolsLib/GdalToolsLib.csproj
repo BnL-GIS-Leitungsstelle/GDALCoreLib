@@ -10,7 +10,7 @@
     <PackageReference Include="MaxRev.Gdal.Core" Version="3.9.1.247" />
     <PackageReference Include="MaxRev.Gdal.LinuxRuntime.Minimal" Version="3.9.1.247" />
     <PackageReference Include="MaxRev.Gdal.WindowsRuntime.Minimal" Version="3.9.1.247" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
   </ItemGroup>
 
