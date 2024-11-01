@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using GdalCoreTest.SqlStatements;
-using GdalToolsLib;
 using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
@@ -55,9 +54,6 @@ namespace GdalCoreTest
                         long featurecount = layer.FilterByAttributeOnlyRespectedInNextFeatureLoop(sqlWhereClause);
 
                         var rows=  layer.ReadRows(layer.LayerDetails.Schema.FieldList);
-
-
-
 
 
                         Assert.NotNull(layer);
