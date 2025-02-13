@@ -24,7 +24,6 @@ public interface IOgctFeature : IDisposable
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="feature"></param>
     /// <param name="fieldDef"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
@@ -35,8 +34,6 @@ public interface IOgctFeature : IDisposable
     /// <summary>
     /// write value to field
     /// </summary>
-    /// <param name="feature"></param>
-    /// <param name="layer"></param>
     /// <param name="field"></param>
     /// <param name="value"></param>
     /// <returns></returns>

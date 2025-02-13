@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using GdalToolsLib.DataAccess;
 using GdalToolsLib.Feature;
 using GdalToolsLib.Layer;
 using GdalToolsLib.Models;
