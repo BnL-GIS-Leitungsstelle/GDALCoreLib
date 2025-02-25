@@ -175,7 +175,7 @@ public class OgctDataSource : IOgctDataSource
     {
         if (SupportInfo.Type != EDataSourceType.OpenFGDB)
         {
-            throw new DataSourceMethodNotImplementedException("Cannot only read metadata of layers in an FGDB");
+            throw new DataSourceMethodNotImplementedException("Can only read metadata of layers in an FGDB");
         }
 
         var tmpLayer = _dataSource.ExecuteSQL($"GetLayerMetadata {layerName}", null, OgcConstants.GpkgSqlDialect);
