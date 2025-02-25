@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Hochmoore\\Hochmoore.gdb"
+      "commandLineArgs": "D:\\Daten\\Projects\\GISToolsNetCore\\VerhaltensregelApp\\doc\\Wildruhezonen.gdb"
     }
   }
 }
