@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ESRIFileGeodatabaseAPI\ESRIFileGeodatabaseAPI.csproj" />
     <ProjectReference Include="..\GdalToolsLib\GdalToolsLib.csproj" />
   </ItemGroup>
 
