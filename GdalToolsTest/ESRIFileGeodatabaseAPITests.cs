@@ -42,6 +42,8 @@ namespace GdalToolsTest
 
                 Assert.Equal(testMetadata, readMetadata);
             }
+
+            FGDBMetadataWriter.WriteLayerMetadata(testDbPath, layerName, "aäöü*$");
         }
 
         [Theory]
