@@ -12,19 +12,27 @@ namespace BnL.CopyDissolverFGDB.Parameters;
 /// </summary>
 public class ProcessParameter
 {
-    public List<FilterParameter> Filters { get; set; }
-    public List<BufferParameter> Buffers { get; set; }
-    public List<UnionParameter> Unions { get; set; }
-    public List<UnionGroup> UnionGroups { get; set; }
+    public List<FilterParameter> Filters = [];
+    public List<BufferParameter> Buffers = [];
+    public List<UnionParameter> Unions = [];
 
-    public ProcessParameter()
+
+    private static IEnumerable<string[]> GetLinesWithoutComments(string filePath)
     {
-        Filters = new List<FilterParameter>();
-        Buffers = new List<BufferParameter>();
-        Unions = new List<UnionParameter>();
-        UnionGroups = new List<UnionGroup>();
-    }
+        if (!File.Exists(filePath)) throw new Exception($"File '{filePath}' not found");
 
+        using var fileStream = File.OpenRead(filePath);
+        using var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, 128);
+        
+        while (!streamReader.EndOfStream)
+        {
+            var line = streamReader.ReadLine()!;
+            if (!line.StartsWith("//"))
+            {
+                yield return line.Split(';');
+            }
+        }
+    }
 
     /// <summary>
     ///  read filter conditions from file
@@ -33,28 +41,9 @@ public class ProcessParameter
     /// <returns></returns>
     public void LoadFilterParameter(string path)
     {
-        var currPath = AppDomain.CurrentDomain.RelativeSearchPath ?? AppDomain.CurrentDomain.BaseDirectory;
-        if (!File.Exists(path)) throw new Exception("Filter file not found.");
-
-        var filters = new List<FilterParameter>();
-
-        using (var fileStream = File.OpenRead(path))
-        {
-            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, 128))
-            {
-                String line;
-                while ((line = streamReader.ReadLine()) != null)
-                {
-                    if (!line.StartsWith("//"))
-                    {
-                        string[] attributes = line.Split(';');
-                        filters.Add(new FilterParameter(attributes[0], attributes[1], "N.N.", attributes[2]));
-                    }
-                }
-            }
-        }
-
-        Filters = filters;
+        Filters = GetLinesWithoutComments(path)
+            .Select(attributes => new FilterParameter(attributes[0], attributes[1], "N.N.", attributes[2]))
+            .ToList();
     }
 
     /// <summary>
@@ -64,30 +53,15 @@ public class ProcessParameter
     /// <returns></returns>
     public void LoadBufferParameter(string path)
     {
-        if (!File.Exists(path)) throw new Exception("Buffer file not found.");
-
-        var result = new List<BufferParameter>();
-
-        using (var fileStream = File.OpenRead(path))
-        {
-            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, 128))
+        Buffers = GetLinesWithoutComments(path)
+            .Select(attributes =>
             {
-                String line;
-                while ((line = streamReader.ReadLine()) != null)
-                {
-                    if (!line.StartsWith("//"))
-                    {
-                        string[] attributes = line.Split(';');
-                        var legalState = attributes[0];
-                        var layerName = attributes[1];
-                        var distance = attributes[2];
-                        result.Add(new BufferParameter(legalState, layerName, "N.N.", distance));
-                    }
-                }
-            }
-        }
-
-        Buffers = result;
+                var legalState = attributes[0];
+                var layerName = attributes[1];
+                var distance = attributes[2];
+                return new BufferParameter(legalState, layerName, "N.N.", distance);
+            })
+            .ToList();
     }
 
 
@@ -98,36 +72,20 @@ public class ProcessParameter
     /// <returns></returns>
     public void LoadUnionParameter(string path)
     {
-        if (!File.Exists(path)) throw new Exception("Union file not found.");
-
-        var parameterLayers = new List<UnionParameterLayer>();
-
-        using (var fileStream = File.OpenRead(path))
-        {
-            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true, 128))
+        Unions = GetLinesWithoutComments(path)
+            .Select(attributes =>
             {
-                String line;
-                while ((line = streamReader.ReadLine()) != null)
-                {
-                    if (!line.StartsWith("//"))
-                    {
-                        // N2001_Serie1_amphibLaichgebietUndWanderobjekte;2001;Serie1;amphibWanderobjekt
-                        string[] attributes = line.Split(';');
-                        var resultLayerName = attributes[0];
+                var resultLayerName = attributes[0];
 
-                        var year = attributes[1];
-                        var legalState = attributes[2];
-                        var layerName = attributes[3];
-                        parameterLayers.Add(new UnionParameterLayer(resultLayerName, new LayerParameter(layerName, year, legalState)));
-                    }
-                }
-            }
-        }
+                var year = attributes[1];
+                var legalState = attributes[2];
+                var layerName = attributes[3];
+                return new UnionParameterLayer(resultLayerName, new LayerParameter(layerName, year, legalState));
+            })
+            .GroupBy(u => u.ResultLayerName)
+            .Select(group => new UnionParameter(group.Key, group.Select(p => p.LayerParameter).ToList()))
+            .ToList();
 
-        foreach (var group in parameterLayers.GroupBy(u => u.ResultLayerName))
-        {
-            Unions.Add(new UnionParameter(group.Key, group.Select(p => p.LayerParameter).ToList()));
-        }
     }
 
 

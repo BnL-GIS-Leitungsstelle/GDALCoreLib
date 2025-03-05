@@ -1,0 +1,32 @@
+﻿using System.Collections.Generic;
+
+namespace GdalToolsLib.VectorTranslate
+{
+    /// <summary>
+    /// An easier interface for the VectorTranslateOptions specified under <see href="https://gdal.org/en/stable/programs/ogr2ogr.html"/>
+    /// Common options are made configurable through properties, instead of just raw strings. 
+    /// If you do wanna pass raw string options, you can do that using the <see cref="OtherOptions"/> property.
+    /// </summary>
+    public record class VectorTranslateOptions
+    {
+        public string? Where { get; init; }
+        public bool Overwrite { get; init; }
+        public string[]? OtherOptions { get; init; }
+        public string? SourceLayerName { get; init; }
+        public string? NewLayerName { get; init; }
+        public string? Sql { get; init; }
+
+        public string[] ToStringArray()
+        {
+            var options = new List<string>();
+            if (SourceLayerName != null) options.Add(SourceLayerName);
+            if (Where != null) options.AddRange(["-where", Where]);
+            if (Sql != null) options.AddRange(["-sql", Sql]);
+            if (NewLayerName != null) options.AddRange(["-nln", NewLayerName]);
+            if (Overwrite) options.Add("-overwrite");
+
+            if (OtherOptions != null) options.AddRange(OtherOptions);
+            return options.ToArray();
+        }
+    }
+}

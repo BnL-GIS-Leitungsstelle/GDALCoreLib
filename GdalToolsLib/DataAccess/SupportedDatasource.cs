@@ -14,12 +14,14 @@ public class SupportedDatasource
         {
             if (_supportedDatasources != null) return _supportedDatasources;
 
-            _supportedDatasources = new List<SupportedDatasource>();
-            _supportedDatasources.Add(new SupportedDatasource(EDataSourceType.GPKG, EAccessLevel.Full, ".gpkg", "gpkg", EFileType.File));
-            _supportedDatasources.Add(new SupportedDatasource(EDataSourceType.SHP, EAccessLevel.Full, ".shp", "ESRI Shapefile", EFileType.MultiFile));
-            _supportedDatasources.Add(new SupportedDatasource(EDataSourceType.SHP_FOLDER, EAccessLevel.Full, null, "ESRI Shapefile", EFileType.Folder));
-            _supportedDatasources.Add(new SupportedDatasource(EDataSourceType.OpenFGDB, EAccessLevel.Full, ".gdb", "openfilegdb", EFileType.Folder));
-            _supportedDatasources.Add(new SupportedDatasource(EDataSourceType.InMemory, EAccessLevel.Full, ".inMemory", "inmemory", EFileType.File));
+            _supportedDatasources =
+            [
+                new SupportedDatasource(EDataSourceType.GPKG, EAccessLevel.Full, ".gpkg", "gpkg", EFileType.File),
+                new SupportedDatasource(EDataSourceType.SHP, EAccessLevel.Full, ".shp", "ESRI Shapefile", EFileType.MultiFile),
+                new SupportedDatasource(EDataSourceType.SHP_FOLDER, EAccessLevel.Full, null, "ESRI Shapefile", EFileType.Folder),
+                new SupportedDatasource(EDataSourceType.OpenFGDB, EAccessLevel.Full, ".gdb", "openfilegdb", EFileType.Folder),
+                new SupportedDatasource(EDataSourceType.InMemory, EAccessLevel.Full, ".inMemory", "inmemory", EFileType.File),
+            ];
 
 
             return _supportedDatasources;
@@ -68,12 +70,9 @@ public class SupportedDatasource
     /// <returns></returns>
     public static SupportedDatasource GetSupportedDatasource(EDataSourceType datasourceType)
     {
-        foreach (var supportedDatasource in Datasources.Where(ds => ds.Type == datasourceType))
-        {
-            return supportedDatasource;
-        }
+        var ds = Datasources.FirstOrDefault(ds => ds.Type == datasourceType);
 
-        throw new Exception($"Unsupported datasource: not found by type  {datasourceType}");
+        return ds ?? throw new Exception($"Unsupported datasource: not found by type  {datasourceType}");
     }
 
     /// <summary>

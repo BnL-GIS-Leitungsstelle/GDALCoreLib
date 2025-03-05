@@ -1,4 +1,5 @@
 ﻿using GdalToolsLib.Layer;
+using GdalToolsLib.Models;
 
 namespace BnL.CopyDissolverFGDB;
 
@@ -14,6 +15,7 @@ public class WorkLayer
     public LayerNameBafuContent LayerContentInfo { get; set; }
 
     public EWorkState WorkState { get; set; }
+    public IOgctLayer OgcLayer { get; set; }
 
     public WorkLayer(LayerDetails layerDetails, EWorkState workState)
     {
@@ -24,6 +26,10 @@ public class WorkLayer
         LayerContentInfo = new LayerNameBafuContent(LayerName);
     }
 
+    public WorkLayer(IOgctLayer l): this(l.LayerDetails, EWorkState.IsTableHasNoGeometry)
+    {
+        OgcLayer = l;
+    }
 
     public override string ToString()
     {

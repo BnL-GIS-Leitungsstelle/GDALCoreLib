@@ -1,6 +1,6 @@
 ﻿namespace BnL.CopyDissolverFGDB.Parameters;
 
-public class FilterParameter: LayerParameter
+public class FilterParameter : LayerParameter
 {
     public string WhereClause { get; private set; }
 
@@ -8,6 +8,8 @@ public class FilterParameter: LayerParameter
     {
         WhereClause = filter;
     }
+
+    public FilterParameter(string[] line) : this(line[0], line[1], "N.N.", line[2]) { }
 
     public override string ToString()
     {

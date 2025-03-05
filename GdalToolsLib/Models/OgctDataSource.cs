@@ -417,6 +417,15 @@ public class OgctDataSource : IOgctDataSource
         _dataSource?.Dispose();
     }
 
+    public IEnumerable<IOgctLayer> LayerIterator()
+    {
+        var layerCount = OgrDataSource.GetLayerCount();
+        for (int i = 0; i < layerCount; i++)
+        {
+            yield return new OgctLayer(_dataSource.GetLayerByIndex(i), this);
+        }
+    }
+
     ~OgctDataSource()
     {
         _dataSource?.Dispose();

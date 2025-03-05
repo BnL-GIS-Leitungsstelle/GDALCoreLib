@@ -10,8 +10,8 @@ namespace BnL.CopyDissolverFGDB.Parameters
 
         public UnionParameter(string resultLayerName, List<LayerParameter> layersToUnion)
         {
-            ResultLayerName=resultLayerName;
-            LayerParameters=layersToUnion;
+            ResultLayerName = resultLayerName;
+            LayerParameters = layersToUnion;
         }
 
         public override string ToString()

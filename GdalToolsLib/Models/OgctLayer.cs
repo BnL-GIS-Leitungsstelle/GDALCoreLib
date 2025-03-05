@@ -152,7 +152,7 @@ public partial class OgctLayer : IOgctLayer
 
     public long CopyToLayer(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true)
     {
-        using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
+        using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName ?? Name, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
         CloneFieldSchema(targetLayer);
         return CopyFeatures(targetLayer);
     }

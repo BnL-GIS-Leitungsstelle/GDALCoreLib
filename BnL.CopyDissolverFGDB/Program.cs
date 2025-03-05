@@ -9,16 +9,16 @@ public class Program
     {
         const string FolderTimestampFormat = "yyyyMMdd_HHmmss";
 
-        var _inputfolders = new List<string>
-        {
+        List<string> _inputfolders =
+        [
             @"G:\BnL\Daten\Ablage\DNL\Bundesinventare",
             @"G:\BnL\Daten\Ablage\DNL\Schutzgebiete",
-        };
+        ];
 
 
         string _outputFolder = @$"D:\Analyse\Flaechenstatistik_Generiert_FGDB{DateTime.Now.ToString(FolderTimestampFormat, System.Globalization.CultureInfo.InvariantCulture)}";
 
-        var copyDissolver = new PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase(_inputfolders, _outputFolder, new List<string>() { "ObjNummer", "Name" });
+        var copyDissolver = new PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase(_inputfolders, _outputFolder, ["ObjNummer", "Name"]);
 
         copyDissolver.ShowAbout();
 

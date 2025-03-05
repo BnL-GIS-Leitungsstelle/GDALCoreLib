@@ -114,36 +114,39 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
+        AddLayersToWorkList(CollectGeodataFiles([TargetPath], EDataSourceType.OpenFGDB));
 
+
+        // Deleting layers that don't have the the specified dissolve fields
         CleanupLayersWithoutValidDissolveFields();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
+        AddLayersToWorkList(CollectGeodataFiles([TargetPath], EDataSourceType.OpenFGDB));
 
-        // Preprocessing before dissolving
+        // Filter source layers with where queries defined in CSV and Buffer specified layers defined in CSV
         FilterAndBufferSomeLayers();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
+        AddLayersToWorkList(CollectGeodataFiles([TargetPath], EDataSourceType.OpenFGDB));
 
-        // to summarize data based on objNummer and Name
+
+        // dissolve based on objNummer and Name
         DissolveLayers();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
+        AddLayersToWorkList(CollectGeodataFiles([TargetPath], EDataSourceType.OpenFGDB));
 
-        // Unify some (e.g.amphibien)
+        // Union some geometries based on CSV
         UnifySomeLayers();
 
         Worklist.Clear();
 
-        AddLayersToWorkList(CollectGeodataFiles(new List<string>() { TargetPath }, EDataSourceType.OpenFGDB));
+        AddLayersToWorkList(CollectGeodataFiles([TargetPath], EDataSourceType.OpenFGDB));
 
-        // Cleanup all non-dissolved or non-unified layers
+        // Delete temporary and source layers
         CleanupNonDissolvedAndNonUnifiedLayers();
 
 
@@ -363,24 +366,22 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
     {
         var gdbsWithLayersToRemove = Worklist.WorkLayers
             .Where(w => w.WorkState != EWorkState.ValidDissolveFields)
-            .Select(x => x.FileName)
-            .Distinct();
+            .GroupBy(x => x.FileName);
 
-        foreach (var gdbFileName in gdbsWithLayersToRemove)
+        foreach (var group in gdbsWithLayersToRemove)
         {
-            var layersToRemove = Worklist.WorkLayers
-                .Where(w => w.FileName == gdbFileName && w.WorkState != EWorkState.ValidDissolveFields)
+            var gdbFileName = group.Key;
+            var layersToRemove = group
                 .Select(w => w.LayerName)
-                .Distinct()
-                .ToArray();
+                .Distinct();
 
-            Console.WriteLine($"Remove {layersToRemove.Length} Layers with missing dissolve fields from GDB {gdbFileName}.");
+            Console.WriteLine($"Remove {layersToRemove.Count()} Layers with missing dissolve fields from GDB {gdbFileName}.");
 
             using var gdb = new OgctDataSourceAccessor().OpenOrCreateDatasource(gdbFileName, EAccessLevel.Full);
-            foreach (var layer in layersToRemove) 
+            foreach (var layer in layersToRemove)
             {
                 var success = gdb.DeleteLayer(layer);
-                
+
                 if (!success)
                 {
                     throw new ApplicationException($"**error: Could not delete layer {layer} from file {gdbFileName}");
@@ -449,7 +450,7 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
             // Targetpath and last subdirectory of gdb
             string outputdirectory = Path.Combine(TargetPath, new DirectoryInfo(Path.GetDirectoryName(gdbFile)).Name);
 
-            if (Directory.Exists(outputdirectory) == false && outputdirectory.EndsWith(".gdb") == false) Directory.CreateDirectory(outputdirectory);
+            if (!Directory.Exists(outputdirectory) && !outputdirectory.EndsWith(".gdb")) Directory.CreateDirectory(outputdirectory);
 
             new OgctDataSourceAccessor().CopyDatasource(gdbFile, outputdirectory, outputFileName);
         }
@@ -460,14 +461,14 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
     /// <summary>
     /// Collects fgdb-files from a starting directory
     /// </summary>
-    /// <param name="pathes"></param>
+    /// <param name="paths"></param>
     /// <param name="datasoureType"></param>
     /// <returns>list of gdbs</returns>
-    private List<string> CollectGeodataFiles(List<string> pathes, EDataSourceType datasoureType)
+    private List<string> CollectGeodataFiles(List<string> paths, EDataSourceType datasoureType)
     {
         var fileList = new List<string>();
 
-        foreach (var path in pathes)
+        foreach (var path in paths)
         {
             int startLevel = path.Split('\\').Length;
             int targetLevel = startLevel + _subFolderDepthLevel;
@@ -479,7 +480,7 @@ public class PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase
                 fileList.AddRange(Directory.GetDirectories(path, "*" + supportedDataSource.Extension, SearchOption.AllDirectories)
                     .Where(folder => folder.Split('\\').Length <= targetLevel).ToList());
             }
-            if (supportedDataSource.FileType == EFileType.File)
+            else if (supportedDataSource.FileType == EFileType.File)
             {
                 fileList.AddRange(Directory.GetFiles(path, "*" + supportedDataSource.Extension, SearchOption.AllDirectories)
                     .Where(folder => folder.Split('\\').Length <= targetLevel).ToList());
