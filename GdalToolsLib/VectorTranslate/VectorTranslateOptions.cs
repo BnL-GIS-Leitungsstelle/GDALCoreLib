@@ -11,10 +11,11 @@ namespace GdalToolsLib.VectorTranslate
     {
         public string? Where { get; init; }
         public bool Overwrite { get; init; }
-        public string[]? OtherOptions { get; init; }
+        public bool Update { get; init; }
         public string? SourceLayerName { get; init; }
         public string? NewLayerName { get; init; }
         public string? Sql { get; init; }
+        public string[]? OtherOptions { get; init; }
 
         public string[] ToStringArray()
         {
@@ -24,6 +25,7 @@ namespace GdalToolsLib.VectorTranslate
             if (Sql != null) options.AddRange(["-sql", Sql]);
             if (NewLayerName != null) options.AddRange(["-nln", NewLayerName]);
             if (Overwrite) options.Add("-overwrite");
+            if (Update) options.Add("-update");
 
             if (OtherOptions != null) options.AddRange(OtherOptions);
             return options.ToArray();

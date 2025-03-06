@@ -6,9 +6,9 @@ namespace BnL.CopyDissolverFGDB.Parameters
     {
         public string ResultLayerName { get; set; }
 
-        public List<LayerParameter> LayerParameters { get; set; }
+        public List<UnionParameterLayer> LayerParameters { get; set; }
 
-        public UnionParameter(string resultLayerName, List<LayerParameter> layersToUnion)
+        public UnionParameter(string resultLayerName, List<UnionParameterLayer> layersToUnion)
         {
             ResultLayerName = resultLayerName;
             LayerParameters = layersToUnion;

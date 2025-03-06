@@ -1,20 +1,19 @@
-﻿namespace BnL.CopyDissolverFGDB.Parameters
+﻿using GdalToolsLib.Layer;
+
+namespace BnL.CopyDissolverFGDB.Parameters
 {
-    public class UnionParameterLayer
+    public class UnionParameterLayer : LayerParameter
     {
         public string ResultLayerName { get; private set; }
-        public LayerParameter LayerParameter { get; private set; }
 
-
-        public UnionParameterLayer(string resultLayerName, LayerParameter layerParameter)
+        public UnionParameterLayer(string[] line) : base(line[3], line[1], line[2])
         {
-            ResultLayerName = resultLayerName;
-            LayerParameter = layerParameter;
+            ResultLayerName = line[0];
         }
 
         public override string ToString()
         {
-            return $"{ResultLayerName}, {LayerParameter.Year,4}, {LayerParameter.Theme,30}, {LayerParameter.LegalState,15} ";
+            return $"{ResultLayerName}, {Year,4}, {Theme,30}, {LegalState,15} ";
         }
     }
 }

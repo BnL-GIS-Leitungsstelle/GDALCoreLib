@@ -8,31 +8,19 @@ namespace BnL.CopyDissolverFGDB;
 /// </summary>
 public class WorkLayer
 {
-    public string FileName { get; }
+    public string DataSourcePath { get; init; }
 
-    public string LayerName { get; }
+    public string OriginalLayerName { get; init; }
 
     public LayerNameBafuContent LayerContentInfo { get; set; }
 
-    public EWorkState WorkState { get; set; }
-    public IOgctLayer OgcLayer { get; set; }
+    public string CurrentLayerName { get; set; }
 
-    public WorkLayer(LayerDetails layerDetails, EWorkState workState)
+    public WorkLayer(LayerDetails layerDetails)
     {
-        FileName = layerDetails.DataSourceFileName;
-        LayerName = layerDetails.Name;
-        WorkState = workState;
-
-        LayerContentInfo = new LayerNameBafuContent(LayerName);
-    }
-
-    public WorkLayer(IOgctLayer l): this(l.LayerDetails, EWorkState.IsTableHasNoGeometry)
-    {
-        OgcLayer = l;
-    }
-
-    public override string ToString()
-    {
-        return $"{WorkState}: {LayerName} {FileName}; {LayerContentInfo.Year} {LayerContentInfo.LegalState} {LayerContentInfo.Category} {LayerContentInfo.FormatErrorInfo}";
+        DataSourcePath = layerDetails.DataSourceFileName;
+        OriginalLayerName = layerDetails.Name;
+        CurrentLayerName = OriginalLayerName;
+        LayerContentInfo = new LayerNameBafuContent(OriginalLayerName);
     }
 }

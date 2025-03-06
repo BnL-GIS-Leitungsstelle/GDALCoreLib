@@ -27,7 +27,7 @@ public class UnionGroup
 
         if (workLayers.Count == 2)
         {
-            Items.Add(new UnionGroupItem(workLayers[0].FileName, workLayers[0].LayerName, workLayers[1].LayerName, ResultLayerName));
+            Items.Add(new UnionGroupItem(workLayers[0].DataSourcePath, workLayers[0].OriginalLayerName, workLayers[1].OriginalLayerName, ResultLayerName));
             return;
         }
 
@@ -37,20 +37,20 @@ public class UnionGroup
         {
             if (i == 0)
             {
-                resultTempName = $"{workLayers[0].LayerName}{workLayers[i + 1].LayerName}";
-                Items.Add(new UnionGroupItem(workLayers[0].FileName, workLayers[i].LayerName, workLayers[i + 1].LayerName, $"{resultTempName}TempUnion"));
+                resultTempName = $"{workLayers[0].OriginalLayerName}{workLayers[i + 1].OriginalLayerName}";
+                Items.Add(new UnionGroupItem(workLayers[0].DataSourcePath, workLayers[i].OriginalLayerName, workLayers[i + 1].OriginalLayerName, $"{resultTempName}TempUnion"));
             }
 
             if (i >= 2 && i + 2 < workLayers.Count)
             {
-                var tempName = $"{resultTempName}{workLayers[i + 1].LayerName}";
-                Items.Add(new UnionGroupItem(workLayers[0].FileName, $"{resultTempName}TempUnion", workLayers[i + 1].LayerName, $"{tempName}TempUnion"));
+                var tempName = $"{resultTempName}{workLayers[i + 1].OriginalLayerName}";
+                Items.Add(new UnionGroupItem(workLayers[0].DataSourcePath, $"{resultTempName}TempUnion", workLayers[i + 1].OriginalLayerName, $"{tempName}TempUnion"));
                 resultTempName = tempName;
             }
 
             if (i + 2 == workLayers.Count)
             {
-                Items.Add(new UnionGroupItem(workLayers[0].FileName, $"{resultTempName}TempUnion", workLayers[i + 1].LayerName, ResultLayerName));
+                Items.Add(new UnionGroupItem(workLayers[0].DataSourcePath, $"{resultTempName}TempUnion", workLayers[i + 1].OriginalLayerName, ResultLayerName));
             }
         }
 

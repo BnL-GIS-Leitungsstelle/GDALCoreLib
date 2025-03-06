@@ -18,11 +18,11 @@ public class Program
 
         string _outputFolder = @$"D:\Analyse\Flaechenstatistik_Generiert_FGDB{DateTime.Now.ToString(FolderTimestampFormat, System.Globalization.CultureInfo.InvariantCulture)}";
 
-        var copyDissolver = new PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase(_inputfolders, _outputFolder, ["ObjNummer", "Name"]);
+        //var copyDissolver = new PrepareOptimizedGeodataOfProtectedAreasForFurtherAnalysisUseCase(_inputfolders, _outputFolder, ["ObjNummer", "Name"]);
 
-        copyDissolver.ShowAbout();
+        //copyDissolver.ShowAbout();
 
-        copyDissolver.Run();
+        //copyDissolver.Run();
 
 
         Console.WriteLine();

@@ -80,10 +80,10 @@ public class ProcessParameter
                 var year = attributes[1];
                 var legalState = attributes[2];
                 var layerName = attributes[3];
-                return new UnionParameterLayer(resultLayerName, new LayerParameter(layerName, year, legalState));
+                return new UnionParameterLayer(attributes);
             })
             .GroupBy(u => u.ResultLayerName)
-            .Select(group => new UnionParameter(group.Key, group.Select(p => p.LayerParameter).ToList()))
+            .Select(group => new UnionParameter(group.Key, group.ToList()))
             .ToList();
 
     }
