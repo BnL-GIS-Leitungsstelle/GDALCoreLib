@@ -14,16 +14,15 @@ namespace GdalToolsLib.VectorTranslate
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <param name="options"></param>
-        public static void Run(string source, string destination, VectorTranslateOptions options)
+        public static void Run(string source, string destination, VectorTranslateOptions? options)
         {
             GdalBase.ConfigureAll();
             Gdal.UseExceptions();
             // TODO: Figure out the driver based on the extension (like this only FGDBs work)
             using var ds = Gdal.OpenEx(source, (uint)GdalConst.OF_VECTOR, ["OpenFileGDB"], [], []);
 
-            using var opts = new GDALVectorTranslateOptions(options.ToStringArray());
-
-            using var _ = Gdal.wrapper_GDALVectorTranslateDestName(destination, ds, opts, null, null);
+            using var opts = new GDALVectorTranslateOptions(options?.ToStringArray() ?? []);
+            Gdal.wrapper_GDALVectorTranslateDestName(destination, ds, opts, null, null).Dispose();
         }
     }
 }

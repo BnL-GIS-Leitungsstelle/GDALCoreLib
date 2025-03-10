@@ -3,18 +3,16 @@ using System;
 
 namespace GdalToolsLib.Common
 {
-    internal static class GdalHelpers
+    public static class GdalHelpers
     {
-
         public static wkbGeometryType ToMulti(this wkbGeometryType geomType)
         {
-            return geomType switch
+            // Couldn't find a better way to check if a geometry is already multipart
+            if (Ogr.GeometryTypeToName(geomType).Contains("Multi"))
             {
-                wkbGeometryType.wkbPolygon => wkbGeometryType.wkbMultiPolygon,
-                wkbGeometryType.wkbLineString => wkbGeometryType.wkbMultiLineString,
-                wkbGeometryType.wkbPoint => wkbGeometryType.wkbMultiPoint,
-                _ => throw new NotImplementedException(),
-            };
+                return geomType;
+            }
+            return Ogr.GT_GetCollection(geomType);
         }
 
         public static string ToStringName(this wkbGeometryType geometryType)

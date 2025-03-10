@@ -1,5 +1,6 @@
 ﻿using BnL.CopyDissolverFGDB;
 using BnL.CopyDissolverFGDB.Parameters;
+using GdalToolsLib.Common;
 using GdalToolsLib.GeoProcessor;
 using GdalToolsLib.Models;
 using GdalToolsLib.VectorTranslate;
@@ -12,20 +13,20 @@ using System.Linq;
 Console.WriteLine("Bonjour...");
 
 var workDir = "D:\\Daten\\MMO\\temp\\CopyDissolverTest";
-//var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\Jagdbanngebiete\Jagdbanngebiete.gdb";
-//var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\AmphibienIANB\IANB.gdb";
-var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Schutzgebiete\Waldreservate\Waldreservate.gdb";
+var sourceGdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\Jagdbanngebiete\Jagdbanngebiete.gdb";
+//var sourceGdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\AmphibienIANB\IANB.gdb";
+//var sourceGdbPath = @"G:\BnL\Daten\Ablage\DNL\Schutzgebiete\Waldreservate\Waldreservate.gdb";
 string[] dissolveFieldNames = ["ObjNummer", "Name"];
 
-var filterParameters = MyHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
+var filterParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
                                 .Select(line => new FilterParameter(line));
-var bufferParameters = MyHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\buffers.txt")
+var bufferParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\buffers.txt")
                                 .Select(line => new BufferParameter(line));
 
-var unionParameters = MyHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
+var unionParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
                                 .Select(line => new UnionParameterLayer(line));
 
-using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(gdbPath, GdalToolsLib.DataAccess.EAccessLevel.ReadOnly);
+using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(sourceGdbPath, GdalToolsLib.DataAccess.EAccessLevel.ReadOnly);
 
 var layers = ds.LayerIterator()
                 .Where(l => l
@@ -45,9 +46,20 @@ foreach (var layer in layers)
     var filter = filterParameters.SingleOrDefault(p => layer.LayerContentInfo.Year == int.Parse(p.Year)
                                               && layer.LayerContentInfo.Category.Equals(p.Theme, StringComparison.InvariantCultureIgnoreCase));
 
-    var destination = Path.Join(workDir, Path.GetFileName(gdbPath));
-    VectorTranslate.Run(gdbPath, destination, new VectorTranslateOptions { Overwrite = true, Where = filter?.WhereClause, SourceLayerName = layer.CurrentLayerName, Update = true });
-    layer.DataSourcePath = destination;
+    var workGdb = Path.Join(workDir, Path.GetFileName(sourceGdbPath));
+    VectorTranslate.Run(sourceGdbPath, workGdb, new VectorTranslateOptions
+    {
+        Overwrite = true,
+        Update = true,
+        Where = filter?.WhereClause,
+        SourceLayerName = layer.CurrentLayerName,
+        // removes other dimensions than XY
+        OtherOptions = ["-dim", "XY"]
+    });
+    layer.DataSourcePath = workGdb;
+
+    // removes the M and Z from the geometry type
+    layer.GeometryType = Ogr.GT_Flatten(layer.GeometryType);
 
     var buffer = bufferParameters.SingleOrDefault(b => layer.LayerContentInfo.LegalState.Contains(b.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
                                            layer.LayerContentInfo.Category.Contains(b.Theme, StringComparison.CurrentCultureIgnoreCase));
@@ -58,18 +70,16 @@ foreach (var layer in layers)
     {
         var sqlStatement = $"SELECT {dissolveFieldsString}, ST_Buffer(SHAPE, {buffer.BufferDistanceMeter}) as SHAPE FROM '{layer.CurrentLayerName}'";
 
-
-        VectorTranslate.Run(destination, destination, new VectorTranslateOptions
+        VectorTranslate.Run(workGdb, workGdb, new VectorTranslateOptions
         {
             Overwrite = true,
             Update = true,
             SourceLayerName = layer.CurrentLayerName,
             NewLayerName = layer.CurrentLayerName += "_buf",
             Sql = sqlStatement,
-            NewGeometryType = wkbGeometryType.wkbPolygon,
+            NewGeometryType = layer.GeometryType = wkbGeometryType.wkbPolygon,
             OtherOptions = ["-dialect", "SQLITE"]
         });
-        layer.GeometryType = wkbGeometryType.wkbPolygon;
     }
 
     var dissolveSql = $"""
@@ -77,7 +87,7 @@ foreach (var layer in layers)
         FROM '{layer.CurrentLayerName}'
         GROUP BY {dissolveFieldsString}
         """;
-    VectorTranslate.Run(destination, destination, new VectorTranslateOptions
+    VectorTranslate.Run(workGdb, workGdb, new VectorTranslateOptions
     {
         SourceLayerName = layer.CurrentLayerName,
         NewLayerName = layer.CurrentLayerName += "_dis",
@@ -105,7 +115,7 @@ foreach (var unionGroup in unionParameters.GroupBy(up => up.ResultLayerName))
 
     using var ds1 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer1.DataSourcePath, GdalToolsLib.DataAccess.EAccessLevel.Full);
     using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer2.DataSourcePath);
-    using var layer = ds1.OpenLayer(layer1.CurrentLayerName);  // open layer
+    using var layer = ds1.OpenLayer(layer1.CurrentLayerName);
 
     using var otherLayer = ds2.OpenLayer(layer2.CurrentLayerName);
 
@@ -115,7 +125,6 @@ foreach (var unionGroup in unionParameters.GroupBy(up => up.ResultLayerName))
 
     Console.WriteLine($" into {outputLayerName}.");
 }
-
 
 Console.WriteLine("Finished...");
 Console.ReadKey();
