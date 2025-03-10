@@ -3,7 +3,6 @@ using BnL.CopyDissolverFGDB.Parameters;
 using GdalToolsLib.GeoProcessor;
 using GdalToolsLib.Models;
 using GdalToolsLib.VectorTranslate;
-using NetTopologySuite.Index.HPRtree;
 using OSGeo.OGR;
 using System;
 using System.Collections.Generic;
@@ -13,8 +12,9 @@ using System.Linq;
 Console.WriteLine("Bonjour...");
 
 var workDir = "D:\\Daten\\MMO\\temp\\CopyDissolverTest";
-var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\Jagdbanngebiete\Jagdbanngebiete.gdb";
+//var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\Jagdbanngebiete\Jagdbanngebiete.gdb";
 //var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\AmphibienIANB\IANB.gdb";
+var gdbPath = @"G:\BnL\Daten\Ablage\DNL\Schutzgebiete\Waldreservate\Waldreservate.gdb";
 string[] dissolveFieldNames = ["ObjNummer", "Name"];
 
 var filterParameters = MyHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
@@ -47,7 +47,7 @@ foreach (var layer in layers)
 
     var destination = Path.Join(workDir, Path.GetFileName(gdbPath));
     VectorTranslate.Run(gdbPath, destination, new VectorTranslateOptions { Overwrite = true, Where = filter?.WhereClause, SourceLayerName = layer.CurrentLayerName, Update = true });
-
+    layer.DataSourcePath = destination;
 
     var buffer = bufferParameters.SingleOrDefault(b => layer.LayerContentInfo.LegalState.Contains(b.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
                                            layer.LayerContentInfo.Category.Contains(b.Theme, StringComparison.CurrentCultureIgnoreCase));
@@ -66,8 +66,10 @@ foreach (var layer in layers)
             SourceLayerName = layer.CurrentLayerName,
             NewLayerName = layer.CurrentLayerName += "_buf",
             Sql = sqlStatement,
-            OtherOptions = ["-dialect", "SQLITE", "-nlt", "POLYGON"]
+            NewGeometryType = wkbGeometryType.wkbPolygon,
+            OtherOptions = ["-dialect", "SQLITE"]
         });
+        layer.GeometryType = wkbGeometryType.wkbPolygon;
     }
 
     var dissolveSql = $"""
@@ -82,7 +84,8 @@ foreach (var layer in layers)
         Overwrite = true,
         Update = true,
         Sql = dissolveSql,
-        OtherOptions = ["-dialect", "SQLITE", "-nlt", "PROMOTE_TO_MULTI"]
+        NewGeometryType = layer.GeometryType.ToMulti(),
+        OtherOptions = ["-dialect", "SQLITE"]
     });
 }
 
@@ -100,7 +103,7 @@ foreach (var unionGroup in unionParameters.GroupBy(up => up.ResultLayerName))
     var layer1 = layerToUnion.ElementAt(0);
     var layer2 = layerToUnion.ElementAt(1);
 
-    using var ds1 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer1.DataSourcePath);
+    using var ds1 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer1.DataSourcePath, GdalToolsLib.DataAccess.EAccessLevel.Full);
     using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer2.DataSourcePath);
     using var layer = ds1.OpenLayer(layer1.CurrentLayerName);  // open layer
 

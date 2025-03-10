@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OSGeo.OGR;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BnL.CopyDissolverFGDB
 {
-    class MyHelpers
+    public static class MyHelpers
     {
         public static IEnumerable<string[]> GetLinesWithoutComments(string filePath)
         {

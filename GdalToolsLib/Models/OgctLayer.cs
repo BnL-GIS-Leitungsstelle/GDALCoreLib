@@ -508,22 +508,13 @@ public partial class OgctLayer : IOgctLayer
     /// <returns></returns>
     private wkbGeometryType ForceMultiPartGeomType(wkbGeometryType geomType)
     {
-        switch (geomType)
+        return geomType switch
         {
-            case wkbGeometryType.wkbPolygon:
-                return wkbGeometryType.wkbMultiPolygon;
-
-            case wkbGeometryType.wkbLineString:
-                return wkbGeometryType.wkbMultiLineString;
-
-            case wkbGeometryType.wkbPoint:
-                return wkbGeometryType.wkbMultiPoint;
-
-            default:
-                return geomType;
-        }
-
-
+            wkbGeometryType.wkbPolygon => wkbGeometryType.wkbMultiPolygon,
+            wkbGeometryType.wkbLineString => wkbGeometryType.wkbMultiLineString,
+            wkbGeometryType.wkbPoint => wkbGeometryType.wkbMultiPoint,
+            _ => geomType,
+        };
     }
 
     /// <summary>
