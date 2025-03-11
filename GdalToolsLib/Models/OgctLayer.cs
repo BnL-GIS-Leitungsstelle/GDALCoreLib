@@ -616,7 +616,7 @@ public partial class OgctLayer : IOgctLayer
         GeoProcessWithLayer(geoProcess, otherLayer, tempInMemoryLayer);
 
         long cnt = tempInMemoryLayer.CopyToLayer(DataSource, outputLayerName, true);
-        Console.WriteLine($"  -- result: copied {cnt} features into {outputLayerName} in {DataSource.Name}");
+        //Console.WriteLine($"  -- result: copied {cnt} features into {outputLayerName} in {DataSource.Name}");
 
         return outputLayerName;
     }

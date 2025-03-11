@@ -1,22 +1,14 @@
 ﻿using BnL.CopyDissolverFGDB;
 using BnL.CopyDissolverFGDB.Parameters;
-using GdalToolsLib.Common;
-using GdalToolsLib.GeoProcessor;
-using GdalToolsLib.Models;
-using GdalToolsLib.VectorTranslate;
-using OSGeo.OGR;
+using Spectre.Console;
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
-Console.WriteLine("Bonjour...");
 
 var workDir = "D:\\Daten\\MMO\\temp\\CopyDissolverTest";
-var sourceGdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\Jagdbanngebiete\Jagdbanngebiete.gdb";
-//var sourceGdbPath = @"G:\BnL\Daten\Ablage\DNL\Bundesinventare\AmphibienIANB\IANB.gdb";
-//var sourceGdbPath = @"G:\BnL\Daten\Ablage\DNL\Schutzgebiete\Waldreservate\Waldreservate.gdb";
-string[] dissolveFieldNames = ["ObjNummer", "Name"];
 
 var filterParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
                                 .Select(line => new FilterParameter(line));
@@ -24,107 +16,54 @@ var bufferParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\
                                 .Select(line => new BufferParameter(line));
 
 var unionParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
-                                .Select(line => new UnionParameterLayer(line));
+                                .Select(line => new UnionParameter(line));
 
-using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(sourceGdbPath, GdalToolsLib.DataAccess.EAccessLevel.ReadOnly);
+string[] dissolveFieldNames = ["ObjNummer", "Name"];
 
-var layers = ds.LayerIterator()
-                .Where(l => l
-                    .LayerDetails
-                    .Schema!
-                    .FieldList
-                    .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length
-                )
-                .Select(l => new WorkLayer(l.LayerDetails))
-                .ToList();
+string[] searchDirs =
+[
+    @"G:\BnL\Daten\Ablage\DNL\Bundesinventare",
+    @"G:\BnL\Daten\Ablage\DNL\Schutzgebiete",
+];
 
-var layersToDissolve = new List<WorkLayer>();
+AnsiConsole.Write(new FigletText("CopyDissolver").Centered().Color(Color.Red));
 
-foreach (var layer in layers)
+var root = new Tree("[bold]Datasources:[/]");
+
+var allGdbPaths = searchDirs.SelectMany(searchDir =>
 {
-    // filter layers according to csv
-    var filter = filterParameters.SingleOrDefault(p => layer.LayerContentInfo.Year == int.Parse(p.Year)
-                                              && layer.LayerContentInfo.Category.Equals(p.Theme, StringComparison.InvariantCultureIgnoreCase));
+    var dirRoot = root.AddNode($"[yellow]{searchDir}[/]");
+    var gdbs = CopyDissolverHelpers.CollectGeodataFiles(searchDir);
+    dirRoot.AddNodes(gdbs.Select(p => new TextPath(p).LeafColor(Color.Yellow)));
+    return gdbs;
+}).ToList();
 
-    var workGdb = Path.Join(workDir, Path.GetFileName(sourceGdbPath));
-    VectorTranslate.Run(sourceGdbPath, workGdb, new VectorTranslateOptions
+AnsiConsole.Write(new Panel(root));
+
+var shouldContinue = AnsiConsole.Prompt(new ConfirmationPrompt("Looks good?"));
+
+if (shouldContinue)
+{
+    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
     {
-        Overwrite = true,
-        Update = true,
-        Where = filter?.WhereClause,
-        SourceLayerName = layer.CurrentLayerName,
-        // removes other dimensions than XY
-        OtherOptions = ["-dim", "XY"]
-    });
-    layer.DataSourcePath = workGdb;
-
-    // removes the M and Z from the geometry type
-    layer.GeometryType = Ogr.GT_Flatten(layer.GeometryType);
-
-    var buffer = bufferParameters.SingleOrDefault(b => layer.LayerContentInfo.LegalState.Contains(b.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
-                                           layer.LayerContentInfo.Category.Contains(b.Theme, StringComparison.CurrentCultureIgnoreCase));
-
-    var dissolveFieldsString = string.Join(", ", dissolveFieldNames);
-
-    if (buffer != null)
-    {
-        var sqlStatement = $"SELECT {dissolveFieldsString}, ST_Buffer(SHAPE, {buffer.BufferDistanceMeter}) as SHAPE FROM '{layer.CurrentLayerName}'";
-
-        VectorTranslate.Run(workGdb, workGdb, new VectorTranslateOptions
+        await Task.WhenAll(allGdbPaths.Select(path =>
         {
-            Overwrite = true,
-            Update = true,
-            SourceLayerName = layer.CurrentLayerName,
-            NewLayerName = layer.CurrentLayerName += "_buf",
-            Sql = sqlStatement,
-            NewGeometryType = layer.GeometryType = wkbGeometryType.wkbPolygon,
-            OtherOptions = ["-dialect", "SQLITE"]
-        });
-    }
+            var tsk = ctx.AddTask(path);
+            
+            return Task.Run(() =>
+            {
+                CopyDissolverHelpers.ProcessFGDB(path, workDir, dissolveFieldNames, filterParameters, bufferParameters, unionParameters);
+                tsk.StopTask();
+            });
+        }).ToArray());
 
-    var dissolveSql = $"""
-        SELECT {dissolveFieldsString}, ST_Multi(ST_Union(SHAPE)) as SHAPE
-        FROM '{layer.CurrentLayerName}'
-        GROUP BY {dissolveFieldsString}
-        """;
-    VectorTranslate.Run(workGdb, workGdb, new VectorTranslateOptions
-    {
-        SourceLayerName = layer.CurrentLayerName,
-        NewLayerName = layer.CurrentLayerName += "_dis",
-        Overwrite = true,
-        Update = true,
-        Sql = dissolveSql,
-        NewGeometryType = layer.GeometryType.ToMulti(),
-        OtherOptions = ["-dialect", "SQLITE"]
+        //AnsiConsole.Status().Spinner(Spinner.Known.BouncingBar)
+        //    .Start($"[yellow]Processing {gdb}...[/]", _ =>
+        //    {
+        //    });
+        //Console.WriteLine($"Finished with {gdb}");
     });
 }
 
-foreach (var unionGroup in unionParameters.GroupBy(up => up.ResultLayerName))
-{
-    var combinedName = unionGroup.Key;
-    var layerToUnion = unionGroup.Select(ul => layers.SingleOrDefault(l =>
-                l.LayerContentInfo.Year == Convert.ToInt32(ul.Year) &&
-                l.LayerContentInfo.LegalState.Contains(ul.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
-                l.LayerContentInfo.SubCategory.StartsWith("Anhang") == false &&
-                l.LayerContentInfo.Category.Contains(ul.Theme, StringComparison.CurrentCultureIgnoreCase)))
-        .Where(x => x != null);
-    if (!layerToUnion.Any()) continue;
-
-    var layer1 = layerToUnion.ElementAt(0);
-    var layer2 = layerToUnion.ElementAt(1);
-
-    using var ds1 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer1.DataSourcePath, GdalToolsLib.DataAccess.EAccessLevel.Full);
-    using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer2.DataSourcePath);
-    using var layer = ds1.OpenLayer(layer1.CurrentLayerName);
-
-    using var otherLayer = ds2.OpenLayer(layer2.CurrentLayerName);
-
-    Console.Write($" -- > Unify areas from {layer.Name} and {otherLayer.Name} ");
-
-    var outputLayerName = layer.GeoProcessWithLayer(EGeoProcess.Union, otherLayer, combinedName);
-
-    Console.WriteLine($" into {outputLayerName}.");
-}
-
-Console.WriteLine("Finished...");
+Console.WriteLine("Goodbye!");
 Console.ReadKey();

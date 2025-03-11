@@ -22,7 +22,11 @@ namespace GdalToolsLib.Models;
 /// </summary>
 public class OgctDataSourceAccessor : IOgctSourceAccessor
 {
-    public OgctDataSourceAccessor()
+    /// <summary>
+    /// This needs to be a static constructor, because then it will only get called once across the runtime of the whole program.
+    /// This prevents problems with multithreading and avoids unnecessary re-execution
+    /// </summary>
+    static OgctDataSourceAccessor()
     {
         GdalBase.ConfigureAll();
 
