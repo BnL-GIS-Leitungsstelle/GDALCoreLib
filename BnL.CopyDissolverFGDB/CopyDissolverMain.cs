@@ -2,6 +2,8 @@
 using BnL.CopyDissolverFGDB.Parameters;
 using Spectre.Console;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,15 +28,24 @@ string[] searchDirs =
 
 AnsiConsole.Write(new FigletText("CopyDissolver").Centered().Color(Color.Red));
 
-var root = new Tree("[bold]Datasources:[/]");
 
-var allGdbPaths = searchDirs.SelectMany(searchDir =>
+List<string> allGdbPaths = [];
+
+var root = new Tree("[bold]Found Datasources:[/]");
+
+AnsiConsole.Status().Start("Searching subfolders...", ctx =>
 {
-    var dirRoot = root.AddNode($"[yellow]{searchDir}[/]");
-    var gdbs = CopyDissolverHelpers.CollectGeodataFiles(searchDir);
-    dirRoot.AddNodes(gdbs.Select(p => new TextPath(p).LeafColor(Color.Yellow)));
-    return gdbs;
-}).ToList();
+    allGdbPaths = searchDirs.SelectMany(searchDir =>
+    {
+        AnsiConsole.WriteLine($"Searching {searchDir}...");
+        var dirRoot = root.AddNode($"[yellow]{searchDir}[/]");
+        var gdbs = CopyDissolverHelpers.CollectGeodataFiles(searchDir);
+
+        dirRoot.AddNodes(gdbs.Select(p => new TextPath(p).LeafColor(Color.Yellow)));
+        return gdbs;
+    }).ToList();
+});
+
 
 AnsiConsole.Write(new Panel(root));
 
@@ -47,19 +58,16 @@ if (shouldContinue)
         await Task.WhenAll(allGdbPaths.Select(path =>
         {
             var tsk = ctx.AddTask(path);
-            
+
             return Task.Run(() =>
             {
-                CopyDissolverHelpers.ProcessFGDB(path, workDir, dissolveFieldNames, filterParameters, bufferParameters, unionParameters);
+                var outPath = Path.Join(workDir, Path.GetFileName(path));
+                FGDBProcessor fGDBProcessor = new (path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters);
+                fGDBProcessor.Run(outPath);
                 tsk.StopTask();
             });
         }).ToArray());
 
-        //AnsiConsole.Status().Spinner(Spinner.Known.BouncingBar)
-        //    .Start($"[yellow]Processing {gdb}...[/]", _ =>
-        //    {
-        //    });
-        //Console.WriteLine($"Finished with {gdb}");
     });
 }
 

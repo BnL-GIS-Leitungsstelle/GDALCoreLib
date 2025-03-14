@@ -2,18 +2,19 @@
 
 namespace BnL.CopyDissolverFGDB.Parameters
 {
-    public class UnionParameter : LayerParameter
+    public class UnionParameter
     {
-        public string ResultLayerName { get; private set; }
+        public string ResultLayerName { get; }
+        public int Year { get; }
+        public string LegalState { get; }
+        public string Theme { get; }
 
-        public UnionParameter(string[] line) : base(line[3], line[1], line[2])
+        public UnionParameter(string[] line)
         {
             ResultLayerName = line[0];
-        }
-
-        public override string ToString()
-        {
-            return $"{ResultLayerName}, {Year,4}, {Theme,30}, {LegalState,15} ";
+            Year = int.Parse(line[1]);
+            LegalState = line[2];
+            Theme = line[3];
         }
     }
 }

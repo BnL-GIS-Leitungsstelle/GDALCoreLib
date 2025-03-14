@@ -1,27 +1,27 @@
-﻿using GdalToolsLib.Layer;
+﻿using BnL.CopyDissolverFGDB.Parameters;
+using GdalToolsLib.Layer;
 using OSGeo.OGR;
 
 namespace BnL.CopyDissolverFGDB;
 
 public class WorkLayer
 {
-    public string DataSourcePath { get; set; }
-
     public string CurrentLayerName { get; set; }
 
-    public string OutputLayerName { get; set; }
+    public string OutputLayerName { get; }
 
     public wkbGeometryType GeometryType { get; set; }
 
-    public LayerNameBafuContent LayerContentInfo { get; set; }
+    public FilterParameter? Filter { get; }
+    public BufferParameter? Buffer { get; }
 
 
-    public WorkLayer(LayerDetails layerDetails)
+    public WorkLayer(string currentLayerName, string outputLayerName, wkbGeometryType geometryType, FilterParameter? filterParameter, BufferParameter? bufferParameter)
     {
-        DataSourcePath = layerDetails.DataSourceFileName;
-        CurrentLayerName = layerDetails.Name;
-        OutputLayerName = CurrentLayerName;
-        GeometryType = layerDetails.GeomType;
-        LayerContentInfo = new LayerNameBafuContent(CurrentLayerName);
+        CurrentLayerName = currentLayerName;
+        OutputLayerName = outputLayerName;
+        GeometryType = geometryType;
+        Filter = filterParameter;
+        Buffer = bufferParameter;
     }
 }

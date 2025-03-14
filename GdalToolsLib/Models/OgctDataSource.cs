@@ -199,12 +199,10 @@ public class OgctDataSource : IOgctDataSource
     {
         var layerNames = new List<string?>();
 
-        for (int i = 0; i < GetLayerCount(); i++)
+        foreach (var layer in GetLayers())
         {
-            OSGeo.OGR.Layer layer = _dataSource.GetLayerByIndex(i); // test
-            var layerName = _dataSource.GetLayerByIndex(i).GetName();
-
-            var layerInfo = GetLayerInfo(layerName);
+            var layerName = layer.Name;
+            var layerInfo = new LayerDetails(layer);
 
             switch (layerType)
             {
@@ -417,7 +415,7 @@ public class OgctDataSource : IOgctDataSource
         _dataSource?.Dispose();
     }
 
-    public IEnumerable<IOgctLayer> LayerIterator()
+    public IEnumerable<IOgctLayer> GetLayers()
     {
         var layerCount = OgrDataSource.GetLayerCount();
         for (int i = 0; i < layerCount; i++)
