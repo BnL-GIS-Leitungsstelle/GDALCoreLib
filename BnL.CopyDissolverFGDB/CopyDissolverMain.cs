@@ -2,8 +2,6 @@
 using BnL.CopyDissolverFGDB.Parameters;
 using Spectre.Console;
 using System;
-using System.Collections.Concurrent;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 

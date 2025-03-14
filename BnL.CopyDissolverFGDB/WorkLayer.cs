@@ -7,9 +7,9 @@ public class WorkLayer
 {
     public string DataSourcePath { get; set; }
 
-    public string OriginalLayerName { get; init; }
-
     public string CurrentLayerName { get; set; }
+
+    public string OutputLayerName { get; set; }
 
     public wkbGeometryType GeometryType { get; set; }
 
@@ -19,9 +19,9 @@ public class WorkLayer
     public WorkLayer(LayerDetails layerDetails)
     {
         DataSourcePath = layerDetails.DataSourceFileName;
-        OriginalLayerName = layerDetails.Name;
-        CurrentLayerName = OriginalLayerName;
+        CurrentLayerName = layerDetails.Name;
+        OutputLayerName = CurrentLayerName;
         GeometryType = layerDetails.GeomType;
-        LayerContentInfo = new LayerNameBafuContent(OriginalLayerName);
+        LayerContentInfo = new LayerNameBafuContent(CurrentLayerName);
     }
 }

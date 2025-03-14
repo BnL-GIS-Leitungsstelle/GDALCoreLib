@@ -4,6 +4,7 @@ using GdalToolsLib.DataAccess;
 using GdalToolsLib.GeoProcessor;
 using GdalToolsLib.Models;
 using GdalToolsLib.VectorTranslate;
+using OSGeo.GDAL;
 using OSGeo.OGR;
 using System;
 using System.Collections.Generic;
@@ -63,14 +64,15 @@ namespace BnL.CopyDissolverFGDB
                             .Select(l => new WorkLayer(l.LayerDetails))
                             .ToList();
 
-            var layersToDissolve = new List<WorkLayer>();
+            var outGdb = Path.Join(workDir, Path.GetFileName(sourceGdbPath));
+            var workGdb = "/vsimem/" + outGdb;
+
             foreach (var layer in layers)
             {
                 // filter layers according to csv
                 var filter = filterParameters.SingleOrDefault(p => layer.LayerContentInfo.Year == int.Parse(p.Year)
                                                           && layer.LayerContentInfo.Category.Equals(p.Theme, StringComparison.InvariantCultureIgnoreCase));
 
-                var workGdb = Path.Join(workDir, Path.GetFileName(sourceGdbPath));
                 VectorTranslate.Run(sourceGdbPath, workGdb, new VectorTranslateOptions
                 {
                     Overwrite = true,
@@ -134,20 +136,32 @@ namespace BnL.CopyDissolverFGDB
                     .Where(x => x != null);
                 if (!layerToUnion.Any()) continue;
 
-                var layer1 = layerToUnion.ElementAt(0);
-                var layer2 = layerToUnion.ElementAt(1);
+                var workLayer1 = layerToUnion.ElementAt(0);
+                var workLayer2 = layerToUnion.ElementAt(1);
 
-                using var ds1 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer1.DataSourcePath, EAccessLevel.Full);
-                using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(layer2.DataSourcePath);
-                using var layer = ds1.OpenLayer(layer1.CurrentLayerName);
+                // new OgctDataSourceAccessor().CreateAndOpenDatasource() does not work wiha /vsimem/ path...
+                using var workDs = new OgctDataSource(Ogr.Open(workGdb, GdalConst.GA_Update));
 
-                using var otherLayer = ds2.OpenLayer(layer2.CurrentLayerName);
+                using var layer = workDs.OpenLayer(workLayer1.CurrentLayerName);
+                using var otherLayer = workDs.OpenLayer(workLayer2.CurrentLayerName);
+
+                using var unionResultLayer = workDs.CreateAndOpenLayer(combinedName, layer.GetSpatialRef(), layer.LayerDetails.GeomType, overwriteExisting: false);
 
                 //Console.Write($" -- > Unify areas from {layer.Name} and {otherLayer.Name} ");
 
-                var outputLayerName = layer.GeoProcessWithLayer(EGeoProcess.Union, otherLayer, combinedName);
+                layer.GeoProcessWithLayer(EGeoProcess.Union, otherLayer, unionResultLayer);
+
+                workLayer1.OutputLayerName = workLayer2.OutputLayerName = combinedName;
 
                 //Console.WriteLine($" into {outputLayerName}.");
+            }
+
+            var copiedLayers = new List<string>();
+            foreach (var layer in layers)
+            {
+                if (copiedLayers.Contains(layer.OutputLayerName)) continue;
+                VectorTranslate.Run(workGdb, outGdb, new VectorTranslateOptions { SourceLayerName = layer.CurrentLayerName, NewLayerName = layer.OutputLayerName, Overwrite = true, Update = true });
+                copiedLayers.Add(layer.OutputLayerName);
             }
         }
     }
