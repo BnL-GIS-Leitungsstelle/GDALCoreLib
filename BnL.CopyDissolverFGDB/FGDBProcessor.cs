@@ -24,7 +24,13 @@ namespace BnL.CopyDissolverFGDB
         private List<WorkLayer> workLayers = [];
         private string workDb;
 
-        public FGDBProcessor(string sourceGdbPath, string[] dissolveFieldNames, IEnumerable<FilterParameter> filterParameters, IEnumerable<BufferParameter> bufferParameters, IEnumerable<UnionParameter> unionParameters)
+        public FGDBProcessor(
+            string sourceGdbPath,
+            string[] dissolveFieldNames,
+            IEnumerable<FilterParameter> filterParameters,
+            IEnumerable<BufferParameter> bufferParameters,
+            IEnumerable<UnionParameter> unionParameters,
+            (string, string)[] renamePatterns)
         {
             this.sourceGdbPath = sourceGdbPath;
             this.dissolveFieldsString = string.Join(", ", dissolveFieldNames);
@@ -38,7 +44,7 @@ namespace BnL.CopyDissolverFGDB
                                 .Schema!
                                 .FieldList
                                 .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length;
-                
+
                 if (!hasDissolveFields)
                 {
                     layersWithoutDissolveFields.Add(l.Name);
@@ -61,6 +67,11 @@ namespace BnL.CopyDissolverFGDB
                             layerNameMetadata.Category.Contains(ul.Theme, StringComparison.CurrentCultureIgnoreCase));
 
                 var outputName = union != null ? union.ResultLayerName : l.Name;
+
+                foreach (var (oldStr, newStr) in renamePatterns)
+                {
+                    outputName = outputName.Replace(oldStr, newStr);
+                }
 
                 workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer, true));
             }

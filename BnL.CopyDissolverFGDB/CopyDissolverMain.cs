@@ -19,6 +19,8 @@ var bufferParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\
 var unionParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
                                 .Select(line => new UnionParameter(line));
 
+(string, string)[] renamePatterns = [("_Park_", "_ParkKernzone_")];
+
 string[] dissolveFieldNames = ["ObjNummer", "Name"];
 
 string[] searchDirs =
@@ -63,7 +65,7 @@ if (shouldContinue)
             return Task.Run(() =>
             {
                 var outPath = Path.Join(workDir, Path.GetFileName(path));
-                FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters);
+                FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters, renamePatterns);
                 fGDBProcessor.Run(outPath);
                 tsk.StopTask();
             });
