@@ -125,11 +125,9 @@ namespace BnL.CopyDissolverFGDB
             using var layer = workDs.OpenLayer(workLayer1.CurrentLayerName);
             using var otherLayer = workDs.OpenLayer(workLayer2.CurrentLayerName);
 
-            using var unionResultLayer = workDs.CreateAndOpenLayer(combinedName, layer.GetSpatialRef(), layer.LayerDetails.GeomType, overwriteExisting: false);
-
             //Console.Write($" -- > Unify areas from {layer.Name} and {otherLayer.Name} ");
-
-            layer.GeoProcessWithLayer(EGeoProcess.Union, otherLayer, unionResultLayer);
+            var outName = layer.GeoProcessWithLayer(EGeoProcess.Union, otherLayer, combinedName)!;
+            workLayer1.CurrentLayerName = workLayer2.CurrentLayerName = outName;
         }
 
         private void DissolveLayer(WorkLayer layer)
