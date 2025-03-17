@@ -1,5 +1,6 @@
 ﻿using BnL.CopyDissolverFGDB;
 using BnL.CopyDissolverFGDB.Parameters;
+using ESRIFileGeodatabaseAPI;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ if (shouldContinue)
             return Task.Run(() =>
             {
                 var outPath = Path.Join(workDir, Path.GetFileName(path));
-                FGDBProcessor fGDBProcessor = new (path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters);
+                FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters);
                 fGDBProcessor.Run(outPath);
                 tsk.StopTask();
             });

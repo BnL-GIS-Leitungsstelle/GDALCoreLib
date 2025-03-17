@@ -1,4 +1,5 @@
 ﻿using BnL.CopyDissolverFGDB.Parameters;
+using ESRIFileGeodatabaseAPI;
 using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.GeoProcessor;
@@ -9,6 +10,7 @@ using OSGeo.GDAL;
 using OSGeo.OGR;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace BnL.CopyDissolverFGDB
@@ -116,6 +118,7 @@ namespace BnL.CopyDissolverFGDB
                 });
             }
 
+            FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
         }
 
         private void UnionLayers(WorkLayer workLayer1, WorkLayer workLayer2, string combinedName)

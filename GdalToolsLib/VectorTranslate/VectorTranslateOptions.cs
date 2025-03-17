@@ -11,7 +11,7 @@ namespace GdalToolsLib.VectorTranslate
     /// 
     /// Use the <see cref="ToStringArray"/> method to translate the options object back into a list of string arguments GDAL can understand. 
     /// </summary>
-    public record class VectorTranslateOptions
+    public class VectorTranslateOptions
     {
         public string? Where { get; init; }
         public bool Overwrite { get; init; }
