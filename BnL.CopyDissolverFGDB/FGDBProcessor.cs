@@ -36,10 +36,11 @@ namespace BnL.CopyDissolverFGDB
                                 .Schema!
                                 .FieldList
                                 .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length;
-
+                
                 if (!hasDissolveFields)
                 {
                     layersWithoutDissolveFields.Add(l.Name);
+                    workLayers.Add(new WorkLayer(l.Name, l.Name, wkbGeometryType.wkbUnknown));
                     continue;
                 }
 
@@ -59,7 +60,7 @@ namespace BnL.CopyDissolverFGDB
 
                 var outputName = union != null ? union.ResultLayerName : l.Name;
 
-                workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer));
+                workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer, true));
             }
         }
 
@@ -84,7 +85,7 @@ namespace BnL.CopyDissolverFGDB
 
                 if (layer.Buffer != null) BufferLayer(layer);
 
-                DissolveLayer(layer);
+                if (layer.Dissolve) DissolveLayer(layer);
             }
 
             // process unions in separate loop, since all layers have to be dissolved first
@@ -119,7 +120,7 @@ namespace BnL.CopyDissolverFGDB
 
         private void UnionLayers(WorkLayer workLayer1, WorkLayer workLayer2, string combinedName)
         {
-            // new OgctDataSourceAccessor().CreateAndOpenDatasource() does not work wiha /vsimem/ path...
+            // new OgctDataSourceAccessor().CreateAndOpenDatasource() does not work with a /vsimem/ path...
             using var workDs = new OgctDataSource(Ogr.Open(workDb, GdalConst.GA_Update));
 
             using var layer = workDs.OpenLayer(workLayer1.CurrentLayerName);

@@ -9,7 +9,7 @@ namespace GdalToolsLib.VectorTranslate
     /// Common options are made configurable through properties, instead of just raw strings. 
     /// If you do wanna pass raw string options, you can do that using the <see cref="OtherOptions"/> property.
     /// 
-    /// Use the <see cref="ToStringArray"/> method to translate the option object back into a list of string arguments GDAL can understand. 
+    /// Use the <see cref="ToStringArray"/> method to translate the options object back into a list of string arguments GDAL can understand. 
     /// </summary>
     public record class VectorTranslateOptions
     {
