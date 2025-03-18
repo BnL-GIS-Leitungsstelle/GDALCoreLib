@@ -21,6 +21,7 @@ namespace GdalToolsLib.VectorTranslate
         public wkbGeometryType? NewGeometryType { get; init; }
         public string? Sql { get; init; }
         public string[]? OtherOptions { get; init; }
+        public bool MakeValid { get; init; }
 
         public string[] ToStringArray()
         {
@@ -32,6 +33,7 @@ namespace GdalToolsLib.VectorTranslate
             if (NewGeometryType != null) options.AddRange(["-nlt", NewGeometryType.Value.ToStringName()]);
             if (Overwrite) options.Add("-overwrite");
             if (Update) options.Add("-update");
+            if (MakeValid) options.Add("-makevalid");
 
             if (OtherOptions != null) options.AddRange(OtherOptions);
             return options.ToArray();

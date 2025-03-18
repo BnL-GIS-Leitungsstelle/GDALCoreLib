@@ -10,19 +10,21 @@ using OSGeo.GDAL;
 using OSGeo.OGR;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace BnL.CopyDissolverFGDB
 {
     class FGDBProcessor
     {
-        private readonly string sourceGdbPath;
+        public readonly string sourceGdbPath;
         private readonly string dissolveFieldsString;
 
-        private readonly List<string> layersWithoutDissolveFields = [];
-        private List<WorkLayer> workLayers = [];
+        public List<WorkLayer> workLayers = [];
         private string workDb;
+
+        public List<string> layersWithoutDissolveFields = [];
+        public List<string> nonPointBufferLayers = [];
+        public bool HasWarnings => layersWithoutDissolveFields.Count > 0 || nonPointBufferLayers.Count > 0;
 
         public FGDBProcessor(
             string sourceGdbPath,
@@ -60,6 +62,11 @@ namespace BnL.CopyDissolverFGDB
                 var buffer = bufferParameters.SingleOrDefault(b => layerNameMetadata.LegalState.Contains(b.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
                                                      layerNameMetadata.Category.Contains(b.Theme, StringComparison.CurrentCultureIgnoreCase));
 
+                if (buffer != null && l.LayerDetails.GeomType is not wkbGeometryType.wkbPoint or wkbGeometryType.wkbMultiPoint)
+                {
+                    nonPointBufferLayers.Add(l.Name);
+                }
+
                 var union = unionParameters.SingleOrDefault(ul =>
                             layerNameMetadata.Year == ul.Year &&
                             layerNameMetadata.LegalState.Contains(ul.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
@@ -72,7 +79,10 @@ namespace BnL.CopyDissolverFGDB
                 {
                     outputName = outputName.Replace(oldStr, newStr);
                 }
-
+                //if ((Ogr.GT_HasZ(l.LayerDetails.GeomType) + Ogr.GT_HasM(l.LayerDetails.GeomType)) != 0)
+                //{
+                //    layersWithoutDissolveFields.Add(l.Name);
+                //}
                 workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer, true));
             }
         }
@@ -90,10 +100,11 @@ namespace BnL.CopyDissolverFGDB
                     Update = true,
                     Where = layer.Filter?.WhereClause,
                     SourceLayerName = layer.CurrentLayerName,
+                    MakeValid = true,
                     // removes dimensions other than XY
                     OtherOptions = ["-dim", "XY"]
                 });
-                // removes the M and Z from the geometry type
+                // removes the M and Z from the geometry type in the worklayer
                 layer.GeometryType = Ogr.GT_Flatten(layer.GeometryType);
 
                 if (layer.Buffer != null) BufferLayer(layer);
@@ -180,5 +191,6 @@ namespace BnL.CopyDissolverFGDB
                 OtherOptions = ["-dialect", "SQLITE"]
             });
         }
+
     }
 }

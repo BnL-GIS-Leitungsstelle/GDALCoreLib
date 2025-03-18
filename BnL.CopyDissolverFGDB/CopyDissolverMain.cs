@@ -54,25 +54,62 @@ AnsiConsole.Write(new Panel(root));
 
 var shouldContinue = AnsiConsole.Prompt(new ConfirmationPrompt("Looks good?"));
 
-if (shouldContinue)
+if (!shouldContinue) return;
+
+//await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
+//{
+
+var warningGrid = new Grid().AddColumns(1);
+
+bool hasWarning = false;
+
+var fgdbs = await Task.WhenAll(allGdbPaths.Select(path =>
 {
-    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
+    //var tsk = ctx.AddTask(path);
+    return Task.Run(() =>
     {
-        await Task.WhenAll(allGdbPaths.Select(path =>
+
+        // 1. Print warnings and info
+        FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters, renamePatterns);
+        if (fGDBProcessor.HasWarnings)
         {
-            var tsk = ctx.AddTask(path);
+            hasWarning = true;
+            var gd = new Grid().AddColumn();
 
-            return Task.Run(() =>
+            if (fGDBProcessor.layersWithoutDissolveFields.Count > 0)
             {
-                var outPath = Path.Join(workDir, Path.GetFileName(path));
-                FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters, renamePatterns);
-                fGDBProcessor.Run(outPath);
-                tsk.StopTask();
-            });
-        }).ToArray());
+                gd.AddRow(new Rows(new Text("Layers without dissolve fields:", Color.Red), new Rows(fGDBProcessor.layersWithoutDissolveFields.Select(l => new Text(l)))));
+            }
 
+            if (fGDBProcessor.nonPointBufferLayers.Count > 0)
+            {
+                gd.AddRow(new Rows(new Text("Non-point layers to be buffered:", Color.Red), new Rows(fGDBProcessor.nonPointBufferLayers.Select(l => new Text(l)))));
+            }
+            warningGrid.AddRow(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
+        }
+        return fGDBProcessor;
+
+
+        // 2. Ask user for confirmation, if they wanna continue despite warnings
+
+        // 3. Run the script 
+        //fGDBProcessor.Run(outPath);
+
+        //if (fGDBProcessor.layersWithoutDissolveFields.Any())
+        //{
+        //    AnsiConsole.MarkupLine($"[yellow]{path}[/]");
+        //    AnsiConsole.Write(new Columns(fGDBProcessor.layersWithoutDissolveFields));
+        //    AnsiConsole.Write(new Rule());
+        //}
+        //tsk.StopTask();
     });
-}
+}).ToArray());
+AnsiConsole.Write(warningGrid);
+
+if (hasWarning && !AnsiConsole.Prompt(new ConfirmationPrompt("Continue despite warnings?"))) return;
+
+await Task.WhenAll(fgdbs.Select(processor => Task.Run(() => processor.Run(Path.Join(workDir, Path.GetFileName(processor.sourceGdbPath))))));
+
 
 Console.WriteLine("Goodbye!");
 Console.ReadKey();
