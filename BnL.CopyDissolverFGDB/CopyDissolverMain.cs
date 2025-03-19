@@ -8,7 +8,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-var workDir = "D:\\Daten\\MMO\\temp\\CopyDissolverTest";
+var today = DateTime.Today.ToString("yyyyMMdd");
+
+var workDir = Path.Join(@"D:\Daten\MMO\temp\CopyDissolverTest", "Stand_" + today);
 
 var filterParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
                                 .Select(line => new FilterParameter(line));
@@ -75,7 +77,7 @@ var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
             {
                 gd.AddRow(new Rows(new Text("Layers with ZM geometry:", Color.Red), new Rows(fGDBProcessor.zMGeometryLayers.Select(l => new Text(l)))));
             }
-            
+
             AnsiConsole.Write(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
         }
         return fGDBProcessor;
@@ -83,6 +85,8 @@ var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
 }).ToArray());
 
 if (hasWarning && !AnsiConsole.Prompt(new ConfirmationPrompt("Continue despite warnings?"))) return;
+
+Directory.CreateDirectory(workDir);
 
 await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
 {
