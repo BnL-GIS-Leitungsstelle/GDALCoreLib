@@ -24,6 +24,7 @@ namespace BnL.CopyDissolverFGDB
 
         public List<string> layersWithoutDissolveFields = [];
         public List<string> nonPointBufferLayers = [];
+        public List<string> zMGeometryLayers = [];
         public bool HasWarnings => layersWithoutDissolveFields.Count > 0 || nonPointBufferLayers.Count > 0;
 
         public FGDBProcessor(
@@ -53,6 +54,10 @@ namespace BnL.CopyDissolverFGDB
                     workLayers.Add(new WorkLayer(l.Name, l.Name, wkbGeometryType.wkbUnknown));
                     continue;
                 }
+                if ((Ogr.GT_HasZ(l.LayerDetails.GeomType) + Ogr.GT_HasM(l.LayerDetails.GeomType)) != 0)
+                {
+                    zMGeometryLayers.Add(l.Name);
+                }
 
                 var layerNameMetadata = new LayerNameBafuContent(l.Name);
 
@@ -79,10 +84,6 @@ namespace BnL.CopyDissolverFGDB
                 {
                     outputName = outputName.Replace(oldStr, newStr);
                 }
-                //if ((Ogr.GT_HasZ(l.LayerDetails.GeomType) + Ogr.GT_HasM(l.LayerDetails.GeomType)) != 0)
-                //{
-                //    layersWithoutDissolveFields.Add(l.Name);
-                //}
                 workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer, true));
             }
         }

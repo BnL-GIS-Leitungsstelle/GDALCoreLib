@@ -33,10 +33,9 @@ AnsiConsole.Write(new FigletText("CopyDissolver").Centered().Color(Color.Red));
 
 List<string> allGdbPaths = [];
 
-var root = new Tree("[bold]Found Datasources:[/]");
-
 AnsiConsole.Status().Start("Searching subfolders...", ctx =>
 {
+    var root = new Tree("[bold]Found Datasources:[/]");
     allGdbPaths = searchDirs.SelectMany(searchDir =>
     {
         AnsiConsole.WriteLine($"Searching {searchDir}...");
@@ -46,24 +45,18 @@ AnsiConsole.Status().Start("Searching subfolders...", ctx =>
         dirRoot.AddNodes(gdbs.Select(p => new TextPath(p).LeafColor(Color.Yellow)));
         return gdbs;
     }).ToList();
+    AnsiConsole.Write(new Panel(root));
 });
 
 
-AnsiConsole.Write(new Panel(root));
-
-var shouldContinue = AnsiConsole.Prompt(new ConfirmationPrompt("Looks good?"));
-
-if (!shouldContinue) return;
-
-var warningGrid = new Grid().AddColumns(1);
 bool hasWarning = false;
 
+
+AnsiConsole.MarkupLine("[bold]Warnings:[/]");
 var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
 {
     return Task.Run(() =>
     {
-
-        // 1. Print warnings and info
         FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters, renamePatterns);
         if (fGDBProcessor.HasWarnings)
         {
@@ -74,28 +67,32 @@ var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
             {
                 gd.AddRow(new Rows(new Text("Layers without dissolve fields:", Color.Red), new Rows(fGDBProcessor.layersWithoutDissolveFields.Select(l => new Text(l)))));
             }
-
             if (fGDBProcessor.nonPointBufferLayers.Count > 0)
             {
                 gd.AddRow(new Rows(new Text("Non-point layers to be buffered:", Color.Red), new Rows(fGDBProcessor.nonPointBufferLayers.Select(l => new Text(l)))));
             }
-            warningGrid.AddRow(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
+            if (fGDBProcessor.zMGeometryLayers.Count > 0)
+            {
+                gd.AddRow(new Rows(new Text("Layers with ZM geometry:", Color.Red), new Rows(fGDBProcessor.zMGeometryLayers.Select(l => new Text(l)))));
+            }
+            
+            AnsiConsole.Write(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
         }
         return fGDBProcessor;
     });
 }).ToArray());
 
-AnsiConsole.Write(warningGrid);
 if (hasWarning && !AnsiConsole.Prompt(new ConfirmationPrompt("Continue despite warnings?"))) return;
 
 await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
 {
     await Task.WhenAll(fgdbProcessors.Select(processor =>
     {
-        var tsk = ctx.AddTask(processor.sourceGdbPath);
+        var tsk = ctx.AddTask(processor.sourceGdbPath, false);
 
         return Task.Run(() =>
         {
+            tsk.StartTask();
             processor.Run(Path.Join(workDir, Path.GetFileName(processor.sourceGdbPath)));
             tsk.StopTask();
         });
