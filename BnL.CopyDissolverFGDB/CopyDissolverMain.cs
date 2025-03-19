@@ -1,6 +1,5 @@
 ﻿using BnL.CopyDissolverFGDB;
 using BnL.CopyDissolverFGDB.Parameters;
-using ESRIFileGeodatabaseAPI;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
@@ -56,16 +55,11 @@ var shouldContinue = AnsiConsole.Prompt(new ConfirmationPrompt("Looks good?"));
 
 if (!shouldContinue) return;
 
-//await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
-//{
-
 var warningGrid = new Grid().AddColumns(1);
-
 bool hasWarning = false;
 
-var fgdbs = await Task.WhenAll(allGdbPaths.Select(path =>
+var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
 {
-    //var tsk = ctx.AddTask(path);
     return Task.Run(() =>
     {
 
@@ -88,28 +82,25 @@ var fgdbs = await Task.WhenAll(allGdbPaths.Select(path =>
             warningGrid.AddRow(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
         }
         return fGDBProcessor;
-
-
-        // 2. Ask user for confirmation, if they wanna continue despite warnings
-
-        // 3. Run the script 
-        //fGDBProcessor.Run(outPath);
-
-        //if (fGDBProcessor.layersWithoutDissolveFields.Any())
-        //{
-        //    AnsiConsole.MarkupLine($"[yellow]{path}[/]");
-        //    AnsiConsole.Write(new Columns(fGDBProcessor.layersWithoutDissolveFields));
-        //    AnsiConsole.Write(new Rule());
-        //}
-        //tsk.StopTask();
     });
 }).ToArray());
-AnsiConsole.Write(warningGrid);
 
+AnsiConsole.Write(warningGrid);
 if (hasWarning && !AnsiConsole.Prompt(new ConfirmationPrompt("Continue despite warnings?"))) return;
 
-await Task.WhenAll(fgdbs.Select(processor => Task.Run(() => processor.Run(Path.Join(workDir, Path.GetFileName(processor.sourceGdbPath))))));
+await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
+{
+    await Task.WhenAll(fgdbProcessors.Select(processor =>
+    {
+        var tsk = ctx.AddTask(processor.sourceGdbPath);
 
+        return Task.Run(() =>
+        {
+            processor.Run(Path.Join(workDir, Path.GetFileName(processor.sourceGdbPath)));
+            tsk.StopTask();
+        });
+    }));
+});
 
 Console.WriteLine("Goodbye!");
 Console.ReadKey();
