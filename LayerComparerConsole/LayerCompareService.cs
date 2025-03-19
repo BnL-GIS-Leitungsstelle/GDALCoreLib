@@ -103,7 +103,7 @@ public class LayerCompareService : ILayerCompareService
 
 
 
-        _log.LogInformation(" --  start layer features comparison");
+        _log.LogInformation(" --  start layer features comparison");  // bei hochmooren die TeilobjNummer einfügen
         var layerFeaturesComparer = new LayerFeaturesComparer(masterLayerInfo, candidateLayerInfo,"ObjNummer");
         layerFeaturesComparer.RunCompareAttributeValues();
         ReportLayerFeatureAttributeValuesComparisonResults(layerFeaturesComparer.DifferenceFeatureList);
