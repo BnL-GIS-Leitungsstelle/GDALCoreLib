@@ -88,13 +88,13 @@ public class LayerFeaturesComparer
             using var masterFeature = masterLayer.OpenNextFeature();
 
             using var candidateFeature = candidateLayer.OpenNextFeature();
-                    
+
             if (masterFeature != null && candidateFeature != null)
             {
                 using var masterGeom = masterFeature.OpenGeometry();
 
                 using var candidateGeom = candidateFeature.OpenGeometry();
-                                
+
                 var intersectionGeom = masterGeom.GetAndOpenIntersection(candidateGeom);
 
                 var masterArea = masterGeom.Area;
@@ -116,13 +116,13 @@ public class LayerFeaturesComparer
 
                     DifferenceFeatureList.Add(compareResult);
                 }
-                    
+
             }
             else
             {
                 throw new ArgumentOutOfRangeException("one or both features are null");
             }
-               
+
         }
     }
 }

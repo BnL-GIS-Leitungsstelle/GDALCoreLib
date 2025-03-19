@@ -91,12 +91,12 @@ public class LayerSchema
 
         if (HasField(shapeAreaName))
         {
-            FieldList.Remove(FieldList.First(_ => _.Name == shapeAreaName));
+            FieldList.Remove(FieldList.First(_ => _.Name.ToUpper() == shapeAreaName.ToUpper()));
         }
 
         if (HasField(shapeLengthName))
         {
-            FieldList.Remove(FieldList.First(_ => _.Name == shapeLengthName));
+            FieldList.Remove(FieldList.First(_ => _.Name.ToUpper() == shapeLengthName.ToUpper()));
         }
 
     }
@@ -130,7 +130,7 @@ public class LayerSchema
 
     public bool HasField(string fieldName)
     {
-        return FieldList.Any(_ => _.Name == fieldName);
+        return FieldList.Any(_ => _.Name.ToUpper() == fieldName.ToUpper());
     }
 
     public bool HasField(FieldDefnInfo field)
