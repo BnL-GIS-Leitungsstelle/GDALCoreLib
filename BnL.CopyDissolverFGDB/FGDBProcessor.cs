@@ -42,6 +42,8 @@ namespace BnL.CopyDissolverFGDB
 
             foreach (var l in ds.GetLayers())
             {
+                if (l.LayerDetails.LayerType == ELayerType.Table) continue;
+
                 var hasDissolveFields = l
                                 .LayerDetails
                                 .Schema!
@@ -137,7 +139,8 @@ namespace BnL.CopyDissolverFGDB
                     SourceLayerName = layer.CurrentLayerName,
                     NewLayerName = layer.OutputLayerName,
                     Overwrite = true,
-                    Update = true
+                    Update = true,
+                    LayerCreationOptions = [("CREATE_SHAPE_AREA_AND_LENGTH_FIELDS", "YES")]
                 });
             }
 

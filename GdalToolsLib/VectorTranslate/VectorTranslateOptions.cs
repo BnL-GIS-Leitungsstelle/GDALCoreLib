@@ -1,6 +1,7 @@
 ﻿using OSGeo.OGR;
 using System.Collections.Generic;
 using GdalToolsLib.Common;
+using System.Linq;
 
 namespace GdalToolsLib.VectorTranslate
 {
@@ -22,6 +23,7 @@ namespace GdalToolsLib.VectorTranslate
         public string? Sql { get; init; }
         public string[]? OtherOptions { get; init; }
         public bool MakeValid { get; init; }
+        public (string name, string value)[]? LayerCreationOptions { get; init; }
 
         public string[] ToStringArray()
         {
@@ -34,6 +36,7 @@ namespace GdalToolsLib.VectorTranslate
             if (Overwrite) options.Add("-overwrite");
             if (Update) options.Add("-update");
             if (MakeValid) options.Add("-makevalid");
+            if (LayerCreationOptions != null) options.AddRange(LayerCreationOptions.SelectMany(lco => new string[] { "-lco", $"{lco.name}={lco.value}" }));
 
             if (OtherOptions != null) options.AddRange(OtherOptions);
             return options.ToArray();
