@@ -42,18 +42,17 @@ namespace BnL.CopyDissolverFGDB
 
             foreach (var l in ds.GetLayers())
             {
-                if (l.LayerDetails.LayerType == ELayerType.Table) continue;
+                if (l.LayerDetails.GeomType == wkbGeometryType.wkbNone) continue;
 
                 var hasDissolveFields = l
-                                .LayerDetails
-                                .Schema!
-                                .FieldList
-                                .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length;
+                               .LayerDetails
+                               .Schema!
+                               .FieldList
+                               .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length;
 
                 if (!hasDissolveFields)
                 {
                     layersWithoutDissolveFields.Add(l.Name);
-                    workLayers.Add(new WorkLayer(l.Name, l.Name, wkbGeometryType.wkbUnknown));
                     continue;
                 }
                 if ((Ogr.GT_HasZ(l.LayerDetails.GeomType) + Ogr.GT_HasM(l.LayerDetails.GeomType)) != 0)
@@ -92,6 +91,8 @@ namespace BnL.CopyDissolverFGDB
 
         public void Run(string destination)
         {
+            if (workLayers.Count == 0) return;
+
             workDb = "/vsimem/" + destination;
 
             foreach (var layer in workLayers)
@@ -143,7 +144,6 @@ namespace BnL.CopyDissolverFGDB
                     LayerCreationOptions = [("CREATE_SHAPE_AREA_AND_LENGTH_FIELDS", "YES")]
                 });
             }
-
             FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
         }
 

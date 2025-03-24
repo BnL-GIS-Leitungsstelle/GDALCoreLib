@@ -23,7 +23,7 @@ namespace GdalToolsLib.VectorTranslate
         public string? Sql { get; init; }
         public string[]? OtherOptions { get; init; }
         public bool MakeValid { get; init; }
-        public (string name, string value)[]? LayerCreationOptions { get; init; }
+        public (string name, object value)[]? LayerCreationOptions { get; init; }
 
         public string[] ToStringArray()
         {
