@@ -26,7 +26,7 @@ class Program
             .WriteTo.Console()
             .CreateLogger();
 
-       // Log.Logger.Information("Application starting");
+        // Log.Logger.Information("Application starting");
 
 
         var builder = CoconaApp.CreateBuilder();
@@ -51,7 +51,7 @@ class Program
         {
             layerCompareService.ShowAbout();
 
-            layerCompareService.Compare( masterGdbPath, masterLayer, candidateGdbPath, candidateLayer );
+            layerCompareService.Compare(masterGdbPath, masterLayer, candidateGdbPath, candidateLayer);
 
             Console.WriteLine("Vergleich durchgeführt.");
 
@@ -70,9 +70,9 @@ class Program
             layerCompareService.ShowAbout();
 
             var records = CsvParser.ParseRecords<MultiLayerInputEntry>(masterCandidateCsv);
-            foreach (var record in records) 
+            foreach (var record in records)
             {
-                layerCompareService.Compare(record.MasterGdb, record.MasterLayer, record.CandidateGdb, record.CandidateLayer);   
+                layerCompareService.Compare(record.MasterGdb, record.MasterLayer, record.CandidateGdb, record.CandidateLayer);
             }
 
             Console.WriteLine("Vergleich durchgeführt.");

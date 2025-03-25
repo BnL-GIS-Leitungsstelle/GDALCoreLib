@@ -1,0 +1,78 @@
+﻿<Window x:Class="LayerComparer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LayerComparer"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="696" Width="1113"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBox IsReadOnly="True" TextWrapping="Wrap" Margin="5,10" Text="Source path..." Width="160"/>
+            <Button Margin="5,10" Content="Select source"/>
+            <TextBox IsReadOnly="True" TextWrapping="Wrap" Margin="5,10" Text="Compare path..." Width="160"/>
+            <Button Margin="5,10" Content="Select source"/>
+        </StackPanel>
+        <Button Content="Load Sources" Margin="5,10" HorizontalAlignment="Right"/>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Overview">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="155*"/>
+                        <RowDefinition Height="49*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+                    <!--<DataGrid Template="{StaticResource testTemplate}"  Name="dgLayers" ></DataGrid>-->
+                    <local:LayerTable LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" x:Name="dgLayersLeft" DataContext="{Binding LayersLeft}" />
+                    <local:LayerTable x:Name="dgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
+                    <ListBox Margin="0, 24, 0, 0" ItemsSource="{Binding OrderByFields}" Grid.Column="2">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding [0], FallbackValue=Test}">
+                                    <TextBlock.ContextMenu>
+                                        <ContextMenu>
+                                            <ContextMenu.Template>
+                                                <ControlTemplate>
+                                                    <ListBox ItemsSource="{Binding}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"/>
+                                                </ControlTemplate>
+                                            </ContextMenu.Template>
+                                        </ContextMenu>
+                                    </TextBlock.ContextMenu>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Background="MintCream"  Grid.Row="1" Grid.ColumnSpan="3">
+                        <!--<TextBlock Text="Layers to compare:"/>-->
+                        <Button Content="Compare" Click="Compare_Click"/>
+                        <!--<ListBox dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" Name="lbCompare" >
+                            -->
+                        <!--<ListBox.ItemTemplate>\
+                                <DataTemplate>
+                                    
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>-->
+                        <!--
+                        </ListBox>-->
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="TabItem">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+        <!--<ContentPresenter />-->
+    </Grid>
+</Window>

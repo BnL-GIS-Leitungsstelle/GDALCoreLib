@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "LayerComparer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ENABLE_XAML_DIAGNOSTICS_SOURCE_INFO": "1"
+      },
+      "nativeDebugging": false
+    }
+  }
+}
