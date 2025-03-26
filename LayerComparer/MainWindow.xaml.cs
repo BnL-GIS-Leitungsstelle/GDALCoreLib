@@ -15,8 +15,6 @@ public partial class MainWindow : Window
     public ObservableCollection<LayerInfo> LayersLeft { get; } = [];
     public ObservableCollection<LayerInfo> LayersRight { get; } = [];
 
-    public ObservableCollection<string[]> OrderByFields { get; private set; } = [];
-
     public MainWindow()
     {
         //DataContext = this;
@@ -31,21 +29,8 @@ public partial class MainWindow : Window
         LayersLeft = [.. ds.GetLayers().Select(GetLayerInfo).OrderBy(l => l.Name)];
         LayersRight = [.. ds2.GetLayers().Select(GetLayerInfo).OrderBy(l => l.Name)];
 
-        LayersLeft.CollectionChanged += Layers_CollectionChanged;
-        LayersRight.CollectionChanged += Layers_CollectionChanged;
         InitializeComponent();
 
-    }
-
-    private void Layers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        int len = Math.Min(LayersLeft.Count, LayersRight.Count);
-        OrderByFields.Clear();
-        for (int i = 0; i < len; i++)
-        {
-            var intersection = LayersRight[i].Fields.Select(l => l.Name).Intersect(LayersLeft[i].Fields.Select(l => l.Name));
-            OrderByFields.Add(intersection.ToArray());
-        }
     }
 
     public static LayerInfo GetLayerInfo(IOgctLayer layer)
@@ -55,7 +40,10 @@ public partial class MainWindow : Window
 
     private void Compare_Click(object sender, RoutedEventArgs e)
     {
-        var intersection = LayersRight.Select(l => l.Name).Intersect(LayersLeft.Select(l => l.Name));
+        var res = dgLayersLeft.dataGrid.SelectedItems.Cast<LayerInfo>();
+        var res1 = dgLayersRight.dataGrid.SelectedItems.Cast<LayerInfo>();
+        var dialogResult = new OrderByFieldsDialog(res, res1).ShowDialog();
+
         //lbCompare.ItemsSource = intersection;
         //MessageBox.Show(string.Join(',', intersection));
     }
@@ -63,7 +51,6 @@ public partial class MainWindow : Window
 
 public class LayerInfo
 {
-    public bool Expanded { get; set; }
     public required string Name { get; set; }
     public required wkbGeometryType GeometryType { get; set; }
     public required long FeatureCount { get; set; }

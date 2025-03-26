@@ -8,12 +8,7 @@ namespace LayerComparer
     /// Interaction logic for LayerTable.xaml
     /// </summary>
     public partial class LayerTable : UserControl
-    {
-        //public DataGrid? LinkedWith { get; set; }
-
-
-        //public DataGrid? LinkedWith { get; set; }
-
+    { 
         public DataGrid? LinkedWith
         {
             get { return (DataGrid)GetValue(LinkedWithProperty); }

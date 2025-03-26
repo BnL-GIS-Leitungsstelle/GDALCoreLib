@@ -31,32 +31,14 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="120"/>
                     </Grid.ColumnDefinitions>
-                    <!--<DataGrid Template="{StaticResource testTemplate}"  Name="dgLayers" ></DataGrid>-->
-                    <local:LayerTable LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" x:Name="dgLayersLeft" DataContext="{Binding LayersLeft}" />
+                    <!--<DataGrid Template="{StaticResource testTemplate}" Name="dgLayers" ></DataGrid>-->
+                    <local:LayerTable x:Name="dgLayersLeft" LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" DataContext="{Binding LayersLeft}" />
                     <local:LayerTable x:Name="dgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
-                    <ListBox Margin="0, 24, 0, 0" ItemsSource="{Binding OrderByFields}" Grid.Column="2">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding [0], FallbackValue=Test}">
-                                    <TextBlock.ContextMenu>
-                                        <ContextMenu>
-                                            <ContextMenu.Template>
-                                                <ControlTemplate>
-                                                    <ListBox ItemsSource="{Binding}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"/>
-                                                </ControlTemplate>
-                                            </ContextMenu.Template>
-                                        </ContextMenu>
-                                    </TextBlock.ContextMenu>
-                                </TextBlock>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
 
                     <StackPanel Background="MintCream"  Grid.Row="1" Grid.ColumnSpan="3">
                         <!--<TextBlock Text="Layers to compare:"/>-->
-                        <Button Content="Compare" Click="Compare_Click"/>
+                        <Button Content="Compare selected layers" Click="Compare_Click"/>
                         <!--<ListBox dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" Name="lbCompare" >
                             -->
                         <!--<ListBox.ItemTemplate>\
