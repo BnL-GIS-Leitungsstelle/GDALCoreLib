@@ -37,6 +37,7 @@ public interface IOgctDataSource : IDisposable
     bool DeleteLayer(string? layerName);
     IOgctLayer OpenLayer(string? layerName);
     IOgctLayer OpenLayer(string? layerName, string orderByFieldname);
+    IOgctLayer OpenLayer(string? layerName, IEnumerable<string>? orderByFields);
 
 
     void RenameLayerGpkg(string? layerName, string? newLayerName);

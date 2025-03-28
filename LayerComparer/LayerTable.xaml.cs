@@ -8,7 +8,7 @@ namespace LayerComparer
     /// Interaction logic for LayerTable.xaml
     /// </summary>
     public partial class LayerTable : UserControl
-    { 
+    {
         public DataGrid? LinkedWith
         {
             get { return (DataGrid)GetValue(LinkedWithProperty); }
@@ -40,24 +40,15 @@ namespace LayerComparer
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var dg = (DataGrid)sender;
+            var selectedIndices = dataGrid.SelectedItems.Cast<LayerInfo>().Select(dataGrid.Items.IndexOf);
 
-            var selectedIndices = dg.SelectedItems.Cast<LayerInfo>().Select(l => dg.Items.IndexOf(l));
-
-            //MessageBox.Show(LinkedWith?.ToString());
-
-            //LinkedWith.RaiseEvent(new SelectionChangedEventArgs(
-            //    DataGrid.SelectionChangedEvent,
-
-            //));
-            //MessageBox.Show(e.Source);
             if (LinkedWith != null)
             {
                 LinkedWith.SelectedItems.Clear();
-                foreach (var idx in selectedIndices)
+                foreach (var index in selectedIndices)
                 {
-                    if (LinkedWith.Items.Count <= idx) continue;
-                    LinkedWith.SelectedItems.Add(LinkedWith.Items[idx]);
+                    if (LinkedWith.Items.Count <= index) continue;
+                    LinkedWith.SelectedItems.Add(LinkedWith.Items[index]);
                 }
             }
         }

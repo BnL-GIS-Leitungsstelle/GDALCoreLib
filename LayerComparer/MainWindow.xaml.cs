@@ -1,8 +1,11 @@
 ﻿using GdalToolsLib.Layer;
 using GdalToolsLib.Models;
+using LayerComparerConsole;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using OSGeo.OGR;
+using Serilog;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 
 namespace LayerComparer;
@@ -12,25 +15,25 @@ namespace LayerComparer;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private string datasourceOne;
+    private string datasourceTwo;
+
     public ObservableCollection<LayerInfo> LayersLeft { get; } = [];
     public ObservableCollection<LayerInfo> LayersRight { get; } = [];
 
     public MainWindow()
     {
-        //DataContext = this;
-        var testPath = "D:\\Daten\\MMO\\temp\\CopyDissolverTest\\Stand_20250320\\Auengebiete.gdb";
-        var testPath2 = "G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Auengebiete\\Auengebiete.gdb";
-        //var testPath2 = "D:\\Daten\\MMO\\temp\\CopyDissolverTest\\Old\\Auengebiete.gdb";
+        datasourceOne = "D:\\Daten\\MMO\\temp\\CopyDissolverTest\\Stand_20250320\\Auengebiete.gdb";
+        datasourceTwo = "G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Auengebiete\\Auengebiete.gdb";
 
-        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(testPath);
-        using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(testPath2);
+        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(datasourceOne);
+        using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(datasourceTwo);
 
 
         LayersLeft = [.. ds.GetLayers().Select(GetLayerInfo).OrderBy(l => l.Name)];
         LayersRight = [.. ds2.GetLayers().Select(GetLayerInfo).OrderBy(l => l.Name)];
 
         InitializeComponent();
-
     }
 
     public static LayerInfo GetLayerInfo(IOgctLayer layer)
@@ -40,12 +43,32 @@ public partial class MainWindow : Window
 
     private void Compare_Click(object sender, RoutedEventArgs e)
     {
-        var res = dgLayersLeft.dataGrid.SelectedItems.Cast<LayerInfo>();
-        var res1 = dgLayersRight.dataGrid.SelectedItems.Cast<LayerInfo>();
-        var dialogResult = new OrderByFieldsDialog(res, res1).ShowDialog();
+        var layersLeft = dgLayersLeft.dataGrid.SelectedItems.Cast<LayerInfo>();
+        var layersRight = dgLayersRight.dataGrid.SelectedItems.Cast<LayerInfo>();
+        var dialog = new OrderByFieldsDialog(layersLeft, layersRight);
 
-        //lbCompare.ItemsSource = intersection;
-        //MessageBox.Show(string.Join(',', intersection));
+        if (dialog.ShowDialog() == true)
+        {
+            OutputTab.IsEnabled = true;
+            TabControl.SelectedIndex = 1;
+
+            var hostBuilder = Host.CreateDefaultBuilder();
+
+            hostBuilder.ConfigureServices(s => s.AddTransient<ILayerCompareService, LayerCompareService>());
+
+            hostBuilder.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration)
+                    .WriteTo.Sink(new WpfTextBoxSink(OutputBox)));
+
+            var host = hostBuilder.Build();
+
+            var layerComparer = host.Services.GetService<ILayerCompareService>()!;
+
+            foreach (var pair in dialog.LayerComparisonPairs)
+            {
+                var orderByFields = pair.SharedFields.Where(f => f.Selected).Select(f => f.Name);
+                layerComparer.Compare(datasourceOne, pair.LayerOne, datasourceTwo, pair.LayerTwo, orderByFields);
+            }
+        }
     }
 }
 

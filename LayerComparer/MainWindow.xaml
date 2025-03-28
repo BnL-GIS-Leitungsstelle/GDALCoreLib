@@ -21,40 +21,29 @@
             <Button Margin="5,10" Content="Select source"/>
         </StackPanel>
         <Button Content="Load Sources" Margin="5,10" HorizontalAlignment="Right"/>
-        <TabControl Grid.Row="1">
+        <TabControl Name="TabControl" Grid.Row="1">
             <TabItem Header="Overview">
                 <Grid Background="#FFE5E5E5">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="155*"/>
-                        <RowDefinition Height="49*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <!--<DataGrid Template="{StaticResource testTemplate}" Name="dgLayers" ></DataGrid>-->
+
                     <local:LayerTable x:Name="dgLayersLeft" LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" DataContext="{Binding LayersLeft}" />
                     <local:LayerTable x:Name="dgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
 
-                    <StackPanel Background="MintCream"  Grid.Row="1" Grid.ColumnSpan="3">
-                        <!--<TextBlock Text="Layers to compare:"/>-->
+                    <StackPanel Background="MintCream"  Grid.Row="1" Grid.ColumnSpan="2">
                         <Button Content="Compare selected layers" Click="Compare_Click"/>
-                        <!--<ListBox dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" Name="lbCompare" >
-                            -->
-                        <!--<ListBox.ItemTemplate>\
-                                <DataTemplate>
-                                    
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>-->
-                        <!--
-                        </ListBox>-->
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="TabItem">
-                <Grid Background="#FFE5E5E5"/>
+            <TabItem Name="OutputTab" Header="Output" IsEnabled="False">
+                <RichTextBox Block.LineHeight="1" IsReadOnly="True" Name="OutputBox" />
             </TabItem>
         </TabControl>
-        <!--<ContentPresenter />-->
     </Grid>
 </Window>

@@ -25,16 +25,21 @@
                         <ToggleButton IsEnabled="{Binding IsValidPair}" DockPanel.Dock="Right" x:Name="toggleFieldSelection">
                             <StackPanel>
                                 <TextBlock Text="Change" />
-                                <Popup StaysOpen="False" IsOpen="{Binding IsChecked, ElementName=toggleFieldSelection}">
-                                    <ListView ItemsSource="{Binding SharedFields}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}">
-                                                    <TextBlock Text="{Binding Name}"/>
-                                                </CheckBox>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
+                                <Popup AllowsTransparency="True" Focusable="True" StaysOpen="False" IsOpen="{Binding IsChecked, ElementName=toggleFieldSelection}">
+                                    <Border BorderBrush="Black" BorderThickness="1" Background="White" Padding="10">
+                                        <StackPanel>
+                                            <TextBlock Text="Fields to order layers by:" />
+                                            <ListView ItemsSource="{Binding SharedFields}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}">
+                                                            <TextBlock Text="{Binding Name}"/>
+                                                        </CheckBox>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                        </StackPanel>
+                                    </Border>
                                 </Popup>
                             </StackPanel>
                         </ToggleButton>
@@ -42,5 +47,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Button Content="Run!" Click="Button_Run_Click"/>
     </StackPanel>
 </Window>

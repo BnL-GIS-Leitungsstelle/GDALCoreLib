@@ -24,15 +24,14 @@ public class LayerFeaturesComparer
     /// </summary>
     public List<FeatureComparisonResult> DifferenceFeatureList { get; }
 
-    private FieldDefnInfo OrderByField { get; }
+    private IEnumerable<string>? OrderByFields { get; }
 
-    public LayerFeaturesComparer(LayerDetails master, LayerDetails candidate, string orderByFieldName)
+    public LayerFeaturesComparer(LayerDetails master, LayerDetails candidate, IEnumerable<string>? orderByFields)
     {
         MasterInfo = master;
         CandidateInfo = candidate;
-        DifferenceFeatureList = new List<FeatureComparisonResult>();
-
-        OrderByField = MasterInfo.Schema.FieldList.First(_ => _.Name == orderByFieldName);
+        DifferenceFeatureList = [];
+        OrderByFields = orderByFields;
     }
 
     /// <summary>
@@ -42,10 +41,10 @@ public class LayerFeaturesComparer
     public void RunCompareAttributeValues()
     {
         using var masterDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(MasterInfo.DataSourceFileName);
-        using var masterLayer = masterDataSource.OpenLayer(MasterInfo.Name, OrderByField.Name);
+        using var masterLayer = masterDataSource.OpenLayer(MasterInfo.Name, OrderByFields);
 
         using var candidateDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(CandidateInfo.DataSourceFileName);
-        using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByField.Name);
+        using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByFields);
 
         for (int i = 0; i < MasterInfo.FeatureCount; i++)
         {
@@ -58,7 +57,7 @@ public class LayerFeaturesComparer
                 var masterRow = masterFeature.ReadRow(MasterInfo.Schema.FieldList);
                 var candidateRow = candidateFeature.ReadRow(CandidateInfo.Schema.FieldList);
 
-                var compareResult = masterRow.Compare(candidateRow, MasterInfo.Schema.FieldList, OrderByField.Name);
+                var compareResult = masterRow.Compare(candidateRow, MasterInfo.Schema.FieldList, OrderByFields.ElementAtOrDefault(0));
 
                 if (compareResult.IsValid) continue;
 
@@ -78,10 +77,10 @@ public class LayerFeaturesComparer
     public void RunCompareGeometries()
     {
         using var masterDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(MasterInfo.DataSourceFileName);
-        using var masterLayer = masterDataSource.OpenLayer(MasterInfo.Name, OrderByField.Name);
+        using var masterLayer = masterDataSource.OpenLayer(MasterInfo.Name, OrderByFields);
 
         using var candidateDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(CandidateInfo.DataSourceFileName);
-        using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByField.Name);
+        using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByFields);
 
         for (int i = 0; i < MasterInfo.FeatureCount; i++)
         {
@@ -109,14 +108,13 @@ public class LayerFeaturesComparer
 
                 if (differenceArea > diffToleranceSquaremeter || differencePercentage > diffTolerancePercentage)
                 {
-                    var compareResult = new FeatureComparisonResult(OrderByField.Name, masterFeature.GetFieldAsString(OrderByField.Name));
+                    var compareResult = new FeatureComparisonResult(OrderByFields.ElementAtOrDefault(0), masterFeature.GetFieldAsString(OrderByFields.ElementAtOrDefault(0)));
                     compareResult.AddFieldDifference($"{intersectionArea:F1}", $"{masterArea:F1}", "area", $"{differenceArea:F0}", $"{differencePercentage:F2}");
 
                     ////_log.Warn($" Invalid geometry - {validationResult}");
 
                     DifferenceFeatureList.Add(compareResult);
                 }
-
             }
             else
             {
