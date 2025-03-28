@@ -9,18 +9,23 @@
         Title="MainWindow" Height="696" Width="1113"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         >
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <TextBox IsReadOnly="True" TextWrapping="Wrap" Margin="5,10" Text="Source path..." Width="160"/>
-            <Button Margin="5,10" Content="Select source"/>
-            <TextBox IsReadOnly="True" TextWrapping="Wrap" Margin="5,10" Text="Compare path..." Width="160"/>
-            <Button Margin="5,10" Content="Select source"/>
+            <TextBlock Margin="5,10" Text="Select source:" />
+            <TextBox TextWrapping="NoWrap" Margin="5,10" Text="{Binding DatasourceOne, Mode=TwoWay}" Width="300" Drop="TextBox_Drop" PreviewDragOver="TextBox_PreviewDragOver" />
+            <TextBlock Margin="5,10" Text="Select compare:" />
+            <TextBox TextWrapping="NoWrap" Margin="5,10" Text="{Binding DatasourceTwo, Mode=TwoWay}" Width="300" Drop="TextBox_Drop" PreviewDragOver="TextBox_PreviewDragOver"/>
         </StackPanel>
-        <Button Content="Load Sources" Margin="5,10" HorizontalAlignment="Right"/>
+        <Button Content="Load Sources" Margin="5,10" HorizontalAlignment="Right" Click="CompareSources_Click"/>
         <TabControl Name="TabControl" Grid.Row="1">
             <TabItem Header="Overview">
                 <Grid Background="#FFE5E5E5">
@@ -33,11 +38,11 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <local:LayerTable x:Name="dgLayersLeft" LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" DataContext="{Binding LayersLeft}" />
+                    <local:LayerTable x:Name="dgLayersLeft" DataContext="{Binding LayersLeft}" LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" />
                     <local:LayerTable x:Name="dgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
 
                     <StackPanel Background="MintCream"  Grid.Row="1" Grid.ColumnSpan="2">
-                        <Button Content="Compare selected layers" Click="Compare_Click"/>
+                        <Button Content="Compare selected layers" Click="Compare_Click" />
                     </StackPanel>
                 </Grid>
             </TabItem>

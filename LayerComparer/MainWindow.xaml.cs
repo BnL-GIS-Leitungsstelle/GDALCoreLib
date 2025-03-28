@@ -3,10 +3,12 @@ using GdalToolsLib.Models;
 using LayerComparerConsole;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Win32;
 using OSGeo.OGR;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace LayerComparer;
 
@@ -15,24 +17,13 @@ namespace LayerComparer;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private string datasourceOne;
-    private string datasourceTwo;
-
     public ObservableCollection<LayerInfo> LayersLeft { get; } = [];
     public ObservableCollection<LayerInfo> LayersRight { get; } = [];
+    public string DatasourceOne { get; set; }
+    public string DatasourceTwo { get; set; }
 
     public MainWindow()
     {
-        datasourceOne = "D:\\Daten\\MMO\\temp\\CopyDissolverTest\\Stand_20250320\\Auengebiete.gdb";
-        datasourceTwo = "G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Auengebiete\\Auengebiete.gdb";
-
-        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(datasourceOne);
-        using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(datasourceTwo);
-
-
-        LayersLeft = [.. ds.GetLayers().Select(GetLayerInfo).OrderBy(l => l.Name)];
-        LayersRight = [.. ds2.GetLayers().Select(GetLayerInfo).OrderBy(l => l.Name)];
-
         InitializeComponent();
     }
 
@@ -66,9 +57,39 @@ public partial class MainWindow : Window
             foreach (var pair in dialog.LayerComparisonPairs)
             {
                 var orderByFields = pair.SharedFields.Where(f => f.Selected).Select(f => f.Name);
-                layerComparer.Compare(datasourceOne, pair.LayerOne, datasourceTwo, pair.LayerTwo, orderByFields);
+                layerComparer.Compare(DatasourceOne, pair.LayerOne, DatasourceTwo, pair.LayerTwo, orderByFields);
             }
         }
+    }
+
+    private void CompareSources_Click(object sender, RoutedEventArgs e)
+    {
+        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceOne);
+        using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceTwo);
+
+        LayersLeft.Clear();
+        LayersRight.Clear();
+        foreach (var item in ds.GetLayers())
+        {
+            LayersLeft.Add(GetLayerInfo(item));
+        }
+        foreach (var item in ds2.GetLayers())
+        {
+            LayersRight.Add(GetLayerInfo(item));
+        }
+        MessageBox.Show(LayersLeft.Count.ToString());
+    }
+
+    private void TextBox_PreviewDragOver(object sender, DragEventArgs e)
+    {
+        e.Handled = true;
+    }
+
+    private void TextBox_Drop(object sender, DragEventArgs e)
+    {
+        var textBox = (TextBox)sender;
+        var data = (string[])e.Data.GetData(DataFormats.FileDrop);
+        textBox.Text = data[0];
     }
 }
 
