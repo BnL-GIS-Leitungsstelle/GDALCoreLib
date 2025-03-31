@@ -19,8 +19,8 @@ public partial class MainWindow : Window
 {
     public ObservableCollection<LayerInfo> LayersLeft { get; } = [];
     public ObservableCollection<LayerInfo> LayersRight { get; } = [];
-    public string DatasourceOne { get; set; }
-    public string DatasourceTwo { get; set; }
+    public string DatasourceOne { get; set; } = "";
+    public string DatasourceTwo { get; set; } = "";
 
     public MainWindow()
     {
@@ -62,7 +62,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void CompareSources_Click(object sender, RoutedEventArgs e)
+    private void LoadSources_Click(object sender, RoutedEventArgs e)
     {
         using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceOne);
         using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceTwo);
@@ -85,11 +85,18 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    private void TextBox_Drop(object sender, DragEventArgs e)
+    private void TextBoxLeft_Drop(object sender, DragEventArgs e)
     {
-        var textBox = (TextBox)sender;
         var data = (string[])e.Data.GetData(DataFormats.FileDrop);
-        textBox.Text = data[0];
+        var textBox = (TextBox)sender;
+        textBox.Text = DatasourceOne = data[0];
+    }
+
+    private void TextBoxRight_Drop(object sender, DragEventArgs e)
+    {
+        var data = (string[])e.Data.GetData(DataFormats.FileDrop);
+        var textBox = (TextBox)sender;
+        textBox.Text = DatasourceTwo = data[0];
     }
 }
 

@@ -21,11 +21,11 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <TextBlock Margin="5,10" Text="Select source:" />
-            <TextBox TextWrapping="NoWrap" Margin="5,10" Text="{Binding DatasourceOne, Mode=TwoWay}" Width="300" Drop="TextBox_Drop" PreviewDragOver="TextBox_PreviewDragOver" />
+            <TextBox TextWrapping="NoWrap" Margin="5,10" Text="{Binding DatasourceOne, Mode=TwoWay}" Width="300" Drop="TextBoxLeft_Drop" PreviewDragOver="TextBox_PreviewDragOver" />
             <TextBlock Margin="5,10" Text="Select compare:" />
-            <TextBox TextWrapping="NoWrap" Margin="5,10" Text="{Binding DatasourceTwo, Mode=TwoWay}" Width="300" Drop="TextBox_Drop" PreviewDragOver="TextBox_PreviewDragOver"/>
+            <TextBox TextWrapping="NoWrap" Margin="5,10" Text="{Binding DatasourceTwo, Mode=TwoWay}" Width="300" Drop="TextBoxRight_Drop" PreviewDragOver="TextBox_PreviewDragOver"/>
         </StackPanel>
-        <Button Content="Load Sources" Margin="5,10" HorizontalAlignment="Right" Click="CompareSources_Click"/>
+        <Button Content="Load Sources" Margin="5,10" HorizontalAlignment="Right" Click="LoadSources_Click"/>
         <TabControl Name="TabControl" Grid.Row="1">
             <TabItem Header="Overview">
                 <Grid Background="#FFE5E5E5">
