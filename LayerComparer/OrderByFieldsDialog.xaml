@@ -8,9 +8,6 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Select order by fields" Height="450" Width="800">
-    <Window.Resources>
-        <local:TestConverter x:Key="TestConverter"/>
-    </Window.Resources>
     <StackPanel>
         <ListBox ItemsSource="{Binding LayerComparisonPairs}">
             <ListBox.ItemTemplate>
@@ -20,7 +17,7 @@
                           <Run Text="{Binding LayerOne}"/>
                           <Run Text="&lt;=&gt;"/>
                           <Run Text="{Binding LayerTwo}"/>
-                          <Run Text="{Binding SharedFields, Mode=OneWay, Converter={StaticResource TestConverter}}"/>
+                          <Run Text="{Binding FieldListString, Mode=OneWay}"/>
                         </TextBlock>
                         <ToggleButton IsEnabled="{Binding IsValidPair}" DockPanel.Dock="Right" x:Name="toggleFieldSelection">
                             <StackPanel>

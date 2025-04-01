@@ -23,7 +23,6 @@
             <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
             <DataGridTextColumn Binding="{Binding GeometryType}" Header="Geometrytype"/>
             <DataGridTextColumn Binding="{Binding FeatureCount}" Header="Feature Count"/>
-            <!--<DataGridTextColumn Binding="{Binding TotalArea}" Header="Total Area"/>-->
         </DataGrid.Columns>
         <DataGrid.RowDetailsTemplate>
             <DataTemplate>

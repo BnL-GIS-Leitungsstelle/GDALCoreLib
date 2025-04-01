@@ -1,9 +1,9 @@
-﻿using GdalToolsLib.Layer;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using GdalToolsLib.Layer;
 using GdalToolsLib.Models;
 using LayerComparerConsole;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Win32;
 using OSGeo.OGR;
 using Serilog;
 using System.Collections.ObjectModel;
@@ -12,15 +12,20 @@ using System.Windows.Controls;
 
 namespace LayerComparer;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
+[INotifyPropertyChanged]
 public partial class MainWindow : Window
 {
-    public ObservableCollection<LayerInfo> LayersLeft { get; } = [];
-    public ObservableCollection<LayerInfo> LayersRight { get; } = [];
-    public string DatasourceOne { get; set; } = "";
-    public string DatasourceTwo { get; set; } = "";
+    [ObservableProperty]
+    public ObservableCollection<LayerInfo> layersLeft = [];
+
+    [ObservableProperty]
+    public ObservableCollection<LayerInfo> layersRight = [];
+
+    [ObservableProperty]
+    private string datasourceOne = "";
+
+    [ObservableProperty]
+    private string datasourceTwo = "";
 
     public MainWindow()
     {
@@ -64,20 +69,20 @@ public partial class MainWindow : Window
 
     private void LoadSources_Click(object sender, RoutedEventArgs e)
     {
-        using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceOne);
-        using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceTwo);
+        try
+        {
+            using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceOne);
+            using var ds2 = new OgctDataSourceAccessor().OpenOrCreateDatasource(DatasourceTwo);
 
-        LayersLeft.Clear();
-        LayersRight.Clear();
-        foreach (var item in ds.GetLayers())
-        {
-            LayersLeft.Add(GetLayerInfo(item));
+            LayersLeft = [.. ds.GetLayers().OrderBy(l => l.Name).Select(GetLayerInfo)];
+            LayersRight = [.. ds2.GetLayers().OrderBy(l => l.Name).Select(GetLayerInfo)];
         }
-        foreach (var item in ds2.GetLayers())
+        catch
         {
-            LayersRight.Add(GetLayerInfo(item));
+            MessageBox.Show("Failed to open datasource.");
+            return;
         }
-        MessageBox.Show(LayersLeft.Count.ToString());
+
     }
 
     private void TextBox_PreviewDragOver(object sender, DragEventArgs e)
@@ -88,15 +93,13 @@ public partial class MainWindow : Window
     private void TextBoxLeft_Drop(object sender, DragEventArgs e)
     {
         var data = (string[])e.Data.GetData(DataFormats.FileDrop);
-        var textBox = (TextBox)sender;
-        textBox.Text = DatasourceOne = data[0];
+        DatasourceOne = data[0];
     }
 
     private void TextBoxRight_Drop(object sender, DragEventArgs e)
     {
         var data = (string[])e.Data.GetData(DataFormats.FileDrop);
-        var textBox = (TextBox)sender;
-        textBox.Text = DatasourceTwo = data[0];
+        DatasourceTwo = data[0];
     }
 }
 

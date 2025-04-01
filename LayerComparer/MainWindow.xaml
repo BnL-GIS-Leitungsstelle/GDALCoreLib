@@ -47,7 +47,9 @@
                 </Grid>
             </TabItem>
             <TabItem Name="OutputTab" Header="Output" IsEnabled="False">
-                <RichTextBox Block.LineHeight="1" IsReadOnly="True" Name="OutputBox" />
+                <ScrollViewer>
+                    <RichTextBox Block.LineHeight="1" IsReadOnly="True" Name="OutputBox" />
+                </ScrollViewer>
             </TabItem>
         </TabControl>
     </Grid>
