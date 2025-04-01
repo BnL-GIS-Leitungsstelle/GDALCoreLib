@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:LayerComparer"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="696" Width="1113"
+        Title="MainWindow" Height="560" Width="1200"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         >
     <Window.Resources>
@@ -41,13 +41,13 @@
                     <local:LayerTable x:Name="dgLayersLeft" DataContext="{Binding LayersLeft}" LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" />
                     <local:LayerTable x:Name="dgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
 
-                    <StackPanel Background="MintCream"  Grid.Row="1" Grid.ColumnSpan="2">
-                        <Button Content="Compare selected layers" Click="Compare_Click" />
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                        <Button Margin="5" HorizontalAlignment="Right" Content="Compare selected layers" Click="Compare_Click" />
                     </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Name="OutputTab" Header="Output" IsEnabled="False">
-                <ScrollViewer>
+                <ScrollViewer Name="OutputScrollViewer">
                     <RichTextBox Block.LineHeight="1" IsReadOnly="True" Name="OutputBox" />
                 </ScrollViewer>
             </TabItem>

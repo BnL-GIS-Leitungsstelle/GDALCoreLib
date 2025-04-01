@@ -9,41 +9,40 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Select order by fields" Height="450" Width="800">
     <StackPanel>
-        <ListBox ItemsSource="{Binding LayerComparisonPairs}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel>
-                        <TextBlock>
-                          <Run Text="{Binding LayerOne}"/>
-                          <Run Text="&lt;=&gt;"/>
-                          <Run Text="{Binding LayerTwo}"/>
-                          <Run Text="{Binding FieldListString, Mode=OneWay}"/>
-                        </TextBlock>
-                        <ToggleButton IsEnabled="{Binding IsValidPair}" DockPanel.Dock="Right" x:Name="toggleFieldSelection">
-                            <StackPanel>
-                                <TextBlock Text="Change" />
-                                <Popup AllowsTransparency="True" Focusable="True" StaysOpen="False" IsOpen="{Binding IsChecked, ElementName=toggleFieldSelection}">
-                                    <Border BorderBrush="Black" BorderThickness="1" Background="White" Padding="10">
-                                        <StackPanel>
-                                            <TextBlock Text="Fields to order layers by:" />
-                                            <ListView ItemsSource="{Binding SharedFields}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                                                <ListView.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}">
-                                                            <TextBlock Text="{Binding Name}"/>
-                                                        </CheckBox>
-                                                    </DataTemplate>
-                                                </ListView.ItemTemplate>
-                                            </ListView>
-                                        </StackPanel>
-                                    </Border>
-                                </Popup>
-                            </StackPanel>
-                        </ToggleButton>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <DataGrid AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" ItemsSource="{Binding LayerComparisonPairs}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Layer one" Binding="{Binding LayerOne}" />
+                <DataGridTextColumn Header="Layer to compare to" Binding="{Binding LayerTwo}" />
+                <DataGridTextColumn Header="Order by field(s)" Binding="{Binding FieldListString}" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ToggleButton Margin="5" IsEnabled="{Binding IsValidPair}" DockPanel.Dock="Right" x:Name="toggleFieldSelection">
+                                <StackPanel>
+                                    <TextBlock Text="Change" />
+                                    <Popup AllowsTransparency="True" Focusable="True" StaysOpen="False" IsOpen="{Binding IsChecked, ElementName=toggleFieldSelection}">
+                                        <Border BorderBrush="Black" BorderThickness="1" Background="White" Padding="10">
+                                            <StackPanel>
+                                                <TextBlock Text="Fields to order layers by:" />
+                                                <ListView ItemsSource="{Binding SharedFields}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
+                                                    <ListView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}">
+                                                                <TextBlock Text="{Binding Name}"/>
+                                                            </CheckBox>
+                                                        </DataTemplate>
+                                                    </ListView.ItemTemplate>
+                                                </ListView>
+                                            </StackPanel>
+                                        </Border>
+                                    </Popup>
+                                </StackPanel>
+                            </ToggleButton>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
         <Button Content="Run!" Click="Button_Run_Click"/>
     </StackPanel>
 </Window>

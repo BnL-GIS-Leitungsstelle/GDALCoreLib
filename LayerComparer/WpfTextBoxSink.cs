@@ -7,15 +7,18 @@ namespace LayerComparer
     internal class WpfTextBoxSink : ILogEventSink
     {
         private readonly RichTextBox textBox;
+        private readonly ScrollViewer scrollContainer;
 
-        public WpfTextBoxSink(RichTextBox textBox)
+        public WpfTextBoxSink(RichTextBox textBox, ScrollViewer scrollContainer)
         {
             this.textBox = textBox;
+            this.scrollContainer = scrollContainer;
         }
         public void Emit(LogEvent logEvent)
         {
             var message = logEvent.RenderMessage();
             textBox.AppendText(message + Environment.NewLine);
+            scrollContainer.ScrollToEnd();
         }
     }
 }
