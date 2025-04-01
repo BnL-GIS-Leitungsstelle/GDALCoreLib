@@ -53,14 +53,15 @@ public partial class MainWindow : Window
             return;
         }
     }
-    private void Compare_Click(object sender, RoutedEventArgs e)
+    private async void Compare_Click(object sender, RoutedEventArgs e)
     {
         var layersLeft = dgLayersLeft.dataGrid.SelectedItems.Cast<LayerInfo>();
         var layersRight = dgLayersRight.dataGrid.SelectedItems.Cast<LayerInfo>();
 
-        if (!layersLeft.Any() || !layersRight.Any()) {
+        if (!layersLeft.Any() || !layersRight.Any())
+        {
             MessageBox.Show("You must select at least one layer on both sides");
-            return; 
+            return;
         }
         var dialog = new OrderByFieldsDialog(layersLeft, layersRight);
 
@@ -80,11 +81,15 @@ public partial class MainWindow : Window
 
             var layerComparer = host.Services.GetService<ILayerCompareService>()!;
 
-            foreach (var pair in dialog.LayerComparisonPairs)
+            // run as async task, so the UI can update in the meantime
+            await Task.Run(() =>
             {
-                var orderByFields = pair.SharedFields.Where(f => f.Selected).Select(f => f.Name);
-                layerComparer.Compare(DatasourceOne, pair.LayerOne, DatasourceTwo, pair.LayerTwo, orderByFields);
-            }
+                foreach (var pair in dialog.LayerComparisonPairs)
+                {
+                    var orderByFields = pair.SharedFields.Where(f => f.Selected).Select(f => f.Name);
+                    layerComparer.Compare(DatasourceOne, pair.LayerOne, DatasourceTwo, pair.LayerTwo, orderByFields);
+                }
+            });
         }
     }
 

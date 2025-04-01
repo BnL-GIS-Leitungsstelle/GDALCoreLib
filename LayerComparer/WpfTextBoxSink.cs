@@ -17,8 +17,8 @@ namespace LayerComparer
         public void Emit(LogEvent logEvent)
         {
             var message = logEvent.RenderMessage();
-            textBox.AppendText(message + Environment.NewLine);
-            scrollContainer.ScrollToEnd();
+            textBox.Dispatcher.Invoke(() => textBox.AppendText(message + Environment.NewLine));
+            scrollContainer.Dispatcher.Invoke(scrollContainer.ScrollToBottom);
         }
     }
 }

@@ -8,7 +8,11 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Select order by fields" Height="450" Width="800">
-    <StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <DataGrid AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" ItemsSource="{Binding LayerComparisonPairs}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Layer one" Binding="{Binding LayerOne}" />
@@ -43,6 +47,6 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Content="Run!" Click="Button_Run_Click"/>
-    </StackPanel>
+        <Button Grid.Row="1" HorizontalAlignment="Right" Margin="5" Padding="5" Content="Run" Click="Button_Run_Click"/>
+    </Grid>
 </Window>
