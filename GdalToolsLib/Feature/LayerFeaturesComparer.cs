@@ -54,9 +54,8 @@ public class LayerFeaturesComparer
 
             if (masterFeature != null && candidateFeature != null)
             {
-                var masterRow = masterFeature.ReadRow(MasterInfo.Schema.FieldList);
-                var candidateRow = candidateFeature.ReadRow(CandidateInfo.Schema.FieldList);
-
+                var masterRow = masterFeature.ReadRow(MasterInfo.Schema.FieldList.OrderBy(f => f.Name));
+                var candidateRow = candidateFeature.ReadRow(CandidateInfo.Schema.FieldList.OrderBy(f => f.Name));
                 var compareResult = masterRow.Compare(candidateRow, MasterInfo.Schema.FieldList, OrderByFields.ElementAtOrDefault(0));
 
                 if (compareResult.IsValid) continue;

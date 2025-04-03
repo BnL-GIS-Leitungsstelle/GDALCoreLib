@@ -85,7 +85,7 @@ namespace BnL.CopyDissolverFGDB
                 {
                     outputName = outputName.Replace(oldStr, newStr);
                 }
-                workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer, true));
+                workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer));
             }
         }
 
@@ -113,7 +113,7 @@ namespace BnL.CopyDissolverFGDB
 
                 if (layer.Buffer != null) BufferLayer(layer);
 
-                if (layer.Dissolve) DissolveLayer(layer);
+                DissolveLayer(layer);
             }
 
             // process unions in separate loop, since all layers have to be dissolved first

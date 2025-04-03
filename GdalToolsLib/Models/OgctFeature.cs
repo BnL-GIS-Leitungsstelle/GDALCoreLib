@@ -322,7 +322,7 @@ public dynamic ReadValue(FieldDefnInfo fieldDef)
     }
 }
 
-public FeatureRow ReadRow(List<FieldDefnInfo> fieldList)
+public FeatureRow ReadRow(IEnumerable<FieldDefnInfo> fieldList)
 {
     var row = new FeatureRow();
 

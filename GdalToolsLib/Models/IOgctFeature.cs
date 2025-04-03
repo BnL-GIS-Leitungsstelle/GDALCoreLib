@@ -29,7 +29,7 @@ public interface IOgctFeature : IDisposable
     /// <exception cref="NotImplementedException"></exception>
     dynamic ReadValue(FieldDefnInfo fieldDef);
 
-    FeatureRow ReadRow(List<FieldDefnInfo> fieldList);
+    FeatureRow ReadRow(IEnumerable<FieldDefnInfo> fieldList);
 
     /// <summary>
     /// write value to field

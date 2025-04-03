@@ -56,8 +56,7 @@ public class LayerSchema
     {
         string result = String.Empty;
 
-        int maxFieldCount = Math.Min(FieldList.Count, otherSchema.FieldList.Count);
-        for (int i = 0; i < maxFieldCount; i++)
+        for (int i = 0; i < FieldList.Count; i++)
         {
             if (FieldList[i].Name != otherSchema.FieldList[i].Name)
             {
