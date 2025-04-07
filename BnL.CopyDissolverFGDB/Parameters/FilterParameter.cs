@@ -1,17 +1,16 @@
 ﻿namespace BnL.CopyDissolverFGDB.Parameters;
 
-public class FilterParameter: LayerParameter
+public class FilterParameter
 {
+    public string Theme { get; private set; }
+    public int Year { get; private set; }
     public string WhereClause { get; private set; }
 
-    public FilterParameter(string theme, string year, string legalState, string filter) : base(theme, year, legalState)
+    public FilterParameter(string[] line)
     {
-        WhereClause = filter;
-    }
-
-    public override string ToString()
-    {
-        return $"{Year} {Theme,20}, {WhereClause} ";
+        Theme = line[0];
+        Year = int.Parse(line[1]);
+        WhereClause = line[2];
     }
 }
 

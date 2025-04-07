@@ -92,7 +92,7 @@ public class LayerDetails
     /// </summary>
     /// <param name="layer"></param>
     /// <param name="attributeFilter"></param>
-    public LayerDetails(OgctLayer layer, string? attributeFilter = default)
+    public LayerDetails(IOgctLayer layer, string? attributeFilter = default)
     {
         Initialize(layer.DataSource.Name, layer, attributeFilter);
     }

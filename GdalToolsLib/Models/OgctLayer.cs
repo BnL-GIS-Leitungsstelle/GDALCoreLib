@@ -152,7 +152,7 @@ public partial class OgctLayer : IOgctLayer
 
     public long CopyToLayer(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true)
     {
-        using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
+        using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName ?? Name, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
         CloneFieldSchema(targetLayer);
         return CopyFeatures(targetLayer);
     }
@@ -508,22 +508,13 @@ public partial class OgctLayer : IOgctLayer
     /// <returns></returns>
     private wkbGeometryType ForceMultiPartGeomType(wkbGeometryType geomType)
     {
-        switch (geomType)
+        return geomType switch
         {
-            case wkbGeometryType.wkbPolygon:
-                return wkbGeometryType.wkbMultiPolygon;
-
-            case wkbGeometryType.wkbLineString:
-                return wkbGeometryType.wkbMultiLineString;
-
-            case wkbGeometryType.wkbPoint:
-                return wkbGeometryType.wkbMultiPoint;
-
-            default:
-                return geomType;
-        }
-
-
+            wkbGeometryType.wkbPolygon => wkbGeometryType.wkbMultiPolygon,
+            wkbGeometryType.wkbLineString => wkbGeometryType.wkbMultiLineString,
+            wkbGeometryType.wkbPoint => wkbGeometryType.wkbMultiPoint,
+            _ => geomType,
+        };
     }
 
     /// <summary>
@@ -625,7 +616,7 @@ public partial class OgctLayer : IOgctLayer
         GeoProcessWithLayer(geoProcess, otherLayer, tempInMemoryLayer);
 
         long cnt = tempInMemoryLayer.CopyToLayer(DataSource, outputLayerName, true);
-        Console.WriteLine($"  -- result: copied {cnt} features into {outputLayerName} in {DataSource.Name}");
+        //Console.WriteLine($"  -- result: copied {cnt} features into {outputLayerName} in {DataSource.Name}");
 
         return outputLayerName;
     }

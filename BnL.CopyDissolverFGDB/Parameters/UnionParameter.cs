@@ -1,22 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using GdalToolsLib.Layer;
 
 namespace BnL.CopyDissolverFGDB.Parameters
 {
     public class UnionParameter
     {
-        public string ResultLayerName { get; set; }
+        public string ResultLayerName { get; }
+        public int Year { get; }
+        public string LegalState { get; }
+        public string Theme { get; }
 
-        public List<LayerParameter> LayerParameters { get; set; }
-
-        public UnionParameter(string resultLayerName, List<LayerParameter> layersToUnion)
+        public UnionParameter(string[] line)
         {
-            ResultLayerName=resultLayerName;
-            LayerParameters=layersToUnion;
-        }
-
-        public override string ToString()
-        {
-            return $"UnionResult {ResultLayerName}, Layers {LayerParameters.Count}";
+            ResultLayerName = line[0];
+            Year = int.Parse(line[1]);
+            LegalState = line[2];
+            Theme = line[3];
         }
     }
 }
