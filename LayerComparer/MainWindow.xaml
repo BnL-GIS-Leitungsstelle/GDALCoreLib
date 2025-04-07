@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LayerComparer"
-        xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="MainWindow" Height="560" Width="1200"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
@@ -38,8 +37,8 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <local:LayerTable x:Name="dgLayersLeft" DataContext="{Binding LayersLeft}" LinkedWith="{Binding ElementName=dgLayersRight, Path=DataGridSource}" />
-                    <local:LayerTable x:Name="dgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
+                    <local:LayerTable x:Name="DgLayersLeft" DataContext="{Binding LayersLeft}" LinkedWith="{Binding ElementName=DgLayersRight, Path=DataGridSource}" />
+                    <local:LayerTable x:Name="DgLayersRight" DataContext="{Binding LayersRight}" Grid.Column="1" />
 
                     <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
                         <Button Margin="5" HorizontalAlignment="Right" Content="Compare selected layers" Click="Compare_Click" />

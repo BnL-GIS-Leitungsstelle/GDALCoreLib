@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DataGrid AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" ItemsSource="{Binding LayerComparisonPairs}">
+        <DataGrid Name="DataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserSortColumns="False" ItemsSource="{Binding LayerComparisonPairs}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Layer one" Binding="{Binding LayerOne}" />
                 <DataGridTextColumn Header="Layer to compare to" Binding="{Binding LayerTwo}" />

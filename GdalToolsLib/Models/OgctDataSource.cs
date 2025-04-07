@@ -301,7 +301,7 @@ public class OgctDataSource : IOgctDataSource
         {
             throw new Exception("Could not open LayerName (not found): " + layerName + " in " + Name);
         }
-        var escapedFieldNames = orderByFields.Select(name => $"'name'");
+        var escapedFieldNames = orderByFields.Select(name => $"\"{name}\"");
 
         var sql = $"SELECT * FROM '{layerName}' ORDER BY {string.Join(", ", escapedFieldNames)}";
         

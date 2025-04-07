@@ -12,13 +12,16 @@ var today = DateTime.Today.ToString("yyyyMMdd");
 
 var workDir = Path.Join(@"D:\Daten\MMO\temp\CopyDissolverTest", "Stand_" + today);
 
-var filterParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
-                                .Select(line => new FilterParameter(line));
-var bufferParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\buffers.txt")
-                                .Select(line => new BufferParameter(line));
+var filterParameters = CopyDissolverHelpers
+    .GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
+    .Select(line => new FilterParameter(line));
+var bufferParameters = CopyDissolverHelpers
+    .GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\buffers.txt")
+    .Select(line => new BufferParameter(line));
 
-var unionParameters = CopyDissolverHelpers.GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
-                                .Select(line => new UnionParameter(line));
+var unionParameters = CopyDissolverHelpers
+    .GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
+    .Select(line => new UnionParameter(line));
 
 (string, string)[] renamePatterns = [("_Park_", "_ParkKernzone_")];
 
@@ -50,16 +53,15 @@ AnsiConsole.Status().Start("Searching subfolders...", ctx =>
     AnsiConsole.Write(new Panel(root));
 });
 
-
 bool hasWarning = false;
-
 
 AnsiConsole.MarkupLine("[bold]Warnings:[/]");
 var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
 {
     return Task.Run(() =>
     {
-        FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters, renamePatterns);
+        FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters,
+            renamePatterns);
         if (fGDBProcessor.HasWarnings)
         {
             hasWarning = true;
@@ -67,19 +69,25 @@ var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
 
             if (fGDBProcessor.layersWithoutDissolveFields.Count > 0)
             {
-                gd.AddRow(new Rows(new Text("Layers without dissolve fields:", Color.Red), new Rows(fGDBProcessor.layersWithoutDissolveFields.Select(l => new Text(l)))));
+                gd.AddRow(new Rows(new Text("Layers without dissolve fields:", Color.Red),
+                    new Rows(fGDBProcessor.layersWithoutDissolveFields.Select(l => new Text(l)))));
             }
+
             if (fGDBProcessor.nonPointBufferLayers.Count > 0)
             {
-                gd.AddRow(new Rows(new Text("Non-point layers to be buffered:", Color.Red), new Rows(fGDBProcessor.nonPointBufferLayers.Select(l => new Text(l)))));
+                gd.AddRow(new Rows(new Text("Non-point layers to be buffered:", Color.Red),
+                    new Rows(fGDBProcessor.nonPointBufferLayers.Select(l => new Text(l)))));
             }
+
             if (fGDBProcessor.zMGeometryLayers.Count > 0)
             {
-                gd.AddRow(new Rows(new Text("Layers with ZM geometry:", Color.Red), new Rows(fGDBProcessor.zMGeometryLayers.Select(l => new Text(l)))));
+                gd.AddRow(new Rows(new Text("Layers with ZM geometry:", Color.Red),
+                    new Rows(fGDBProcessor.zMGeometryLayers.Select(l => new Text(l)))));
             }
 
             AnsiConsole.Write(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
         }
+
         return fGDBProcessor;
     });
 }).ToArray());
@@ -88,20 +96,22 @@ if (hasWarning && !AnsiConsole.Prompt(new ConfirmationPrompt("Continue despite w
 
 Directory.CreateDirectory(workDir);
 
-await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]")).StartAsync(async ctx =>
-{
-    await Task.WhenAll(fgdbProcessors.Select(processor =>
+await AnsiConsole.Progress()
+    .Columns(new TaskDescriptionColumn(), new ElapsedTimeColumn(), new SpinnerColumn().CompletedText("[green]Done![/]"))
+    .StartAsync(async ctx =>
     {
-        var tsk = ctx.AddTask(processor.sourceGdbPath, false);
-
-        return Task.Run(() =>
+        await Task.WhenAll(fgdbProcessors.Select(processor =>
         {
-            tsk.StartTask();
-            processor.Run(Path.Join(workDir, Path.GetFileName(processor.sourceGdbPath)));
-            tsk.StopTask();
-        });
-    }));
-});
+            var tsk = ctx.AddTask(processor.sourceGdbPath, false);
+
+            return Task.Run(() =>
+            {
+                tsk.StartTask();
+                processor.Run(Path.Join(workDir, Path.GetFileName(processor.sourceGdbPath)));
+                tsk.StopTask();
+            });
+        }));
+    });
 
 Console.WriteLine("Goodbye!");
 Console.ReadKey();

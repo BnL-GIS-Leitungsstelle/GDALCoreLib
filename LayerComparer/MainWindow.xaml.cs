@@ -8,33 +8,32 @@ using OSGeo.OGR;
 using Serilog;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace LayerComparer;
 
 [INotifyPropertyChanged]
 public partial class MainWindow : Window
 {
-    [ObservableProperty]
-    public ObservableCollection<LayerInfo> layersLeft = [];
+    [ObservableProperty] private ObservableCollection<LayerInfo> layersLeft = [];
 
-    [ObservableProperty]
-    public ObservableCollection<LayerInfo> layersRight = [];
+    [ObservableProperty] private ObservableCollection<LayerInfo> layersRight = [];
 
-    [ObservableProperty]
-    private string datasourceOne = "";
+    [ObservableProperty] private string datasourceOne = "";
 
-    [ObservableProperty]
-    private string datasourceTwo = "";
+    [ObservableProperty] private string datasourceTwo = "";
 
     public MainWindow()
     {
         InitializeComponent();
     }
 
-    public static LayerInfo GetLayerInfo(IOgctLayer layer)
+    private static LayerInfo GetLayerInfo(IOgctLayer layer)
     {
-        return new LayerInfo { Name = layer.Name, GeometryType = layer.LayerDetails.GeomType, FeatureCount = layer.LayerDetails.FeatureCount, TotalArea = 0, Fields = layer.LayerDetails.Schema!.FieldList };
+        return new LayerInfo
+        {
+            Name = layer.Name, GeometryType = layer.LayerDetails.GeomType,
+            FeatureCount = layer.LayerDetails.FeatureCount, TotalArea = 0, Fields = layer.LayerDetails.Schema!.FieldList
+        };
     }
 
     private void LoadSources_Click(object sender, RoutedEventArgs e)
@@ -50,47 +49,47 @@ public partial class MainWindow : Window
         catch
         {
             MessageBox.Show("Failed to open datasource.");
-            return;
         }
     }
+
     private async void Compare_Click(object sender, RoutedEventArgs e)
     {
-        var layersLeft = dgLayersLeft.dataGrid.SelectedItems.Cast<LayerInfo>();
-        var layersRight = dgLayersRight.dataGrid.SelectedItems.Cast<LayerInfo>();
+        var layersLeft = DgLayersLeft.dataGrid.SelectedItems.Cast<LayerInfo>();
+        var layersRight = DgLayersRight.dataGrid.SelectedItems.Cast<LayerInfo>();
 
         if (!layersLeft.Any() || !layersRight.Any())
         {
             MessageBox.Show("You must select at least one layer on both sides");
             return;
         }
+
         var dialog = new OrderByFieldsDialog(layersLeft, layersRight);
 
-        if (dialog.ShowDialog() == true)
+        if (dialog.ShowDialog() != true) return;
+
+        OutputTab.IsEnabled = true;
+        TabControl.SelectedIndex = 1;
+
+        var hostBuilder = Host.CreateDefaultBuilder();
+
+        hostBuilder.ConfigureServices(s => s.AddTransient<ILayerCompareService, LayerCompareService>());
+
+        hostBuilder.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration)
+            .WriteTo.Sink(new WpfTextBoxSink(OutputBox, OutputScrollViewer)));
+
+        var host = hostBuilder.Build();
+
+        var layerComparer = host.Services.GetService<ILayerCompareService>()!;
+
+        // run as async task, so the UI can update in the meantime
+        await Task.Run(() =>
         {
-            OutputTab.IsEnabled = true;
-            TabControl.SelectedIndex = 1;
-
-            var hostBuilder = Host.CreateDefaultBuilder();
-
-            hostBuilder.ConfigureServices(s => s.AddTransient<ILayerCompareService, LayerCompareService>());
-
-            hostBuilder.UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration)
-                    .WriteTo.Sink(new WpfTextBoxSink(OutputBox, OutputScrollViewer)));
-
-            var host = hostBuilder.Build();
-
-            var layerComparer = host.Services.GetService<ILayerCompareService>()!;
-
-            // run as async task, so the UI can update in the meantime
-            await Task.Run(() =>
+            foreach (var pair in dialog.DataGrid.Items.Cast<OrderByFieldsDialog.ComparisonPair>())
             {
-                foreach (var pair in dialog.LayerComparisonPairs)
-                {
-                    var orderByFields = pair.SharedFields.Where(f => f.Selected).Select(f => f.Name);
-                    layerComparer.Compare(DatasourceOne, pair.LayerOne, DatasourceTwo, pair.LayerTwo, orderByFields);
-                }
-            });
-        }
+                var orderByFields = pair.SharedFields.Where(f => f.Selected).Select(f => f.Name);
+                layerComparer.Compare(DatasourceOne, pair.LayerOne, DatasourceTwo, pair.LayerTwo, orderByFields);
+            }
+        });
     }
 
     private void TextBox_PreviewDragOver(object sender, DragEventArgs e)
@@ -113,9 +112,9 @@ public partial class MainWindow : Window
 
 public class LayerInfo
 {
-    public required string Name { get; set; }
-    public required wkbGeometryType GeometryType { get; set; }
-    public required long FeatureCount { get; set; }
-    public required int TotalArea { get; set; }
-    public required List<FieldDefnInfo> Fields { get; set; }
+    public required string Name { get; init; }
+    public required wkbGeometryType GeometryType { get; init; }
+    public required long FeatureCount { get; init; }
+    public required int TotalArea { get; init; }
+    public required List<FieldDefnInfo> Fields { get; init; }
 }

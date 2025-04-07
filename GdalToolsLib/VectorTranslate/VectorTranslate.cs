@@ -3,7 +3,7 @@ using OSGeo.GDAL;
 
 namespace GdalToolsLib.VectorTranslate
 {
-    public class VectorTranslate
+    public static class VectorTranslate
     {
         static VectorTranslate()
         {
@@ -13,7 +13,7 @@ namespace GdalToolsLib.VectorTranslate
 
         /// <summary>
         /// This method should mimic the behaviour of ogr2ogr/VectorTranslate. 
-        /// Therefore a description of all the available options can be found under <see href="https://gdal.org/en/stable/programs/ogr2ogr.html"/>
+        /// Therefore, a description of all the available options can be found under <see href="https://gdal.org/en/stable/programs/ogr2ogr.html"/>
         /// To make it a bit easier to use, common options have been modeled out in the <see cref="VectorTranslateOptions"/> object
         /// 
         /// </summary>
