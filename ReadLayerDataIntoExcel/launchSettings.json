@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\Daten\\Projects\\GISToolsNetCore\\VerhaltensregelApp\\doc\\Wildruhezonen.gdb"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Monitoring\\AlpweidenMitHerdenschutz\\date20240514\\data\\AlpweidenMitHerdenschutz_2056.gdb"
     }
   }
 }
