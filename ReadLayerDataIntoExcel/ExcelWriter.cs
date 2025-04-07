@@ -38,7 +38,7 @@ public static class ExcelWriter
                 }
 
                 // add more worksheets
-                foreach (var fieldInfo in content.FieldList.Where(x => x.Type == FieldType.OFTString))
+                foreach (var fieldInfo in content.FieldList.Where(x => x.Type == FieldType.OFTString || x.Type == FieldType.OFTInteger))
                 {
                     int maxLength = 30; // definition of Excel
 
@@ -57,7 +57,7 @@ public static class ExcelWriter
                     {
                         if (row.Items[columnPosition] is not null)
                         {
-                            columnValues.Add(row.Items[columnPosition]);
+                            columnValues.Add(row.Items[columnPosition].ToString());
                         }
                         else
                         {
