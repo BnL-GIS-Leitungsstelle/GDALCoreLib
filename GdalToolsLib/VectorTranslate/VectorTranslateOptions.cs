@@ -21,6 +21,7 @@ namespace GdalToolsLib.VectorTranslate
         public string? NewLayerName { get; init; }
         public wkbGeometryType? NewGeometryType { get; init; }
         public string? Sql { get; init; }
+        public string? SqlDialect { get; init; }
         public string[]? OtherOptions { get; init; }
         public bool MakeValid { get; init; }
         public (string name, object value)[]? LayerCreationOptions { get; init; }
@@ -29,9 +30,9 @@ namespace GdalToolsLib.VectorTranslate
         public string[] ToStringArray()
         {
             var options = new List<string>();
-            if (SourceLayerName != null) options.Add(SourceLayerName);
+            if (SourceLayerName != null && Sql == null) options.Add(SourceLayerName);
             if (Where != null) options.AddRange(["-where", Where]);
-            if (Sql != null) options.AddRange(["-sql", Sql]);
+            if (Sql != null) options.AddRange(["-sql", Sql, "-dialect", SqlDialect ?? "SQLITE"]);
             if (NewLayerName != null) options.AddRange(["-nln", NewLayerName]);
             if (NewGeometryType != null) options.AddRange(["-nlt", NewGeometryType.Value.ToStringName()]);
             if (Overwrite) options.Add("-overwrite");

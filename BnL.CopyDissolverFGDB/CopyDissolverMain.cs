@@ -13,14 +13,14 @@ var today = DateTime.Today.ToString("yyyyMMdd");
 var workDir = Path.Join(@"D:\Daten\MMO\temp\CopyDissolverTest", "Stand_" + today);
 
 var filterParameters = CopyDissolverHelpers
-    .GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\filters.txt")
+    .GetLinesWithoutComments(@"D:\Daten\MMO\GDALTools_NET8\BnL.CopyDissolverFGDB\filters.txt")
     .Select(line => new FilterParameter(line));
 var bufferParameters = CopyDissolverHelpers
-    .GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\buffers.txt")
+    .GetLinesWithoutComments(@"D:\Daten\MMO\GDALTools_NET8\BnL.CopyDissolverFGDB\buffers.txt")
     .Select(line => new BufferParameter(line));
 
 var unionParameters = CopyDissolverHelpers
-    .GetLinesWithoutComments("D:\\Daten\\MMO\\GDALTools_NET8\\BnL.CopyDissolverFGDB\\unions.txt")
+    .GetLinesWithoutComments(@"D:\Daten\MMO\GDALTools_NET8\BnL.CopyDissolverFGDB\unions.txt")
     .Select(line => new UnionParameter(line));
 
 (string, string)[] renamePatterns = [("_Park_", "_ParkKernzone_")];

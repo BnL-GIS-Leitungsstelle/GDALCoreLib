@@ -139,6 +139,9 @@ namespace BnL.CopyDissolverFGDB
                     }
                 }
 
+                // filter out polygons with an area of less than one square meter
+                var sliverPolyFilter = $"SELECT * FROM '{layer.CurrentLayerName}' WHERE ST_Area(SHAPE) > 1";
+
                 // Copy finished layer to output datasource
                 VectorTranslate.Run(workDb, destination, new VectorTranslateOptions
                 {
@@ -148,11 +151,18 @@ namespace BnL.CopyDissolverFGDB
                     Update = true,
                     MakeValid = true,
                     SkipFailures = true,
+                    Sql = layer.GeometryType == wkbGeometryType.wkbMultiPolygon ? sliverPolyFilter : null,
                     LayerCreationOptions = [("CREATE_SHAPE_AREA_AND_LENGTH_FIELDS", "YES")]
                 });
-            }
 
-            FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
+                using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(destination, EAccessLevel.Full);
+                // Run a makevalid on invalid features
+                ds.ExecuteSQL(
+                    $"UPDATE {layer.OutputLayerName} SET Shape = ST_MakeValid(Shape) WHERE NOT ST_IsValid(SHAPE)",
+                    "SQLITE");
+
+                FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
+            }
         }
 
         private void UnionLayers(WorkLayer workLayer1, WorkLayer workLayer2, string combinedName)
@@ -183,8 +193,7 @@ namespace BnL.CopyDissolverFGDB
                 Overwrite = true,
                 Update = true,
                 Sql = dissolveSql,
-                NewGeometryType = layer.GeometryType.ToMulti(),
-                OtherOptions = ["-dialect", "SQLITE"]
+                NewGeometryType = layer.GeometryType = layer.GeometryType.ToMulti(),
             });
         }
 
@@ -201,7 +210,6 @@ namespace BnL.CopyDissolverFGDB
                 NewLayerName = layer.CurrentLayerName += "_buf",
                 Sql = sqlStatement,
                 NewGeometryType = layer.GeometryType = wkbGeometryType.wkbPolygon,
-                OtherOptions = ["-dialect", "SQLITE"]
             });
         }
     }
