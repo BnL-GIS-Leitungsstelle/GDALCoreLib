@@ -54,6 +54,7 @@ public class LayerFeaturesComparer
 
             if (masterFeature != null && candidateFeature != null)
             {
+                // Order fields by name in an attempt to not care about the field order of the two layers (Obviously won't work, if the number of fields are different)
                 var masterRow = masterFeature.ReadRow(MasterInfo.Schema.FieldList.OrderBy(f => f.Name));
                 var candidateRow = candidateFeature.ReadRow(CandidateInfo.Schema.FieldList.OrderBy(f => f.Name));
                 var compareResult = masterRow.Compare(candidateRow, MasterInfo.Schema.FieldList, OrderByFields.ElementAtOrDefault(0));

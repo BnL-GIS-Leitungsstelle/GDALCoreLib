@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace LayerComparer
 {
@@ -11,13 +12,13 @@ namespace LayerComparer
     {
         public DataGrid? LinkedWith
         {
-            get { return (DataGrid)GetValue(LinkedWithProperty); }
-            set { SetValue(LinkedWithProperty, value); }
+            get => (DataGrid)GetValue(LinkedWithProperty);
+            set => SetValue(LinkedWithProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for LinkedWith.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty LinkedWithProperty =
-            DependencyProperty.Register("LinkedWith", typeof(DataGrid), typeof(LayerTable), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(LinkedWith), typeof(DataGrid), typeof(LayerTable), new PropertyMetadata(null));
 
         public DataGrid DataGridSource => dataGrid;
 
@@ -30,11 +31,11 @@ namespace LayerComparer
         {
             for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
             {
-                if (vis is DataGridRow row)
-                {
-                    row.DetailsVisibility = row.DetailsVisibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-                    break;
-                }
+                if (vis is not DataGridRow row) continue;
+                row.DetailsVisibility = row.DetailsVisibility == Visibility.Visible
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
+                break;
             }
         }
 
@@ -42,14 +43,13 @@ namespace LayerComparer
         {
             var selectedIndices = dataGrid.SelectedItems.Cast<LayerInfo>().Select(dataGrid.Items.IndexOf);
 
-            if (LinkedWith != null)
+            if (LinkedWith == null) return;
+
+            LinkedWith.SelectedItems.Clear();
+            foreach (var index in selectedIndices)
             {
-                LinkedWith.SelectedItems.Clear();
-                foreach (var index in selectedIndices)
-                {
-                    if (LinkedWith.Items.Count <= index) continue;
-                    LinkedWith.SelectedItems.Add(LinkedWith.Items[index]);
-                }
+                if (LinkedWith.Items.Count <= index) continue;
+                LinkedWith.SelectedItems.Add(LinkedWith.Items[index]);
             }
         }
     }

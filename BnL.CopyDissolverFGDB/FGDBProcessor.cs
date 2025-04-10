@@ -160,9 +160,9 @@ namespace BnL.CopyDissolverFGDB
                 ds.ExecuteSQL(
                     $"UPDATE {layer.OutputLayerName} SET Shape = ST_MakeValid(Shape) WHERE NOT ST_IsValid(SHAPE)",
                     "SQLITE");
-
-                FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
             }
+
+            FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
         }
 
         private void UnionLayers(WorkLayer workLayer1, WorkLayer workLayer2, string combinedName)
