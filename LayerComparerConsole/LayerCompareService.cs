@@ -22,9 +22,6 @@ public class LayerCompareService : ILayerCompareService
 
     //    private readonly List<LayerComparisonResult> _layerCompareResultList;
 
-
-
-
     /// <summary>
     /// Information about the tool
     /// </summary>
@@ -61,13 +58,12 @@ public class LayerCompareService : ILayerCompareService
         _config = config;
     }
 
-
-    public void Compare(string file1, string layer1, string file2, string layer2)
+    public void Compare(string file1, string layer1, string file2, string layer2, IEnumerable<string>? orderByFields = null)
     {
-        _file1= file1;
-        _layer1= layer1;
-        _file2= file2;
-        _layer2= layer2;
+        _file1 = file1;
+        _layer1 = layer1;
+        _file2 = file2;
+        _layer2 = layer2;
 
         for (int i = 0; i < _config.GetValue<int>("LoopTimes"); i++)
         {
@@ -75,11 +71,11 @@ public class LayerCompareService : ILayerCompareService
             _log.LogWarning("Compare number {runNumber}", i);  // structured logger stores var-ame and value extra
         }
 
-        CompareLayer();
+        CompareLayer(orderByFields);
     }
 
 
-    private void CompareLayer()
+    private void CompareLayer(IEnumerable<string>? orderByFields)
     {
         _log.LogInformation("Compare MASTER file {file}, layer {layer}, ", _file1, _layer1);  // structured logger stores var-name and value extra
         _log.LogInformation("with CANDIDATE file {file}, layer {layer}, ", _file2, _layer2);
@@ -104,7 +100,7 @@ public class LayerCompareService : ILayerCompareService
 
 
         _log.LogInformation(" --  start layer features comparison");  // bei hochmooren die TeilobjNummer einfügen
-        var layerFeaturesComparer = new LayerFeaturesComparer(masterLayerInfo, candidateLayerInfo,"ObjNummer");
+        var layerFeaturesComparer = new LayerFeaturesComparer(masterLayerInfo, candidateLayerInfo, orderByFields);
         layerFeaturesComparer.RunCompareAttributeValues();
         ReportLayerFeatureAttributeValuesComparisonResults(layerFeaturesComparer.DifferenceFeatureList);
 

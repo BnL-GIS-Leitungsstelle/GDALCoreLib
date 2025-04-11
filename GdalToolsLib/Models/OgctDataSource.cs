@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Exceptions;
@@ -32,11 +33,11 @@ public class OgctDataSource : IOgctDataSource
     private Exception CannotWriteException => new DataSourceMethodNotImplementedException($"Write operations are unsupported in this type of datasource");
 
     public IOgctLayer CreateAndOpenLayer(
-        string? layerName, 
-        ESpatialRefWkt eSpatialRef, 
+        string? layerName,
+        ESpatialRefWkt eSpatialRef,
         wkbGeometryType geometryType,
         List<FieldDefnInfo> fieldDefnInfos = null,
-        bool overwriteExisting = true, 
+        bool overwriteExisting = true,
         bool createAreaAndLengthFields = false,
         string? documentation = null)
     {
@@ -58,7 +59,7 @@ public class OgctDataSource : IOgctDataSource
                 }
 
 
-                var layerOptions = new List<string>() 
+                var layerOptions = new List<string>()
                 {
                     overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo,
                     createAreaAndLengthFields ? OgcConstants.OptionCreateShapeAreaAndLengthFieldsYes : OgcConstants.OptionCreateShapeAreaAndLengthFieldsNo
@@ -90,10 +91,6 @@ public class OgctDataSource : IOgctDataSource
     {
         return _dataSource.GetLayerCount();
     }
-
-
-
-
 
     /// <summary>
     ///
@@ -292,17 +289,24 @@ public class OgctDataSource : IOgctDataSource
         return layer;
     }
 
-    public IOgctLayer OpenLayer(string? layerName, string orderByFieldname)
+    public IOgctLayer OpenLayer(string? layerName, string orderByField)
     {
+        return OpenLayer(layerName, [orderByField]);
+    }
+
+    public IOgctLayer OpenLayer(string? layerName, IEnumerable<string>? orderByFields)
+    {
+        if (orderByFields == null || !orderByFields.Any()) return OpenLayer(layerName);
         if (!HasLayer(layerName))
         {
             throw new Exception("Could not open LayerName (not found): " + layerName + " in " + Name);
         }
+        var escapedFieldNames = orderByFields.Select(name => $"\"{name}\"");
 
-        var sql = $"SELECT * FROM {layerName} ORDER BY {orderByFieldname}";
-
-        var layer = ExecuteSQL(sql);
-        return layer;
+        var sql = $"SELECT * FROM '{layerName}' ORDER BY {string.Join(", ", escapedFieldNames)}";
+        
+        // Using the default OGR-SQL dialect seems to cause problems with the order by
+        return ExecuteSQL(sql, OgcConstants.SQLiteSqlDialect);
     }
 
     public void CopyAllLayersToOtherDataSource(IOgctDataSource outputDataSource)

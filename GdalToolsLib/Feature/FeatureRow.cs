@@ -40,8 +40,6 @@ public class FeatureRow
                 result.AddFieldDifference(self, other, fieldList[i].Name);
             }
         }
-
         return result;
     }
-
 }

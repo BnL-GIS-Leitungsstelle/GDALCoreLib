@@ -19,7 +19,7 @@ namespace BnL.CopyDissolverFGDB
         public readonly string sourceGdbPath;
         private readonly string dissolveFieldsString;
 
-        public List<WorkLayer> workLayers = [];
+        private List<WorkLayer> workLayers = [];
         private string workDb;
 
         public List<string> layersWithoutDissolveFields = [];
@@ -45,16 +45,17 @@ namespace BnL.CopyDissolverFGDB
                 if (l.LayerDetails.GeomType == wkbGeometryType.wkbNone) continue;
 
                 var hasDissolveFields = l
-                               .LayerDetails
-                               .Schema!
-                               .FieldList
-                               .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length;
+                    .LayerDetails
+                    .Schema!
+                    .FieldList
+                    .Count(f => dissolveFieldNames.Contains(f.Name)) == dissolveFieldNames.Length;
 
                 if (!hasDissolveFields)
                 {
                     layersWithoutDissolveFields.Add(l.Name);
                     continue;
                 }
+
                 if ((Ogr.GT_HasZ(l.LayerDetails.GeomType) + Ogr.GT_HasM(l.LayerDetails.GeomType)) != 0)
                 {
                     zMGeometryLayers.Add(l.Name);
@@ -63,21 +64,24 @@ namespace BnL.CopyDissolverFGDB
                 var layerNameMetadata = new LayerNameBafuContent(l.Name);
 
                 var filter = filterParameters.SingleOrDefault(p => layerNameMetadata.Year == p.Year
-                                                          && layerNameMetadata.Category.Equals(p.Theme, StringComparison.InvariantCultureIgnoreCase));
+                                                                   && layerNameMetadata.Category.Equals(p.Theme,
+                                                                       StringComparison.InvariantCultureIgnoreCase));
 
-                var buffer = bufferParameters.SingleOrDefault(b => layerNameMetadata.LegalState.Contains(b.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
-                                                     layerNameMetadata.Category.Contains(b.Theme, StringComparison.CurrentCultureIgnoreCase));
+                var buffer = bufferParameters.SingleOrDefault(b =>
+                    layerNameMetadata.LegalState.Contains(b.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
+                    layerNameMetadata.Category.Contains(b.Theme, StringComparison.CurrentCultureIgnoreCase));
 
-                if (buffer != null && l.LayerDetails.GeomType is not wkbGeometryType.wkbPoint or wkbGeometryType.wkbMultiPoint)
+                if (buffer != null &&
+                    l.LayerDetails.GeomType is not wkbGeometryType.wkbPoint or wkbGeometryType.wkbMultiPoint)
                 {
                     nonPointBufferLayers.Add(l.Name);
                 }
 
                 var union = unionParameters.SingleOrDefault(ul =>
-                            layerNameMetadata.Year == ul.Year &&
-                            layerNameMetadata.LegalState.Contains(ul.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
-                            layerNameMetadata.SubCategory.StartsWith("Anhang") == false &&
-                            layerNameMetadata.Category.Contains(ul.Theme, StringComparison.CurrentCultureIgnoreCase));
+                    layerNameMetadata.Year == ul.Year &&
+                    layerNameMetadata.LegalState.Contains(ul.LegalState, StringComparison.CurrentCultureIgnoreCase) &&
+                    layerNameMetadata.SubCategory.StartsWith("Anhang") == false &&
+                    layerNameMetadata.Category.Contains(ul.Theme, StringComparison.CurrentCultureIgnoreCase));
 
                 var outputName = union != null ? union.ResultLayerName : l.Name;
 
@@ -85,7 +89,8 @@ namespace BnL.CopyDissolverFGDB
                 {
                     outputName = outputName.Replace(oldStr, newStr);
                 }
-                workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer, true));
+
+                workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer));
             }
         }
 
@@ -113,7 +118,7 @@ namespace BnL.CopyDissolverFGDB
 
                 if (layer.Buffer != null) BufferLayer(layer);
 
-                if (layer.Dissolve) DissolveLayer(layer);
+                DissolveLayer(layer);
             }
 
             // process unions in separate loop, since all layers have to be dissolved first
@@ -121,18 +126,21 @@ namespace BnL.CopyDissolverFGDB
             {
                 var layer = group.ElementAt(0);
 
-                if (group.Count() > 2)
+                switch (group.Count())
                 {
-                    throw new Exception("Trying to union more than two layers, which is not supported");
+                    case > 2:
+                        throw new Exception("Trying to union more than two layers, which is not supported");
+                    case 2:
+                    {
+                        var combinedName = group.Key;
+                        var otherLayer = group.ElementAt(1);
+                        UnionLayers(layer, otherLayer, combinedName);
+                        break;
+                    }
                 }
-                else if (group.Count() == 2)
-                {
-                    var combinedName = group.Key;
 
-                    var otherLayer = group.ElementAt(1);
-
-                    UnionLayers(layer, otherLayer, combinedName);
-                }
+                // filter out polygons with an area of less than one square meter
+                var sliverPolyFilter = $"SELECT * FROM '{layer.CurrentLayerName}' WHERE ST_Area(SHAPE) > 1";
 
                 // Copy finished layer to output datasource
                 VectorTranslate.Run(workDb, destination, new VectorTranslateOptions
@@ -141,9 +149,19 @@ namespace BnL.CopyDissolverFGDB
                     NewLayerName = layer.OutputLayerName,
                     Overwrite = true,
                     Update = true,
+                    MakeValid = true,
+                    SkipFailures = true,
+                    Sql = layer.GeometryType == wkbGeometryType.wkbMultiPolygon ? sliverPolyFilter : null,
                     LayerCreationOptions = [("CREATE_SHAPE_AREA_AND_LENGTH_FIELDS", "YES")]
                 });
+
+                using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(destination, EAccessLevel.Full);
+                // Run a makevalid on invalid features
+                ds.ExecuteSQL(
+                    $"UPDATE {layer.OutputLayerName} SET Shape = ST_MakeValid(Shape) WHERE NOT ST_IsValid(SHAPE)",
+                    "SQLITE");
             }
+
             FGDBMetadataWriter.CopyMetadataForAllLayers(sourceGdbPath, destination);
         }
 
@@ -163,10 +181,10 @@ namespace BnL.CopyDissolverFGDB
         private void DissolveLayer(WorkLayer layer)
         {
             var dissolveSql = $"""
-                    SELECT {dissolveFieldsString}, ST_Multi(ST_Union(SHAPE)) as SHAPE
-                    FROM '{layer.CurrentLayerName}'
-                    GROUP BY {dissolveFieldsString}
-                """;
+                                   SELECT {dissolveFieldsString}, ST_Multi(ST_Union(SHAPE)) as SHAPE
+                                   FROM '{layer.CurrentLayerName}'
+                                   GROUP BY {dissolveFieldsString}
+                               """;
 
             VectorTranslate.Run(workDb, workDb, new VectorTranslateOptions
             {
@@ -175,14 +193,14 @@ namespace BnL.CopyDissolverFGDB
                 Overwrite = true,
                 Update = true,
                 Sql = dissolveSql,
-                NewGeometryType = layer.GeometryType.ToMulti(),
-                OtherOptions = ["-dialect", "SQLITE"]
+                NewGeometryType = layer.GeometryType = layer.GeometryType.ToMulti(),
             });
         }
 
         private void BufferLayer(WorkLayer layer)
         {
-            var sqlStatement = $"SELECT {dissolveFieldsString}, ST_Buffer(SHAPE, {layer.Buffer!.BufferDistanceMeter}) as SHAPE FROM '{layer.CurrentLayerName}'";
+            var sqlStatement =
+                $"SELECT {dissolveFieldsString}, ST_Buffer(SHAPE, {layer.Buffer!.BufferDistanceMeter}) as SHAPE FROM '{layer.CurrentLayerName}'";
 
             VectorTranslate.Run(workDb, workDb, new VectorTranslateOptions
             {
@@ -192,9 +210,7 @@ namespace BnL.CopyDissolverFGDB
                 NewLayerName = layer.CurrentLayerName += "_buf",
                 Sql = sqlStatement,
                 NewGeometryType = layer.GeometryType = wkbGeometryType.wkbPolygon,
-                OtherOptions = ["-dialect", "SQLITE"]
             });
         }
-
     }
 }
