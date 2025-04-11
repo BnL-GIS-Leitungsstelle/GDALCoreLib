@@ -30,13 +30,13 @@ namespace BnL.CopyDissolverFGDB
         public FGDBProcessor(
             string sourceGdbPath,
             string[] dissolveFieldNames,
-            IEnumerable<FilterParameter> filterParameters,
-            IEnumerable<BufferParameter> bufferParameters,
-            IEnumerable<UnionParameter> unionParameters,
+            IReadOnlyCollection<FilterParameter> filterParameters,
+            IReadOnlyCollection<BufferParameter> bufferParameters,
+            IReadOnlyCollection<UnionParameter> unionParameters,
             (string, string)[] renamePatterns)
         {
             this.sourceGdbPath = sourceGdbPath;
-            this.dissolveFieldsString = string.Join(", ", dissolveFieldNames);
+            dissolveFieldsString = string.Join(", ", dissolveFieldNames);
 
             using var ds = new OgctDataSourceAccessor().OpenOrCreateDatasource(sourceGdbPath, EAccessLevel.ReadOnly);
 

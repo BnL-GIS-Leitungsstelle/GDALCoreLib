@@ -1,6 +1,7 @@
 ﻿using GdalToolsLib.DataAccess;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace BnL.CopyDissolverFGDB
     {
         public static IEnumerable<string[]> GetLinesWithoutComments(string filePath)
         {
+            filePath = Path.GetFullPath(filePath);
             if (!File.Exists(filePath)) throw new Exception($"File '{filePath}' not found");
 
             using var fileStream = File.OpenRead(filePath);

@@ -3,6 +3,10 @@
     "LayerComparerConsole": {
       "commandName": "Project",
       "commandLineArgs": "single-layer-compare G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Hochmoore\\Hochmoore.gdb N2007_Revision_hochmoor_20070701 G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Hochmoore\\Abgleich_mit_Biop\\Geodata_Biop_2025\\20250303\\geodata_hm_2007_250303.gdb veg_types_Dissolve_bafu"
+    },
+    "LayerComparerConsole Multi": {
+      "commandName": "Project",
+      "commandLineArgs": "multi-layer-compare multi-layer-input.csv"
     }
   }
 }

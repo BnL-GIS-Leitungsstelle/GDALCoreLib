@@ -7,21 +7,26 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 var today = DateTime.Today.ToString("yyyyMMdd");
 
 var workDir = Path.Join(@"D:\Daten\MMO\temp\CopyDissolverTest", "Stand_" + today);
 
 var filterParameters = CopyDissolverHelpers
-    .GetLinesWithoutComments(@"D:\Daten\MMO\GDALTools_NET8\BnL.CopyDissolverFGDB\filters.txt")
-    .Select(line => new FilterParameter(line));
+    .GetLinesWithoutComments("filters.txt")
+    .Select(line => new FilterParameter(line))
+    .ToList()
+    .AsReadOnly();
 var bufferParameters = CopyDissolverHelpers
-    .GetLinesWithoutComments(@"D:\Daten\MMO\GDALTools_NET8\BnL.CopyDissolverFGDB\buffers.txt")
-    .Select(line => new BufferParameter(line));
+    .GetLinesWithoutComments("buffers.txt")
+    .Select(line => new BufferParameter(line))
+    .ToList()
+    .AsReadOnly();
 
 var unionParameters = CopyDissolverHelpers
-    .GetLinesWithoutComments(@"D:\Daten\MMO\GDALTools_NET8\BnL.CopyDissolverFGDB\unions.txt")
-    .Select(line => new UnionParameter(line));
+    .GetLinesWithoutComments("unions.txt")
+    .Select(line => new UnionParameter(line))
+    .ToList()
+    .AsReadOnly();
 
 (string, string)[] renamePatterns = [("_Park_", "_ParkKernzone_")];
 
@@ -53,7 +58,7 @@ AnsiConsole.Status().Start("Searching subfolders...", ctx =>
     AnsiConsole.Write(new Panel(root));
 });
 
-bool hasWarning = false;
+var hasWarning = false;
 
 AnsiConsole.MarkupLine("[bold]Warnings:[/]");
 var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
@@ -62,31 +67,29 @@ var fgdbProcessors = await Task.WhenAll(allGdbPaths.Select(path =>
     {
         FGDBProcessor fGDBProcessor = new(path, dissolveFieldNames, filterParameters, bufferParameters, unionParameters,
             renamePatterns);
-        if (fGDBProcessor.HasWarnings)
+        if (!fGDBProcessor.HasWarnings) return fGDBProcessor;
+        hasWarning = true;
+        var gd = new Grid().AddColumn();
+
+        if (fGDBProcessor.layersWithoutDissolveFields.Count > 0)
         {
-            hasWarning = true;
-            var gd = new Grid().AddColumn();
-
-            if (fGDBProcessor.layersWithoutDissolveFields.Count > 0)
-            {
-                gd.AddRow(new Rows(new Text("Layers without dissolve fields:", Color.Red),
-                    new Rows(fGDBProcessor.layersWithoutDissolveFields.Select(l => new Text(l)))));
-            }
-
-            if (fGDBProcessor.nonPointBufferLayers.Count > 0)
-            {
-                gd.AddRow(new Rows(new Text("Non-point layers to be buffered:", Color.Red),
-                    new Rows(fGDBProcessor.nonPointBufferLayers.Select(l => new Text(l)))));
-            }
-
-            if (fGDBProcessor.zMGeometryLayers.Count > 0)
-            {
-                gd.AddRow(new Rows(new Text("Layers with ZM geometry:", Color.Red),
-                    new Rows(fGDBProcessor.zMGeometryLayers.Select(l => new Text(l)))));
-            }
-
-            AnsiConsole.Write(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
+            gd.AddRow(new Rows(new Text("Layers without dissolve fields:", Color.Red),
+                new Rows(fGDBProcessor.layersWithoutDissolveFields.Select(l => new Text(l)))));
         }
+
+        if (fGDBProcessor.nonPointBufferLayers.Count > 0)
+        {
+            gd.AddRow(new Rows(new Text("Non-point layers to be buffered:", Color.Red),
+                new Rows(fGDBProcessor.nonPointBufferLayers.Select(l => new Text(l)))));
+        }
+
+        if (fGDBProcessor.zMGeometryLayers.Count > 0)
+        {
+            gd.AddRow(new Rows(new Text("Layers with ZM geometry:", Color.Red),
+                new Rows(fGDBProcessor.zMGeometryLayers.Select(l => new Text(l)))));
+        }
+
+        AnsiConsole.Write(new Panel(gd).Header($"[yellow]{Path.GetFileName(path)}[/]"));
 
         return fGDBProcessor;
     });

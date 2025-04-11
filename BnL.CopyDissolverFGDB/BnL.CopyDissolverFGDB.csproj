@@ -16,4 +16,16 @@
     <ProjectReference Include="..\GdalToolsLib\GdalToolsLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="unions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="filters.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="buffers.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

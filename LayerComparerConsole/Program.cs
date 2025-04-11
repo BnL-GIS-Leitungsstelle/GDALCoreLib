@@ -10,9 +10,9 @@ namespace LayerComparerConsole;
 /// <summary>
 /// template using DI, Serilog, Settings 
 /// </summary>
-class Program
+public static class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         // config logger first
         var configuration = new ConfigurationBuilder()
@@ -37,6 +37,8 @@ class Program
 
         var app = builder.Build();
 
+        var defaultOrderByFields = configuration.GetSection("DefaultOrderByFields").Get<string[]>();
+
         // Compare a single master layer with a candidate layer
         app.AddCommand("single-layer-compare", (
             [Argument(Description = @"path to master GDB, e.g. G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\Auengebiete.gdb")]
@@ -51,7 +53,7 @@ class Program
         {
             layerCompareService.ShowAbout();
 
-            layerCompareService.Compare(masterGdbPath, masterLayer, candidateGdbPath, candidateLayer);
+            layerCompareService.Compare(masterGdbPath, masterLayer, candidateGdbPath, candidateLayer, defaultOrderByFields);
 
             Console.WriteLine("Vergleich durchgeführt.");
 
@@ -69,10 +71,12 @@ class Program
         {
             layerCompareService.ShowAbout();
 
-            var records = CsvParser.ParseRecords<MultiLayerInputEntry>(masterCandidateCsv);
+            var records = CsvParser.ParseRecords<MultiLayerInputEntry>(Path.GetFullPath(masterCandidateCsv));
             foreach (var record in records)
             {
-                layerCompareService.Compare(record.MasterGdb, record.MasterLayer, record.CandidateGdb, record.CandidateLayer);
+                layerCompareService.Compare(record.MasterGdb, record.MasterLayer, record.CandidateGdb,
+                    record.CandidateLayer,
+                    string.IsNullOrWhiteSpace(record.OrderByFields) ? null : record.OrderByFields.Split(','));
             }
 
             Console.WriteLine("Vergleich durchgeführt.");

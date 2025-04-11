@@ -1,2 +1,2 @@
-MasterGdb;MasterLayer;CandidateGdb;CandidateLayer
-G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\Auengebiete.gdb;N2017_Revision_Auengebiete_Anhang2_20171101;G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\vonBIOPzurValidierung20210219_20220420abgeschlossen\AU.gdb;au_Anhang2_20171101
+MasterGdb;MasterLayer;CandidateGdb;CandidateLayer;OrderByFields
+G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\Auengebiete.gdb;N2017_Revision_Auengebiete_Anhang2_20171101;G:\BnL\Daten\Ablage\DNL\Bundesinventare\Auengebiete\vonBIOPzurValidierung20210219_20220420abgeschlossen\AU.gdb;au_Anhang2_20171101;
