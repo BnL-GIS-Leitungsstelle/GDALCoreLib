@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Monitoring\\AlpweidenMitHerdenschutz\\date20240514\\data\\AlpweidenMitHerdenschutz_2056.gdb"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\Exports\\DataintegrationMapBafu\\TrockenWiesenWeiden\\date20240116\\data\\Trockenwiesenweiden.gdb"
     }
   }
 }

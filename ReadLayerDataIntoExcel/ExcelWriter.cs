@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using GdalToolsLib.Feature;
 using GdalToolsLib.Layer;
 using OSGeo.OGR;
 using SpreadCheetah;
-using SpreadCheetah.Worksheets;
 
 namespace ReadLayerDataIntoExcel;
 
