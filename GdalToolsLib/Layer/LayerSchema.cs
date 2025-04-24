@@ -49,6 +49,7 @@ public class LayerSchema
 
     public bool IsEqual(LayerSchema? otherSchema)
     {
+        if (FieldList.Count != otherSchema.FieldList.Count) return false;
         return Compare(otherSchema) == String.Empty;
     }
 
