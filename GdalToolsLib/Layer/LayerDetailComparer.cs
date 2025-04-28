@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace GdalToolsLib.Layer;
 
@@ -46,7 +47,10 @@ public class LayerDetailComparer
 
         if (MasterInfo.FieldCount != CandidateInfo.FieldCount)
         {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.FieldCount.ToString(), CandidateInfo.FieldCount.ToString(), "fields", ELayerComparisonDifference.LayerDetail));
+            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.FieldCount.ToString(), CandidateInfo.FieldCount.ToString(), "field count", ELayerComparisonDifference.LayerDetail));
+            var masterFieldNames = MasterInfo.Schema.FieldList.Select(f => f.Name).Order();
+            var candidateFieldNames = CandidateInfo.Schema.FieldList.Select(f => f.Name).Order();
+            AddDifferentLayerDetail(new LayerComparisonResult($"[{string.Join(", ", masterFieldNames)}]", $"[{string.Join(", ", candidateFieldNames)}]", "fields", ELayerComparisonDifference.LayerDetail));
         }
 
         if (MasterInfo.GeomType != CandidateInfo.GeomType)

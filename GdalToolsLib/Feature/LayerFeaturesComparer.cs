@@ -46,6 +46,10 @@ public class LayerFeaturesComparer
         using var candidateDataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(CandidateInfo.DataSourceFileName);
         using var candidateLayer = candidateDataSource.OpenLayer(CandidateInfo.Name, OrderByFields);
 
+        // Order fields by name in an attempt to not care about the field order of the two layers (Obviously won't work, if the number of fields are different)
+        var orderedFieldListMaster = MasterInfo.Schema.FieldList.OrderBy(f => f.Name).ToList();
+        var orderedFieldListCandidate = CandidateInfo.Schema.FieldList.OrderBy(f => f.Name).ToList();
+
         for (int i = 0; i < MasterInfo.FeatureCount; i++)
         {
             using var masterFeature = masterLayer.OpenNextFeature();
@@ -54,10 +58,9 @@ public class LayerFeaturesComparer
 
             if (masterFeature != null && candidateFeature != null)
             {
-                // Order fields by name in an attempt to not care about the field order of the two layers (Obviously won't work, if the number of fields are different)
-                var masterRow = masterFeature.ReadRow(MasterInfo.Schema.FieldList.OrderBy(f => f.Name));
-                var candidateRow = candidateFeature.ReadRow(CandidateInfo.Schema.FieldList.OrderBy(f => f.Name));
-                var compareResult = masterRow.Compare(candidateRow, MasterInfo.Schema.FieldList, OrderByFields.ElementAtOrDefault(0));
+                var masterRow = masterFeature.ReadRow(orderedFieldListMaster);
+                var candidateRow = candidateFeature.ReadRow(orderedFieldListCandidate);
+                var compareResult = masterRow.Compare(candidateRow, orderedFieldListMaster, OrderByFields.ElementAtOrDefault(0));
 
                 if (compareResult.IsValid) continue;
 
