@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GdalToolsLib.Exceptions;
 using GdalToolsLib.Extensions;
 using GdalToolsLib.Feature;
@@ -324,15 +325,7 @@ public dynamic ReadValue(FieldDefnInfo fieldDef)
 
 public FeatureRow ReadRow(IEnumerable<FieldDefnInfo> fieldList)
 {
-    var row = new FeatureRow();
-
-    foreach (var field in fieldList)
-    {
-        FeatureRowItem item = ReadValue(field);
-        row.Items.Add(item);
-    }
-
-    return row;
+    return new FeatureRow {Items = fieldList.Select<FieldDefnInfo, FeatureRowItem>(f => ReadValue(f)).ToList()};
 }
 
 /// <summary>

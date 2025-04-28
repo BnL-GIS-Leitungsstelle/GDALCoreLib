@@ -50,23 +50,18 @@ public class LayerSchema
     public bool IsEqual(LayerSchema? otherSchema)
     {
         if (FieldList.Count != otherSchema.FieldList.Count) return false;
-        return Compare(otherSchema) == String.Empty;
+        return Compare(otherSchema).Count == 0;
     }
 
-    public string Compare(LayerSchema? otherSchema)
+    public List<LayerComparisonResult> Compare(LayerSchema? otherSchema)
     {
-        string result = String.Empty;
+        var result = new List<LayerComparisonResult>();
 
-        for (int i = 0; i < FieldList.Count; i++)
+        for (var i = 0; i < FieldList.Count; i++)
         {
-            if (FieldList[i].Name != otherSchema.FieldList[i].Name)
+            if (FieldList[i].Name != otherSchema.FieldList[i].Name || FieldList[i].Type != otherSchema.FieldList[i].Type)
             {
-                result += $"Field name difference in {i+1}. position: {FieldList[i].Name} and {otherSchema.FieldList[i].Name}";
-            }
-
-            if (FieldList[i].Type != otherSchema.FieldList[i].Type)
-            {
-                result += $"Field type difference in {i + 1}. position: {FieldList[i].TypeName} and {otherSchema.FieldList[i].TypeName}";
+                result.Add(new LayerComparisonResult($"  -- Name: '{FieldList[i].Name}', Type: '{FieldList[i].TypeName}'", $"Name: '{otherSchema.FieldList[i].Name}', Type: '{otherSchema.FieldList[i].TypeName}'", "field", ELayerComparisonDifference.Schema));
             }
         }
         return result;
