@@ -22,17 +22,11 @@ public class LayerDetailComparer
     public List<LayerComparisonResult> DetailDifferences { get; private set; }
 
 
-
     public LayerDetailComparer(LayerDetails masterInfo, LayerDetails candidateInfo)
     {
         MasterInfo = masterInfo;
         CandidateInfo = candidateInfo;
         DetailDifferences = new List<LayerComparisonResult>();
-    }
-
-    private void AddDifferentLayerDetail(LayerComparisonResult result)
-    {
-        DetailDifferences.Add(result);
     }
 
     /// <summary>
@@ -42,38 +36,50 @@ public class LayerDetailComparer
     {
         if (MasterInfo.FeatureCount != CandidateInfo.FeatureCount)
         {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.FeatureCount.ToString(), CandidateInfo.FeatureCount.ToString(), "features", ELayerComparisonDifference.LayerDetail));
-        }
-
-        if (MasterInfo.FieldCount != CandidateInfo.FieldCount)
-        {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.FieldCount.ToString(), CandidateInfo.FieldCount.ToString(), "field count", ELayerComparisonDifference.LayerDetail));
-            var masterFieldNames = MasterInfo.Schema.FieldList.Select(f => f.Name).Order();
-            var candidateFieldNames = CandidateInfo.Schema.FieldList.Select(f => f.Name).Order();
-            AddDifferentLayerDetail(new LayerComparisonResult($"[{string.Join(", ", masterFieldNames)}]", $"[{string.Join(", ", candidateFieldNames)}]", "fields", ELayerComparisonDifference.LayerDetail));
+            DetailDifferences.Add(new LayerComparisonResult(MasterInfo.FeatureCount.ToString(), CandidateInfo.FeatureCount.ToString(), "features", ELayerComparisonDifference.LayerDetail));
         }
 
         if (MasterInfo.GeomType != CandidateInfo.GeomType)
         {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.GeomType.ToString(), CandidateInfo.GeomType.ToString(), "geometry", ELayerComparisonDifference.LayerDetail));
+            DetailDifferences.Add(new LayerComparisonResult(MasterInfo.GeomType.ToString(), CandidateInfo.GeomType.ToString(), "geometry", ELayerComparisonDifference.LayerDetail));
         }
 
         if (MasterInfo.LayerType != CandidateInfo.LayerType)
         {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.LayerType.ToString(), CandidateInfo.LayerType.ToString(), "layer type", ELayerComparisonDifference.LayerDetail));
+            DetailDifferences.Add(new LayerComparisonResult(MasterInfo.LayerType.ToString(), CandidateInfo.LayerType.ToString(), "layer type", ELayerComparisonDifference.LayerDetail));
         }
-  
+
         if (MasterInfo.Projection.SpRef != CandidateInfo.Projection.SpRef)
         {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.Projection.SpRef.ToString(), CandidateInfo.Projection.SpRef.ToString(), "projection", ELayerComparisonDifference.LayerDetail));
+            DetailDifferences.Add(new LayerComparisonResult(MasterInfo.Projection.SpRef.ToString(), CandidateInfo.Projection.SpRef.ToString(), "projection", ELayerComparisonDifference.LayerDetail));
         }
 
         if (MasterInfo.Extent.IsEqual(CandidateInfo.Extent) == false)
         {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.Extent.Json, CandidateInfo.Extent.Json, "extent", ELayerComparisonDifference.LayerDetail));
+            DetailDifferences.Add(new LayerComparisonResult(MasterInfo.Extent.Json, CandidateInfo.Extent.Json, "extent", ELayerComparisonDifference.LayerDetail));
         }
 
-        CompareSchema();
+        if (MasterInfo.Schema.FieldList.Count == CandidateInfo.Schema.FieldList.Count)
+        {
+            CompareSchema();
+        }
+        else
+        {
+            DetailDifferences.Add(new LayerComparisonResult(MasterInfo.Schema.FieldList.Count.ToString(),
+                CandidateInfo.Schema.FieldList.Count.ToString(), "field count", ELayerComparisonDifference.LayerDetail));
+            var masterFieldNames = MasterInfo.Schema.FieldList.Select(f => f.Name).ToList();
+            var candidateFieldNames = CandidateInfo.Schema.FieldList.Select(f => f.Name).ToList();
+
+            var commonFields = masterFieldNames.Intersect(candidateFieldNames).ToList();
+
+            DetailDifferences.Add(
+                new LayerComparisonResult($"[{string.Join(", ", masterFieldNames.Except(commonFields))}]",
+                    $"[{string.Join(", ", candidateFieldNames.Except(commonFields))}]",
+                    "fields not contained in other layer",
+                    ELayerComparisonDifference.LayerDetail
+                )
+            );
+        }
     }
 
     /// <summary>
@@ -81,9 +87,9 @@ public class LayerDetailComparer
     /// </summary>
     private void CompareSchema()
     {
-        if (MasterInfo.Schema.IsEqual(CandidateInfo.Schema) == false)
-        {
-            AddDifferentLayerDetail(new LayerComparisonResult(MasterInfo.Schema.Json, CandidateInfo.Schema.Json, "schema", ELayerComparisonDifference.Schema));
-        }
+        var comparison = MasterInfo.Schema.Compare(CandidateInfo.Schema);
+        if (comparison.Count == 0) return;
+        DetailDifferences.AddRange(comparison);
+        DetailDifferences.Add(new LayerComparisonResult(MasterInfo.Schema.Json, CandidateInfo.Schema.Json, "schema", ELayerComparisonDifference.Schema));
     }
 }

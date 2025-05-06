@@ -53,7 +53,6 @@ public class LayerFeaturesComparer
         for (int i = 0; i < MasterInfo.FeatureCount; i++)
         {
             using var masterFeature = masterLayer.OpenNextFeature();
-
             using var candidateFeature = candidateLayer.OpenNextFeature();
 
             if (masterFeature != null && candidateFeature != null)
