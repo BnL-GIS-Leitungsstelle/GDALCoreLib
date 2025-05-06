@@ -1,5 +1,4 @@
-﻿using GdalToolsLib.DataAccess;
-using GdalToolsLib.Models;
+﻿using GdalToolsLib.Models;
 using OSGeo.OGR;
 
 namespace GdalToolsLib.Layer;
