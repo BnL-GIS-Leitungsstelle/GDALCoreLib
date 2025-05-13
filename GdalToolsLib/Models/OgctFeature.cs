@@ -210,7 +210,7 @@ public GeometryValidationResult ValidateGeometry()
 
             if (area < 1)
             {
-                return new GeometryValidationResult(this, _layer, EGeometryValidationType.VerySmall, $"Geometry has small Area: {area} m²");
+                return new GeometryValidationResult(this, _layer, EGeometryValidationType.VerySmall, $"Geometry has small Area: {area:F6} m²");
             }
         }
 
