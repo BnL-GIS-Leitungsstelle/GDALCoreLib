@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.CopyDissolverFGDB", "Bn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESRIFileGeodatabaseAPI", "ESRIFileGeodatabaseAPI\ESRIFileGeodatabaseAPI.csproj", "{41BB4911-EF53-40EE-80DA-FF96A3A29C85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTest", "PerfTest\PerfTest.csproj", "{B56F9ADD-13C6-470C-AFEE-35D8962D4A7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfOverlapChecker", "SelfOverlapChecker\SelfOverlapChecker.csproj", "{B56F9ADD-13C6-470C-AFEE-35D8962D4A7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
