@@ -1,8 +1,5 @@
 ﻿using BnL.CopyDissolverFGDB.Parameters;
-using GdalToolsLib.Layer;
 using OSGeo.OGR;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace BnL.CopyDissolverFGDB;
 

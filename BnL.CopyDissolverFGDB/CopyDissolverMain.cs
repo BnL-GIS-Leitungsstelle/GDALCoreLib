@@ -7,9 +7,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-var today = DateTime.Today.ToString("yyyyMMdd");
+var today = DateTime.Now.ToString("yyyyMMdd_hhmmss");
 
-var workDir = Path.Join(@"D:\Daten\MMO\temp\CopyDissolverTest", "Stand_" + today);
+var workDir = $@"D:\Analyse\Flaechenstatistik_Generiert_FGDBTest_{today}";
 
 var filterParameters = CopyDissolverHelpers
     .GetLinesWithoutComments("filters.txt")
