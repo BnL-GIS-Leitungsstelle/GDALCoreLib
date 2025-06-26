@@ -939,7 +939,6 @@ namespace GdalCoreTest
             var layerNames = dataSource.GetLayerNames();
 
 
-
         }
 
         #endregion
