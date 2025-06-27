@@ -121,7 +121,7 @@ public class LayerNameBafuContent
             { "hochmoor", ECategory.Hochmoor },
             { "flachmoor", ECategory.Flachmoor },
             { "auengebiete", ECategory.Auengebiete },
-            { "amphiblaichgebietundwanderobjekteunion", ECategory.AmphiblaichgebietUndWanderobjekteUnion },
+            { "amphiblaichgebietundwanderobjekte", ECategory.AmphiblaichgebietUndWanderobjekte },
             { "trockenwiesenweiden", ECategory.Trockenwiesenweiden },
             { "wasserzugvogel", ECategory.Wasserzugvogel },
             { "jagdbann", ECategory.Jagdbann },

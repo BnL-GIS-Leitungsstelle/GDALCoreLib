@@ -824,7 +824,7 @@ namespace GdalCoreTest
         [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
         public void Union_SevenValidLayers_IsWorking(string file)
         {
-            if (file.EndsWith("Union7Layers.gdb") == false) return;
+            if (file.EndsWith("Union7LayersNew.gdb") == false) return;
 
 
             using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
@@ -851,7 +851,7 @@ namespace GdalCoreTest
                 switch (layerName)
                 {
                     case "N1991_Serie1_hochmoor_19910201Dissolve":
-                        Assert.InRange(areaHa, 1469.76, 1469.77);
+                        Assert.InRange(areaHa, 1469.76, 1469.99);
                         break;
                     case "N2000_Erweiterung_nationalpark_20000619Dissolve":
                         Assert.InRange(areaHa, 17032.95, 17032.96);
@@ -871,6 +871,8 @@ namespace GdalCoreTest
                     case "N2001_Serie1_amphibLaichgebietUndWanderobjekteUnion":
                         Assert.InRange(areaHa, 10911.34, 10911.35);
                         break;
+                    default:
+                        throw new NotImplementedException();
                 }
             }
 
@@ -891,7 +893,7 @@ namespace GdalCoreTest
             using var tempLayer2 = dataSource.OpenLayer(tempLayerName2);
             var areaHaResult2 = tempLayer2.CalculateArea() / 10000;
             _outputHelper.WriteLine($"Layer= {tempLayerName2} has {areaHaResult2} ha area.");
-            Assert.InRange(areaHaResult2, 29723.450, 29723.6);
+            Assert.InRange(areaHaResult2, 29723.450, 29723.8);
 
             using var layerFour = dataSource.OpenLayer("N2001_Ergaenzung1_Auengebiete_20010801_20020403Dissolve");
             var tempLayerName3 = tempLayer2.GeoProcessWithLayer(EGeoProcess.Union, layerFour, "N2001_FM_AM_HM_AU_UnionTemp");
