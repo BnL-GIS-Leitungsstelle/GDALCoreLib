@@ -96,6 +96,14 @@ public partial class OgctLayer : IOgctLayer
                  srcGeom.GetGeometryType() != wkbGeometryType.wkbMultiSurface))
             {
                 string geomTypeName = srcGeom?.GetGeometryType().ToString() ?? "null";
+
+                if (geomTypeName.Equals("wkbMultiPolygon25D"))
+                {
+                    OSGeo.OGR.Geometry targetGeom = srcGeom.Clone();
+                    targetGeom.FlattenTo2D();
+                }
+
+
                 // Nicht erlaubter Typ, Feature überspringen
                 Console.WriteLine($"Skipping feature with geometry type: {geomTypeName}");
                 throw new NotSupportedException("inappropriate geometrytype cannot be stored in polygon-layer");
@@ -106,6 +114,7 @@ public partial class OgctLayer : IOgctLayer
 
             // Console.WriteLine($" - Copy Feature {sourceFeature.GetFID()}");
             using OSGeo.OGR.Feature newFeature = new OSGeo.OGR.Feature(fields);
+
 
             if (ogctTargetLayer.LayerDetails.LayerType == ELayerType.Table)
             {
