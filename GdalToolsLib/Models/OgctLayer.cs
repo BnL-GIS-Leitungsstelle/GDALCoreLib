@@ -88,28 +88,12 @@ public partial class OgctLayer : IOgctLayer
 
         while ((sourceFeature = _layer.GetNextFeature()) != null)
         {
-            using OSGeo.OGR.Geometry srcGeom = sourceFeature.GetGeometryRef();
-            if (srcGeom == null ||  srcGeom.IsEmpty() ||
-                (srcGeom.GetGeometryType() != wkbGeometryType.wkbPolygon &&
-                 srcGeom.GetGeometryType() != wkbGeometryType.wkbMultiPolygon &&
-                 srcGeom.GetGeometryType() != wkbGeometryType.wkbCurvePolygon &&
-                 srcGeom.GetGeometryType() != wkbGeometryType.wkbMultiSurface))
+            var sourceFeatureGeomType = wkbGeometryType.wkbUnknown;
+            using (OSGeo.OGR.Geometry srcGeom = sourceFeature.GetGeometryRef())
             {
-                string geomTypeName = srcGeom?.GetGeometryType().ToString() ?? "null";
-
-                if (geomTypeName.Equals("wkbMultiPolygon25D"))
-                {
-                    OSGeo.OGR.Geometry targetGeom = srcGeom.Clone();
-                    targetGeom.FlattenTo2D();
-                }
-
-
-                // Nicht erlaubter Typ, Feature überspringen
-                Console.WriteLine($"Skipping feature with geometry type: {geomTypeName}");
-                throw new NotSupportedException("inappropriate geometrytype cannot be stored in polygon-layer");
-                continue;
+                if (srcGeom == null || srcGeom.IsEmpty()) continue; // skip empty geometries
+                sourceFeatureGeomType = srcGeom.GetGeometryType();
             }
-
 
 
             // Console.WriteLine($" - Copy Feature {sourceFeature.GetFID()}");
@@ -125,12 +109,78 @@ public partial class OgctLayer : IOgctLayer
                 newFeature.CreateFromOther(fields, sourceFields, sourceFeature, ogctTargetLayer.DataSource.SupportInfo.Type);
             }
 
+            // copy geometry, according to layer-geometry-type
+
+            using OSGeo.OGR.Geometry sourceGeom = sourceFeature.GetGeometryRef();
+            var targetLayerGeomType = targetLayer.LayerDetails.GeomType;
+
+            // check if the target layer is a polygon layer
+            if (targetLayerGeomType == wkbGeometryType.wkbMultiPolygon)
+            {
+                if (sourceFeatureGeomType != wkbGeometryType.wkbPolygon &&
+                    sourceFeatureGeomType != wkbGeometryType.wkbMultiPolygon &&
+                    sourceFeatureGeomType != wkbGeometryType.wkbCurvePolygon &&
+                    sourceFeatureGeomType != wkbGeometryType.wkbMultiSurface)
+                {
+                    //try to fix it or throw an exception
+
+                    if (sourceFeatureGeomType == wkbGeometryType.wkbMultiPolygon25D)
+                    {
+                        using OSGeo.OGR.Geometry targetGeom = sourceGeom.Clone();
+                        targetGeom.FlattenTo2D();
+                        newFeature.SetGeometry(targetGeom);
+                    }
+                    else if (sourceFeatureGeomType == wkbGeometryType.wkbGeometryCollection)
+                    {
+                        OSGeo.OGR.Geometry geomCollection = sourceGeom.Clone();
+
+                        // Prüfen, ob alle enthaltenen Geometrien vom Typ Polygon sind
+                        bool allPolygons = true;
+                        for (int i = 0; i < geomCollection.GetGeometryCount(); i++)
+                        {
+                            if (geomCollection.GetGeometryRef(i).GetGeometryType() != wkbGeometryType.wkbPolygon
+                                && geomCollection.GetGeometryRef(i).GetGeometryType() != wkbGeometryType.wkbPolygon25D)
+                            {
+                                allPolygons = false;
+                                break;
+                            }
+                        }
+
+                        if (allPolygons)
+                        {
+                            // Erzeuge ein neues MultiPolygon
+                            OSGeo.OGR.Geometry multiPoly = new OSGeo.OGR.Geometry(wkbGeometryType.wkbMultiPolygon);
+
+                            for (int i = 0; i < geomCollection.GetGeometryCount(); i++)
+                            {
+                                // Polygon aus Collection holen und kopieren
+                                OSGeo.OGR.Geometry polygon = geomCollection.GetGeometryRef(i);
+                                multiPoly.AddGeometry(polygon.Clone());
+                            }
+
+                            // Jetzt kannst du multiPoly im Layer speichern
+                            newFeature.SetGeometry(multiPoly);
+                        }
+                        else
+                        {
+                            // Es gibt Nicht-Polygon-Geometrien: Umwandlung nicht möglich!
+                            throw new InvalidOperationException("GeometryCollection enthält Nicht-Polygone.");
+                        }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"non matching geometry type ({sourceFeatureGeomType}) cannot be stored in polygon-layer");
+                    }
+                }
+            }
+
 
             if (generateNewFids || targetLayer.DataSource.SupportInfo.Type == EDataSourceType.OpenFGDB)
             {
                 newFeature.SetFID(++newFeatureIndex);
             }
             sourceFeature.Dispose();
+
             ogctTargetLayer._layer.CreateFeature(newFeature);
             if (copiedFeatures++ % 100 == 0)
             {
@@ -302,11 +352,11 @@ public partial class OgctLayer : IOgctLayer
         IOgctDataSource outputDatasource = dataSource ?? _dataSource;
         var output = CreateAndOpenLayer(outputDatasource, outputLayerName, fieldsForDissolve);
 
-       // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
-        
+        // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
+
         var featureGroups = GroupFeaturesByFields(fieldsForDissolve);
 
-        ProcessFeatureGroups(output.Layer,output.GeomType, featureGroups, fieldsForDissolve);
+        ProcessFeatureGroups(output.Layer, output.GeomType, featureGroups, fieldsForDissolve);
 
         output.Layer.Dispose();
 
@@ -349,12 +399,12 @@ public partial class OgctLayer : IOgctLayer
     /// </summary>
     /// <param name="fieldsForDissolve"></param>
     /// <returns></returns>
-    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
+    private Dictionary<string, List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
     {
         var featureGroups = new Dictionary<string, List<IOgctFeature>>();
 
         _layer.ResetReading();
-        
+
         var feature = OpenNextFeature(); // feature needs dispose at the end
 
         while (feature != null)
@@ -482,7 +532,7 @@ public partial class OgctLayer : IOgctLayer
             f.Dispose();
         }
 
-        return (dissolvedGeometry,attributeContents);
+        return (dissolvedGeometry, attributeContents);
     }
 
 
