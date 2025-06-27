@@ -88,6 +88,22 @@ public partial class OgctLayer : IOgctLayer
 
         while ((sourceFeature = _layer.GetNextFeature()) != null)
         {
+            using OSGeo.OGR.Geometry srcGeom = sourceFeature.GetGeometryRef();
+            if (srcGeom == null ||  srcGeom.IsEmpty() ||
+                (srcGeom.GetGeometryType() != wkbGeometryType.wkbPolygon &&
+                 srcGeom.GetGeometryType() != wkbGeometryType.wkbMultiPolygon &&
+                 srcGeom.GetGeometryType() != wkbGeometryType.wkbCurvePolygon &&
+                 srcGeom.GetGeometryType() != wkbGeometryType.wkbMultiSurface))
+            {
+                string geomTypeName = srcGeom?.GetGeometryType().ToString() ?? "null";
+                // Nicht erlaubter Typ, Feature überspringen
+                Console.WriteLine($"Skipping feature with geometry type: {geomTypeName}");
+                throw new NotSupportedException("inappropriate geometrytype cannot be stored in polygon-layer");
+                continue;
+            }
+
+
+
             // Console.WriteLine($" - Copy Feature {sourceFeature.GetFID()}");
             using OSGeo.OGR.Feature newFeature = new OSGeo.OGR.Feature(fields);
 
