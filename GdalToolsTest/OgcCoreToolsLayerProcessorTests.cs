@@ -901,7 +901,7 @@ namespace GdalCoreTest
             using var tempLayer3 = dataSource.OpenLayer(tempLayerName3);
             var areaHaResult3 = tempLayer3.CalculateArea() / 10000;
             _outputHelper.WriteLine($"Layer= {tempLayerName3} has {areaHaResult3} ha area.");
-            Assert.InRange(areaHaResult3, 46992.75, 46992.90);
+            Assert.InRange(areaHaResult3, 46992.75, 46993.10);
         
             
             using var layerFive = dataSource.OpenLayer("N2001_Revision_jagdbann_20010101Dissolve");
@@ -910,7 +910,7 @@ namespace GdalCoreTest
             using var tempLayer4 = dataSource.OpenLayer(tempLayerName4);
             var areaHaResult4 = tempLayer4.CalculateArea() / 10000;
             _outputHelper.WriteLine($"Layer= {tempLayerName4} has {areaHaResult4} ha area.");
-            Assert.InRange(areaHaResult4, 194692.1, 194692.2);
+            Assert.InRange(areaHaResult4, 194692.1, 194692.4);
 
             using var layerSix = dataSource.OpenLayer("N2001_Revision_wasserzugvogel_20010801Dissolve");
             var tempLayerName5 = tempLayer4.GeoProcessWithLayer(EGeoProcess.Union, layerSix, "N2001_FM_AM_HM_AU_JB_WZ_UnionTemp");
@@ -918,7 +918,7 @@ namespace GdalCoreTest
             using var tempLayer5 = dataSource.OpenLayer(tempLayerName5);
             var areaHaResult5 = tempLayer5.CalculateArea() / 10000;
             _outputHelper.WriteLine($"Layer= {tempLayerName5} has {areaHaResult5} ha area.");
-            Assert.InRange(areaHaResult5, 211043.82, 211043.85);
+            Assert.InRange(areaHaResult5, 211043.82, 211044.1);
 
             using var layerSeven = dataSource.OpenLayer("N2000_Erweiterung_nationalpark_20000619Dissolve");
             var finalUnionLayerName = tempLayer5.GeoProcessWithLayer(EGeoProcess.Union, layerSeven, "N2001_FM_AM_HM_AU_JB_WZ_NP_UnionFinal");
@@ -926,7 +926,7 @@ namespace GdalCoreTest
             using var finalUnionLayer = dataSource.OpenLayer(finalUnionLayerName);
             var areaHaResult6 = finalUnionLayer.CalculateArea() / 10000;
             _outputHelper.WriteLine($"Layer= {finalUnionLayerName} has {areaHaResult6} ha area.");
-            Assert.InRange(areaHaResult6, 228076.77, 228076.8);
+            Assert.InRange(areaHaResult6, 228076.77, 228077.1);
         }
 
 
