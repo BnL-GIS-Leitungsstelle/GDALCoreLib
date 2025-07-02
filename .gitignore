@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /GdalCoreTest/samples-vector/amphib_point_SpRefLV95_epsg2056_94rec.shape
 /GdalCoreTest/samples-vector/copiedPartedLayer
+/ConsoleApp1
