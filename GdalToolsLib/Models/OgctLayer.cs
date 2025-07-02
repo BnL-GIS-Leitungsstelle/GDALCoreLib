@@ -67,6 +67,7 @@ public partial class OgctLayer : IOgctLayer
 
     /// <summary>
     /// TODO: Fields with a reserved name cannot be used as user defined fields
+    /// 
     /// </summary>
     /// <param name="targetLayer"></param>
     /// <param name="generateNewFids"></param>
@@ -74,54 +75,284 @@ public partial class OgctLayer : IOgctLayer
     /// <returns></returns>
     public long CopyFeatures(IOgctLayer targetLayer, bool generateNewFids = false, Action<int> reportProgressPercentage = null)
     {
+
         var ogctTargetLayer = (OgctLayer)targetLayer;
         FeatureDefn fields = ogctTargetLayer._layer.GetLayerDefn();
-        OSGeo.OGR.Feature sourceFeature;
         FeatureDefn sourceFields = _layer.GetLayerDefn();
-
         var layerFeatureCount = LayerDetails.FeatureCount;
         var copiedFeatures = 0L;
-
         var newFeatureIndex = targetLayer.LayerDetails.FeatureCount;
+        var targetGeomType = targetLayer.LayerDetails.GeomType;
 
         ogctTargetLayer.OgrLayer.StartTransaction();
 
-        while ((sourceFeature = _layer.GetNextFeature()) != null)
+        try
         {
-            // Console.WriteLine($" - Copy Feature {sourceFeature.GetFID()}");
-            using OSGeo.OGR.Feature newFeature = new OSGeo.OGR.Feature(fields);
+            OSGeo.OGR.Feature sourceFeature;
 
-            if (ogctTargetLayer.LayerDetails.LayerType == ELayerType.Table)
+            while ((sourceFeature = _layer.GetNextFeature()) != null)
             {
-                newFeature.CreateTableRecordFromOther(fields, sourceFields, sourceFeature);
-            }
-            else
-            {
-                newFeature.CreateFromOther(fields, sourceFields, sourceFeature, ogctTargetLayer.DataSource.SupportInfo.Type);
-            }
+                try
+                {
+                    if (ogctTargetLayer.IsGeometryType())
+                    {
+                        var geomValidation = HasValidGeometry(sourceFeature);
+                        if (geomValidation.IsValid == false) continue;
+
+                        if (!IsSameGeometryDimension(geomValidation.geomType, targetGeomType)) continue;
 
 
-            if (generateNewFids || targetLayer.DataSource.SupportInfo.Type == EDataSourceType.OpenFGDB)
-            {
-                newFeature.SetFID(++newFeatureIndex);
+                        using var newFeature = CreateFeatureWithGeometry(fields, sourceFields, sourceFeature,
+                            ogctTargetLayer.DataSource.SupportInfo.Type);
+
+                        using var targetGeom = GetMatchingTargetGeometry(sourceFeature,
+                            geomValidation.geomType, targetGeomType);
+
+                        if (targetGeom != null)
+                        {
+                            newFeature.SetGeometry(targetGeom);
+                        }
+
+                        SetFidIfRequired(newFeature, ref newFeatureIndex, generateNewFids, targetLayer);
+
+                        ogctTargetLayer._layer.CreateFeature(newFeature);
+                    }
+                    else
+                    {
+                        using var newFeature = CreateFeatureWithTableFields(fields, sourceFields, sourceFeature);
+
+                        SetFidIfRequired(newFeature, ref newFeatureIndex, generateNewFids, targetLayer);
+
+                        ogctTargetLayer._layer.CreateFeature(newFeature);
+                    }
+
+                    copiedFeatures++;
+
+                    // Report progress if a callback is provided and every 100 features or at the end
+                    if (reportProgressPercentage != null &&
+                        copiedFeatures % 100 == 0 || copiedFeatures== layerFeatureCount)
+                    {
+                        reportProgressPercentage?.Invoke((int)(100 * copiedFeatures / layerFeatureCount));
+                    }
+                }
+                finally
+                {
+                    sourceFeature.Dispose();
+                }
             }
-            sourceFeature.Dispose();
-            ogctTargetLayer._layer.CreateFeature(newFeature);
-            if (copiedFeatures++ % 100 == 0)
-            {
-                reportProgressPercentage?.Invoke((int)(100 * copiedFeatures / layerFeatureCount));
-            }
+
+            ogctTargetLayer.OgrLayer.CommitTransaction();
         }
-
-        ogctTargetLayer.OgrLayer.CommitTransaction();
+        catch (Exception)
+        {
+            try
+            {
+                ogctTargetLayer.OgrLayer.RollbackTransaction();
+            }
+            catch
+            {
+                 // ignore, if db-system does not support rollback
+            }
+            throw;
+        }
 
         return ogctTargetLayer._layer.GetFeatureCount(1);
     }
+
+    /// <summary>
+    /// Sets the feature ID (FID) for the new feature if required.
+    /// </summary>
+    private void SetFidIfRequired(OSGeo.OGR.Feature feature, ref long newFeatureIndex, bool generateNewFids,
+        IOgctLayer targetLayer)
+    {
+        if (generateNewFids || targetLayer.DataSource.SupportInfo.Type == EDataSourceType.OpenFGDB)
+        {
+            feature.SetFID(++newFeatureIndex);
+        }
+    }
+
+
+    /// <summary>
+    /// Ensuring that the geometry of the source feature matches the target layer or tries to adopt the geometry-type.
+    /// </summary>
+    private OSGeo.OGR.Geometry GetMatchingTargetGeometry(
+        OSGeo.OGR.Feature sourceFeature, wkbGeometryType sourceGeomType, wkbGeometryType targetLayerGeomType)
+    {
+        using var sourceGeom = sourceFeature.GetGeometryRef();
+
+        if (IsPolygonLike(targetLayerGeomType))
+        {
+            if (!IsPolygonLike(sourceGeomType))
+            {
+                // special case: MultiPolygon25D
+                if (sourceGeomType == wkbGeometryType.wkbMultiPolygon25D)
+                {
+                    var targetGeom = sourceGeom.Clone();
+                    targetGeom.FlattenTo2D();
+                    return targetGeom;
+                }
+                // special case: GeometryCollection
+                else if (sourceGeomType == wkbGeometryType.wkbGeometryCollection)
+                {
+                    using var geomCollection = sourceGeom.Clone();
+                    return GeometryCollectionToMultiPolygon(geomCollection);
+                }
+                else
+                {
+                    throw new NotSupportedException($"non matching geometry type ({sourceGeomType}) cannot be stored in polygon-layer");
+                }
+            }
+            return sourceGeom.Clone(); // sourceGeom matches already
+        }
+        else
+        {
+            // Non-Polygon-Layer
+            return sourceGeom.Clone();
+        }
+    }
+
+    /// <summary>
+    /// Determines whether the specified geometry type represents a polygon-like structure.
+    /// </summary>
+    /// <param name="type">The geometry type to evaluate.</param>
+    /// <returns><see langword="true"/> if the specified geometry type is a polygon or a polygon-like structure;  otherwise, <see
+    /// langword="false"/>. </returns>
+    private bool IsPolygonLike(wkbGeometryType type)
+    {
+        return type == wkbGeometryType.wkbPolygon
+               || type == wkbGeometryType.wkbMultiPolygon
+               || type == wkbGeometryType.wkbCurvePolygon
+               || type == wkbGeometryType.wkbMultiSurface;
+    }
+
+
+    private (bool IsValid, wkbGeometryType geomType) HasValidGeometry(OSGeo.OGR.Feature feature)
+    {
+        using var geom = feature.GetGeometryRef();
+
+        if (geom == null || geom.IsEmpty())
+        {
+            return (false, wkbGeometryType.wkbUnknown);
+        }
+
+        return (true, geom.GetGeometryType());
+    }
+
+
+    private OSGeo.OGR.Geometry GeometryCollectionToMultiPolygon(OSGeo.OGR.Geometry geomCollection)
+    {
+        var multiPolygon = new OSGeo.OGR.Geometry(wkbGeometryType.wkbMultiPolygon);
+
+        for (int i = 0; i < geomCollection.GetGeometryCount(); i++)
+        {
+            var part = geomCollection.GetGeometryRef(i);
+            if (IsPolygonLike(part.GetGeometryType()))
+            {
+                multiPolygon.AddGeometry(part.Clone());
+            }
+            else if (part.GetGeometryType() == wkbGeometryType.wkbPolygon25D)
+            {
+                var polygon2d = part.Clone();
+                polygon2d.FlattenTo2D();
+                multiPolygon.AddGeometry(polygon2d);
+            }
+        }
+
+        return multiPolygon;
+    }
+
+    /// <summary>
+    /// Creates a new feature with geometry from the source feature.
+    /// </summary>
+    private OSGeo.OGR.Feature CreateFeatureWithGeometry(
+        FeatureDefn fields, FeatureDefn sourceFields,
+        OSGeo.OGR.Feature sourceFeature, EDataSourceType dataSourceType)
+    {
+        var newFeature = new OSGeo.OGR.Feature(fields);
+        newFeature.CreateFromOther(fields, sourceFields, sourceFeature, dataSourceType);
+        return newFeature;
+    }
+
+    /// <summary>
+    /// Creates a new feature with table fields from the source feature.
+    /// </summary>
+    private OSGeo.OGR.Feature CreateFeatureWithTableFields(
+        FeatureDefn fields, FeatureDefn sourceFields, OSGeo.OGR.Feature sourceFeature)
+    {
+        var newFeature = new OSGeo.OGR.Feature(fields);
+        newFeature.CreateTableRecordFromOther(fields, sourceFields, sourceFeature);
+        return newFeature;
+    }
+
 
     public bool IsGeometryType()
     {
         return _layer.IsGeometryType();
     }
+
+
+    /// <summary>
+/// Prüft, ob sourceGeometryType und targetGeometryType zur gleichen OGR-Hauptdimension gehören.
+/// Gibt true zurück, wenn beide vom Typ "Polygon", "LineString" oder "Point" sind.
+/// </summary>
+public static bool IsSameGeometryDimension(wkbGeometryType sourceType, wkbGeometryType targetType)
+{
+    // Polygon-Familie
+    if (IsPolygonLikeExt(sourceType) && IsPolygonLikeExt(targetType))
+        return true;
+
+    // Linien-Familie
+    if (IsLineLikeExt(sourceType) && IsLineLikeExt(targetType))
+        return true;
+
+    // Punkt-Familie
+    if (IsPointLikeExt(sourceType) && IsPointLikeExt(targetType))
+        return true;
+
+    // Sonst nicht kompatibel
+    return false;
+}
+
+    /// <summary>
+    /// returns true if the geometry type is a polygon-like geometry.
+    /// </summary>
+    public static bool IsPolygonLikeExt(wkbGeometryType type)
+{
+    return type == wkbGeometryType.wkbPolygon
+        || type == wkbGeometryType.wkbMultiPolygon
+        || type == wkbGeometryType.wkbPolygon25D
+        || type == wkbGeometryType.wkbMultiPolygon25D
+        || type == wkbGeometryType.wkbCurvePolygon
+        || type == wkbGeometryType.wkbGeometryCollection
+        || type == wkbGeometryType.wkbMultiSurface;
+}
+
+    /// <summary>
+    /// returns true if the geometry type is a line-like geometry.
+    /// </summary>
+    public static bool IsLineLikeExt(wkbGeometryType type)
+{
+    return type == wkbGeometryType.wkbLineString
+        || type == wkbGeometryType.wkbMultiLineString
+        || type == wkbGeometryType.wkbLineString25D
+        || type == wkbGeometryType.wkbMultiLineString25D
+        || type == wkbGeometryType.wkbCurve
+        || type == wkbGeometryType.wkbCompoundCurve
+        || type == wkbGeometryType.wkbGeometryCollection
+        || type == wkbGeometryType.wkbMultiCurve;
+}
+
+    /// <summary>
+    /// returns true if the geometry type is a point-like geometry.
+    /// </summary>
+    public static bool IsPointLikeExt(wkbGeometryType type)
+{
+    return type == wkbGeometryType.wkbPoint
+        || type == wkbGeometryType.wkbMultiPoint
+        || type == wkbGeometryType.wkbPoint25D
+        || type == wkbGeometryType.wkbGeometryCollection
+        || type == wkbGeometryType.wkbMultiPoint25D;
+}
 
     //TODO: consider whether we should use the built-in layer copy for some scenarios
     //TODO:
@@ -277,11 +508,11 @@ public partial class OgctLayer : IOgctLayer
         IOgctDataSource outputDatasource = dataSource ?? _dataSource;
         var output = CreateAndOpenLayer(outputDatasource, outputLayerName, fieldsForDissolve);
 
-       // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
-        
+        // var outputToTest = CreateAndOpenLayer(outputDatasource, outputLayerName+"Pure", fieldsForDissolve);
+
         var featureGroups = GroupFeaturesByFields(fieldsForDissolve);
 
-        ProcessFeatureGroups(output.Layer,output.GeomType, featureGroups, fieldsForDissolve);
+        ProcessFeatureGroups(output.Layer, output.GeomType, featureGroups, fieldsForDissolve);
 
         output.Layer.Dispose();
 
@@ -324,12 +555,12 @@ public partial class OgctLayer : IOgctLayer
     /// </summary>
     /// <param name="fieldsForDissolve"></param>
     /// <returns></returns>
-    private Dictionary<string,List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
+    private Dictionary<string, List<IOgctFeature>> GroupFeaturesByFields(List<FieldDefnInfo> fieldsForDissolve)
     {
         var featureGroups = new Dictionary<string, List<IOgctFeature>>();
 
         _layer.ResetReading();
-        
+
         var feature = OpenNextFeature(); // feature needs dispose at the end
 
         while (feature != null)
@@ -457,7 +688,7 @@ public partial class OgctLayer : IOgctLayer
             f.Dispose();
         }
 
-        return (dissolvedGeometry,attributeContents);
+        return (dissolvedGeometry, attributeContents);
     }
 
 

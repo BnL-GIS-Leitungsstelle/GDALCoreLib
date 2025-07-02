@@ -820,6 +820,129 @@ namespace GdalCoreTest
             Assert.InRange(areaHaResultTwo, 829565.6, 829565.7);
         }
 
+        [Theory]
+        [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
+        public void Union_SevenValidLayers_IsWorking(string file)
+        {
+            if (file.EndsWith("Union7LayersNew.gdb") == false) return;
+
+
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
+            var layerNames = dataSource.GetLayerNames();
+
+
+            // verify total area
+            var layerAreas = new Dictionary<string, double>();
+            layerAreas.Add("N1991_Serie1_hochmoor_19910201Dissolve", 1469.765);  
+            layerAreas.Add("N2000_Erweiterung_nationalpark_20000619Dissolve", 17032.958);   
+            layerAreas.Add("N2001_Ergaenzung1_Auengebiete_20010801_20020403Dissolve", 20083.029);  
+            layerAreas.Add("N2001_Revision_flachmoor_20010801Dissolve", 19184.560);      
+            layerAreas.Add("N2001_Revision_jagdbann_20010101Dissolve", 149529.145);    
+            layerAreas.Add("N2001_Revision_wasserzugvogel_20010801Dissolve", 18920.235);  
+            layerAreas.Add("N2001_Serie1_amphibLaichgebietUndWanderobjekteUnion", 10911.347);
+
+
+            // test for expected area of each layer
+            foreach (var layerName in layerNames)
+            {
+                using var layer = dataSource.OpenLayer(layerName);
+                var areaHa = layer.CalculateArea() / 10000;
+
+                switch (layerName)
+                {
+                    case "N1991_Serie1_hochmoor_19910201Dissolve":
+                        Assert.InRange(areaHa, 1469.76, 1469.99);
+                        break;
+                    case "N2000_Erweiterung_nationalpark_20000619Dissolve":
+                        Assert.InRange(areaHa, 17032.95, 17032.96);
+                        break;
+                    case "N2001_Ergaenzung1_Auengebiete_20010801_20020403Dissolve":
+                        Assert.InRange(areaHa, 20083.02, 20083.03);
+                        break;
+                    case "N2001_Revision_flachmoor_20010801Dissolve":
+                        Assert.InRange(areaHa, 19184.555, 19184.570);
+                        break;
+                    case "N2001_Revision_jagdbann_20010101Dissolve":
+                        Assert.InRange(areaHa, 149529.14, 149529.15);
+                        break;
+                    case "N2001_Revision_wasserzugvogel_20010801Dissolve":
+                        Assert.InRange(areaHa, 18920.23, 18920.24);
+                        break;
+                    case "N2001_Serie1_amphibLaichgebietUndWanderobjekteUnion":
+                        Assert.InRange(areaHa, 10911.34, 10911.35);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
+            // Unify all layers: FM+AM+HM+AU+JB+WZ+NP
+
+            using var layerOne = dataSource.OpenLayer("N2001_Revision_flachmoor_20010801Dissolve");
+            using var layerSecond = dataSource.OpenLayer("N2001_Serie1_amphibLaichgebietUndWanderobjekteUnion");
+            var tempLayerName1 = layerOne.GeoProcessWithLayer(EGeoProcess.Union, layerSecond, "N2001_FM_AM_UnionTemp");
+
+            using var tempLayer1 = dataSource.OpenLayer(tempLayerName1);
+            var areaHaResult1 = tempLayer1.CalculateArea() / 10000;
+            _outputHelper.WriteLine($"Layer= {tempLayerName1} has {areaHaResult1} ha area.");
+            Assert.InRange(areaHaResult1, 28404.9, 28405);
+
+            using var layerThree = dataSource.OpenLayer("N1991_Serie1_hochmoor_19910201Dissolve");
+            var tempLayerName2 = tempLayer1.GeoProcessWithLayer(EGeoProcess.Union, layerThree, "N2001_FM_AM_HM_UnionTemp");
+            
+            using var tempLayer2 = dataSource.OpenLayer(tempLayerName2);
+            var areaHaResult2 = tempLayer2.CalculateArea() / 10000;
+            _outputHelper.WriteLine($"Layer= {tempLayerName2} has {areaHaResult2} ha area.");
+            Assert.InRange(areaHaResult2, 29723.450, 29723.8);
+
+            using var layerFour = dataSource.OpenLayer("N2001_Ergaenzung1_Auengebiete_20010801_20020403Dissolve");
+            var tempLayerName3 = tempLayer2.GeoProcessWithLayer(EGeoProcess.Union, layerFour, "N2001_FM_AM_HM_AU_UnionTemp");
+            
+            using var tempLayer3 = dataSource.OpenLayer(tempLayerName3);
+            var areaHaResult3 = tempLayer3.CalculateArea() / 10000;
+            _outputHelper.WriteLine($"Layer= {tempLayerName3} has {areaHaResult3} ha area.");
+            Assert.InRange(areaHaResult3, 46992.75, 46993.10);
+        
+            
+            using var layerFive = dataSource.OpenLayer("N2001_Revision_jagdbann_20010101Dissolve");
+            var tempLayerName4 = tempLayer3.GeoProcessWithLayer(EGeoProcess.Union, layerFive, "N2001_FM_AM_HM_AU_JB_UnionTemp");
+            
+            using var tempLayer4 = dataSource.OpenLayer(tempLayerName4);
+            var areaHaResult4 = tempLayer4.CalculateArea() / 10000;
+            _outputHelper.WriteLine($"Layer= {tempLayerName4} has {areaHaResult4} ha area.");
+            Assert.InRange(areaHaResult4, 194692.1, 194692.4);
+
+            using var layerSix = dataSource.OpenLayer("N2001_Revision_wasserzugvogel_20010801Dissolve");
+            var tempLayerName5 = tempLayer4.GeoProcessWithLayer(EGeoProcess.Union, layerSix, "N2001_FM_AM_HM_AU_JB_WZ_UnionTemp");
+            
+            using var tempLayer5 = dataSource.OpenLayer(tempLayerName5);
+            var areaHaResult5 = tempLayer5.CalculateArea() / 10000;
+            _outputHelper.WriteLine($"Layer= {tempLayerName5} has {areaHaResult5} ha area.");
+            Assert.InRange(areaHaResult5, 211043.82, 211044.1);
+
+            using var layerSeven = dataSource.OpenLayer("N2000_Erweiterung_nationalpark_20000619Dissolve");
+            var finalUnionLayerName = tempLayer5.GeoProcessWithLayer(EGeoProcess.Union, layerSeven, "N2001_FM_AM_HM_AU_JB_WZ_NP_UnionFinal");
+            
+            using var finalUnionLayer = dataSource.OpenLayer(finalUnionLayerName);
+            var areaHaResult6 = finalUnionLayer.CalculateArea() / 10000;
+            _outputHelper.WriteLine($"Layer= {finalUnionLayerName} has {areaHaResult6} ha area.");
+            Assert.InRange(areaHaResult6, 228076.77, 228077.1);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(TestDataPathProvider.SupportedVectorData), MemberType = typeof(TestDataPathProvider))]
+        public void UnionInGroup_SevenValidLayers_IsWorking(string file)
+        {
+            if (file.EndsWith("Union7Layers.gdb") == false) return;
+
+
+            using var dataSource = new OgctDataSourceAccessor().OpenOrCreateDatasource(file, EAccessLevel.Full);
+            var layerNames = dataSource.GetLayerNames();
+
+
+        }
+
         #endregion
 
 
