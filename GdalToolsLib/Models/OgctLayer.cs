@@ -47,7 +47,7 @@ public partial class OgctLayer : IOgctLayer
         _dataSource = (OgctDataSource)dataSource;
     }
 
-    public OSGeo.OGR.Layer OgrLayer => _layer;
+    internal OSGeo.OGR.Layer OgrLayer => _layer;
 
     public IOgctDataSource DataSource => _dataSource;
     public string Name => _layer.GetName();
