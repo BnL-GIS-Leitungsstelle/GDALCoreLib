@@ -1,45 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="BnL.CopyDissolverFGDB.Parameters.BufferParameter">
-    <Position X="0.5" Y="0.5" Width="2" />
+  <Class Name="BnL.CopyDissolverFGDB.WorkLayer">
+    <Position X="0.5" Y="0.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAABAAAAAAAAAAAAAAIA=</HashCode>
-      <FileName>Parameters\BufferParameter.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="BnL.CopyDissolverFGDB.Parameters.FilterParameter">
-    <Position X="0.5" Y="2.75" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAABAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
-      <FileName>Parameters\FilterParameter.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="BnL.CopyDissolverFGDB.Parameters.UnionParameter">
-    <Position X="0.5" Y="5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAABAAAAAAQAAAAAAAAAABAAAAAAAAAEAAAAAA=</HashCode>
-      <FileName>Parameters\UnionParameter.cs</FileName>
+      <HashCode>CQAAAAAAAAAAAAAAAAAAAAAAABAAAAAAgAAAAAAAQAA=</HashCode>
+      <FileName>WorkLayer.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BnL.CopyDissolverFGDB.CopyDissolverHelpers">
-    <Position X="2.75" Y="0.5" Width="2.25" />
+    <Position X="0.5" Y="3.25" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
       <FileName>CopyDissolverHelpers.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="BnL.CopyDissolverFGDB.FGDBProcessor">
-    <Position X="2.75" Y="2.25" Width="2.25" />
+    <Position X="0.5" Y="5" Width="2.25" />
     <TypeIdentifier>
       <HashCode>AFAAAAIAAIAAQABAAAAAAAACAAQAAAAAAAAEQAAAAAI=</HashCode>
       <FileName>FGDBProcessor.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="BnL.CopyDissolverFGDB.WorkLayer">
-    <Position X="5.25" Y="0.5" Width="2" />
+  <Class Name="BnL.CopyDissolverFGDB.Parameters.BufferParameter">
+    <Position X="3.25" Y="0.5" Width="1.75" />
     <TypeIdentifier>
-      <HashCode>CQAAAAAAAAAAAAAAAAAAAAAAABAAAAAAgAAAAAAAQAA=</HashCode>
-      <FileName>WorkLayer.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAABAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>Parameters\BufferParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BnL.CopyDissolverFGDB.Parameters.FilterParameter">
+    <Position X="3.25" Y="5.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Parameters\FilterParameter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BnL.CopyDissolverFGDB.Parameters.UnionParameter">
+    <Position X="3.25" Y="2.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAQAAAAAAAAAABAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>Parameters\UnionParameter.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

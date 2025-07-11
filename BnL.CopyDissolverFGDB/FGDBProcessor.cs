@@ -85,10 +85,13 @@ namespace BnL.CopyDissolverFGDB
 
                 var outputName = union != null ? union.ResultLayerName : l.Name;
 
+              
                 foreach (var (oldStr, newStr) in renamePatterns)
                 {
                     outputName = outputName.Replace(oldStr, newStr);
                 }
+
+
 
                 workLayers.Add(new WorkLayer(l.Name, outputName, l.LayerDetails.GeomType, filter, buffer));
             }
