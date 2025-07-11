@@ -67,7 +67,7 @@ public partial class OgctLayer
                     var tileGeometry = PolygonFromExtent(tileMinX, tileMaxX, tileMinY, tileMaxY);
 
                     using var dsRef = new OgctDataSourceAccessor().OpenOrCreateDatasource(LayerDetails.DataSourceFileName);
-                    using var layerRef = dsRef.OpenLayer(LayerDetails.Name);
+                    using var layerRef = (OgctLayer)dsRef.OpenLayer(LayerDetails.Name);
 
                     tileResults.Add(CalculateOverlaps(layerRef.OgrLayer, featuresPerTileApproximation, ref progress, tileGeometry));
                 });

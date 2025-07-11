@@ -15,7 +15,6 @@ public interface IOgctLayer : IDisposable
     string Name { get; }
     LayerDetails LayerDetails { get; }
     IOgctDataSource DataSource { get; }
-    OSGeo.OGR.Layer OgrLayer { get; }
     ESpatialRefWkt GetSpatialRef();
     long CopyFeatures(IOgctLayer targetLayer, bool generateNewFids = false, Action<int> reportProgressPercentage = null);
     bool IsGeometryType();
