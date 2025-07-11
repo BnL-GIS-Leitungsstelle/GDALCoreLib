@@ -1,3 +1,3 @@
 ﻿namespace GdalToolsLib.Geometry;
 
-public record struct SelfOverlapErrorResult(long FidA, long FidB, double Area);
+public record SelfOverlapErrorResult(long FidA, long FidB, double Area);
