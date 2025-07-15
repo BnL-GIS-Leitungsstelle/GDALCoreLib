@@ -78,8 +78,10 @@ public class FgdbExtractor
 
                 // To convert an XML node contained in string xml into a JSON string
 
-                //WriteXmlFile(xmlMetadata, path, layerName, "_metadata");
-                //WriteXmlFile(xmlLayerDefinition, path, layerName, "_layerDefinition");
+                string parentPath = Directory.GetParent(fgdbPath).FullName;
+
+                WriteXmlFile(xmlMetadata, parentPath, layerName, "_metadata");
+                WriteXmlFile(xmlLayerDefinition, parentPath, layerName, "_layerDefinition");
 
                 //WriteJsonFile(xmlMetadata, path, layerName, "_metadata");
                 //WriteJsonFile(xmlLayerDefinition, path, layerName, "_layerDefinition");

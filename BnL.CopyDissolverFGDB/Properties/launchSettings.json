@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BnL.CopyDissolverFGDB": {
+      "commandName": "Project",
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Flora\\Flachwasserzonen\\Export\\data"
+    }
+  }
+}
