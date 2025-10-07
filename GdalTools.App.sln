@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESRIFileGeodatabaseAPI", "E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.FGDBCopy", "BnL.FGDBCopy\BnL.FGDBCopy.csproj", "{ED998C86-4588-41F1-A649-DC1B7ADF2865}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.GDBSubstringReplacerInTextfields", "BnL.GDBSubstringReplacerInTextfields\BnL.GDBSubstringReplacerInTextfields.csproj", "{FBBAABC8-C9A0-4E23-9968-DD8A3D3D92D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{ED998C86-4588-41F1-A649-DC1B7ADF2865}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED998C86-4588-41F1-A649-DC1B7ADF2865}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED998C86-4588-41F1-A649-DC1B7ADF2865}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBBAABC8-C9A0-4E23-9968-DD8A3D3D92D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBBAABC8-C9A0-4E23-9968-DD8A3D3D92D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBBAABC8-C9A0-4E23-9968-DD8A3D3D92D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBBAABC8-C9A0-4E23-9968-DD8A3D3D92D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
