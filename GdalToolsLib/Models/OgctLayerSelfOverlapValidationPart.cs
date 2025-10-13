@@ -17,7 +17,11 @@ public partial class OgctLayer
         Action<double> reportSelfOverlapValidationProgress = null,
         CancellationToken? cancellationToken = null)
     {
-        if (LayerDetails.GeomType is not (wkbGeometryType.wkbPolygon or wkbGeometryType.wkbMultiPolygon)) throw new Exception("Only polygons are supported.");
+        if (LayerDetails.GeomType is not (wkbGeometryType.wkbPolygon or wkbGeometryType.wkbMultiPolygon))
+        {
+            return new List<SelfOverlapErrorResult>();
+            //throw new Exception("Only polygons are supported.");
+        }
 
         _layer.ResetReading();
         var featureCount = (int)LayerDetails.FeatureCount;
