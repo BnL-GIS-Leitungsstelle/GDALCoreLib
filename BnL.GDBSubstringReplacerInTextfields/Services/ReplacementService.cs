@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BnL.GDBSubstringReplacerInTextfields.Models;
 using GdalToolsLib.DataAccess;
-using GdalToolsLib.Layer;
 using GdalToolsLib.Models;
 
 namespace BnL.GDBSubstringReplacerInTextfields.Services
