@@ -81,7 +81,7 @@ public class OgctDataSourceAccessor : IOgctSourceAccessor
 
         if (ds == null)  // fgdb is empty or contains only raster-files
         {
-            throw new NotSupportedException("Cannot open empty FGDB: its broken or contains only raster-featureclasses");
+            throw new NotSupportedException($"Cannot open empty FGDB: its broken or contains only raster-featureclasses ({path})");
         }
 
         return new OgctDataSource(ds);
