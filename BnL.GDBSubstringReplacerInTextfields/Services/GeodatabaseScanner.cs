@@ -27,7 +27,7 @@ namespace BnL.GDBSubstringReplacerInTextfields.Services
 
             foreach (var fgdbPath in EnumerateGeodatabases(startDirectory))
             {
-                Console.WriteLine($"Scanning {fgdbPath}...");
+                Console.WriteLine($"Scanning {Path.GetFileName(fgdbPath)}...");
                 try
                 {
                     using var dataSource = _accessor.OpenOrCreateDatasource(fgdbPath, EAccessLevel.ReadOnly);
@@ -67,6 +67,7 @@ namespace BnL.GDBSubstringReplacerInTextfields.Services
                                 continue;
                             }
 
+                            Console.WriteLine($"  -- Add Layer {layer.Name.PadRight(60)} ({textField.Name})");
                             results.Add(new LayerCandidate(fgdbPath, layer.Name, textField.Name));
                         }
                     }

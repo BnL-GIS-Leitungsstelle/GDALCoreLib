@@ -2,7 +2,6 @@ using System;
 using BnL.GDBSubstringReplacerInTextfields.Configuration;
 using BnL.GDBSubstringReplacerInTextfields.Services;
 using BnL.GDBSubstringReplacerInTextfields.UI;
-using GdalToolsLib.DataAccess;
 using GdalToolsLib.Models;
 
 namespace BnL.GDBSubstringReplacerInTextfields

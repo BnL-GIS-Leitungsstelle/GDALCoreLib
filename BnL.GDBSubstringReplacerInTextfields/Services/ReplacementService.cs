@@ -53,31 +53,35 @@ namespace BnL.GDBSubstringReplacerInTextfields.Services
 
                     while ((feature = layer.OpenNextFeature()) != null)
                     {
-                        using var currentFeature = feature;
-                        var fieldValue = currentFeature.ReadValue(field);
+                        //using var currentFeature = feature;
+                        var fieldValue = feature.ReadValue(field);
 
                         if (fieldValue is not string text || string.IsNullOrWhiteSpace(text))
                         {
+                            feature.Dispose();
                             continue;
                         }
 
                         if (!ContainsTargetPatterns(text))
                         {
+                            feature.Dispose();
                             continue;
                         }
 
                         var updatedValue = ReplaceUrl(text);
                         if (string.Equals(updatedValue, text, StringComparison.Ordinal))
                         {
+                            feature.Dispose();
                             continue;
                         }
 
-                        var writeResult = currentFeature.WriteValue(field, updatedValue);
+                        var writeResult = feature.WriteValue(field, updatedValue);
                         if (!writeResult.Valid)
                         {
                             Console.Error.WriteLine($"  ! Validation warning for feature {writeResult.FeatureFid} in {candidate.LayerName}.{candidate.FieldName}: {writeResult.ResultValidationType}");
                         }
                         replacements++;
+                        feature.Dispose();
                     }
 
                     Console.WriteLine($"  -> {candidate.LayerName}.{candidate.FieldName}: replaced {replacements} occurrence(s).");

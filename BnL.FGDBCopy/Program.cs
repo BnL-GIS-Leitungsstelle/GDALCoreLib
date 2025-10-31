@@ -141,7 +141,7 @@ namespace BnL.FGDBCopy
                     {
                         var result = CopyGeodatabaseTree(path, options);
                         results.Add(result);
-                        task.Description = $"Copying {result.Name}";
+                        task.Description = $"Copying {result.Name}".ToFixedString(50,'-');
                         task.Increment(1);
                     }
 
@@ -150,6 +150,8 @@ namespace BnL.FGDBCopy
 
             return results;
         }
+
+
 
         private static CopyResult CopyGeodatabaseTree(string sourceGeodatabase, FgdbCopyOptions options)
         {
