@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\Analyse\\Intern\\2025_FledermauskorridoreQueerenAutobahnen_Adrien\\FledermausFlugkorridor\\data\\FledermausFlugkorridor_20250417.gdb"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Jagdbanngebiete\\Jagdbanngebiete.gdb"
     }
   }
 }
