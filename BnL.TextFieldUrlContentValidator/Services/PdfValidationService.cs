@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,6 +18,7 @@ namespace BnL.TextFieldUrlContentValidator.Services
         private readonly OgctDataSourceAccessor _accessor;
         private readonly HttpClient _httpClient;
         private readonly HashSet<string> _validatedUrls = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _failedUrls = new(StringComparer.OrdinalIgnoreCase);
 
         public PdfValidationService(OgctDataSourceAccessor accessor, HttpClient httpClient)
         {
@@ -31,6 +32,7 @@ namespace BnL.TextFieldUrlContentValidator.Services
             int urlsChecked = 0;
             int urlsValidated = 0;
             int urlsSkippedCached = 0;
+            int urlsSkippedFailedCached = 0;
             int urlsFailed = 0;
 
             foreach (var group in candidates.GroupBy(c => c.GeodatabasePath))
@@ -82,6 +84,12 @@ namespace BnL.TextFieldUrlContentValidator.Services
                             continue;
                         }
 
+                        if (_failedUrls.Contains(text))
+                        {
+                            urlsSkippedFailedCached++;
+                            continue;
+                        }
+
                         urlsChecked++;
                         var ok = await DownloadAndValidatePdfAsync(text, cancellationToken).ConfigureAwait(false);
                         if (ok)
@@ -90,19 +98,20 @@ namespace BnL.TextFieldUrlContentValidator.Services
                             urlsValidated++;
                             string spaces = new string(' ', Console.WindowWidth - 1);
                             Console.Write($"\r {spaces}");
-                            Console.Write($"\r  ✓ Valid PDF: {text}");
+                            Console.Write($"\r  Valid PDF: {text}");
                         }
                         else
                         {
+                            _failedUrls.Add(text);
                             urlsFailed++;
                             Console.WriteLine();
-                            Console.WriteLine($"  ✗ Invalid PDF: {text}");
+                            Console.WriteLine($"  Invalid PDF: {text}");
                         }
                     }
                 }
             }
 
-            return new ValidationSummary(layersProcessed, urlsChecked, urlsValidated, urlsSkippedCached, urlsFailed);
+            return new ValidationSummary(layersProcessed, urlsChecked, urlsValidated, urlsSkippedCached, urlsSkippedFailedCached, urlsFailed);
         }
 
         private static bool IsHttpPdfUrl(string value)
@@ -172,6 +181,7 @@ namespace BnL.TextFieldUrlContentValidator.Services
         }
     }
 
-    internal sealed record ValidationSummary(int LayersProcessed, int UrlsChecked, int UrlsValidated, int UrlsSkippedCached, int UrlsFailed);
+    internal sealed record ValidationSummary(int LayersProcessed, int UrlsChecked, int UrlsValidated, int UrlsSkippedCached, int UrlsSkippedFailedCached, int UrlsFailed);
 }
+
 

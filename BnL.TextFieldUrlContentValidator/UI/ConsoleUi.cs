@@ -81,7 +81,8 @@ namespace BnL.TextFieldUrlContentValidator.UI
             table.AddRow("Layers processed", summary.LayersProcessed.ToString());
             table.AddRow("URLs checked", summary.UrlsChecked.ToString());
             table.AddRow("Validated PDFs", summary.UrlsValidated.ToString());
-            table.AddRow("Skipped (cached)", summary.UrlsSkippedCached.ToString());
+            table.AddRow("Skipped (cached valid)", summary.UrlsSkippedCached.ToString());
+            table.AddRow("Skipped (cached failed)", summary.UrlsSkippedFailedCached.ToString());
             table.AddRow("Failed", summary.UrlsFailed.ToString());
             AnsiConsole.Write(table);
         }
@@ -89,4 +90,3 @@ namespace BnL.TextFieldUrlContentValidator.UI
         private static string Escape(string value) => Markup.Escape(value);
     }
 }
-
