@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.GDBSubstringReplacerInT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.TextFieldUrlContentValidator", "BnL.TextFieldUrlContentValidator\BnL.TextFieldUrlContentValidator.csproj", "{09DC377E-B7B2-4ADE-A879-346FB73D898E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.ExcelXYPointDataToEnvelopeLayers", "BnL.ExcelXYPointDataToEnvelopeLayers\BnL.ExcelXYPointDataToEnvelopeLayers.csproj", "{A7D2E747-ADB6-4672-A937-194D7917ED0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{09DC377E-B7B2-4ADE-A879-346FB73D898E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09DC377E-B7B2-4ADE-A879-346FB73D898E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09DC377E-B7B2-4ADE-A879-346FB73D898E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
