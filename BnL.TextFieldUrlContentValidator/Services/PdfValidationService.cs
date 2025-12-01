@@ -67,49 +67,59 @@ namespace BnL.TextFieldUrlContentValidator.Services
                         }
 
                         var value = feature.ReadValue(field);
-                        if (value is not string text || string.IsNullOrWhiteSpace(text))
+                        if (value is not string url || string.IsNullOrWhiteSpace(url))
                         {
                             continue;
                         }
 
-                        text = text.Trim();
-                        if (!IsHttpPdfUrl(text))
+                        url = url.Trim();
+                        if (!IsHttpPdfUrl(url))
                         {
                             continue;
                         }
 
-                        if (_validatedUrls.Contains(text))
+                        if (_validatedUrls.Contains(url))
                         {
                             urlsSkippedCached++;
                             continue;
                         }
 
-                        if (_failedUrls.Contains(text))
+                        if (_failedUrls.Contains(url))
                         {
                             urlsSkippedFailedCached++;
                             continue;
                         }
 
                         urlsChecked++;
-                        var ok = await DownloadAndValidatePdfAsync(text, cancellationToken).ConfigureAwait(false);
+                        var ok = await DownloadAndValidatePdfAsync(url, cancellationToken).ConfigureAwait(false);
                         if (ok)
                         {
-                            _validatedUrls.Add(text);
+                            _validatedUrls.Add(url);
                             urlsValidated++;
                             string spaces = new string(' ', Console.WindowWidth - 1);
                             Console.Write($"\r {spaces}");
-                            Console.Write($"\r  Valid PDF: {text}");
+                            Console.Write($"\r  Valid PDF: {url}");
                         }
                         else
                         {
-                            _failedUrls.Add(text);
+                            _failedUrls.Add(url);
                             urlsFailed++;
                             Console.WriteLine();
-                            Console.WriteLine($"  Invalid PDF: {text}");
+                            Console.WriteLine($"  Invalid PDF: {url}");
                         }
                     }
                 }
             }
+
+            // write list of failed URLs into a file
+            if (_failedUrls.Count > 0)
+            {
+                var failedFilePath = Path.Combine(AppContext.BaseDirectory, "FailedPdfUrls.txt");
+                await File.WriteAllLinesAsync(failedFilePath, _failedUrls.OrderBy(u => u), cancellationToken).ConfigureAwait(false);
+                Console.WriteLine();
+                Console.WriteLine($" List of failed PDF URLs written to: {failedFilePath}");
+            }
+
 
             return new ValidationSummary(layersProcessed, urlsChecked, urlsValidated, urlsSkippedCached, urlsSkippedFailedCached, urlsFailed);
         }
