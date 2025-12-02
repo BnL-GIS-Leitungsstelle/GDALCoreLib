@@ -4,6 +4,7 @@ public class WolfEnvelopeModel
 {
     public string? ObservationDate { get; set; }
     public string? IndividualId { get; set; }
+    public int IndividuumCount { get; set; } = 1;
     public string? CompartmentMain { get; set; }
     public string? Canton { get; set; }
     public double? X { get; set; }
