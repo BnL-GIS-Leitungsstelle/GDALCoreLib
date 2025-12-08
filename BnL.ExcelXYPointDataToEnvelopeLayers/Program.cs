@@ -25,19 +25,15 @@ internal class Program
         var wolves = ExcelWolfReader.Read(excelPath);
         Console.WriteLine($"Loaded {wolves.Count} wolf records.");
 
-        foreach (WolfModel wolf in wolves.Take(5))
-        {
-            Console.WriteLine($"{wolf.IndividualId} | {wolf.Canton} | {wolf.ObservationDate:yyyy-MM-dd}");
-        }
 
-        var envelopes100m = CreateEnvelopes(wolves, 100);
+        var envelopes1000m = CreateEnvelopes(wolves, 1000);
         var envelopes2000m = CreateEnvelopes(wolves, 2000);
         var envelopes5000m = CreateEnvelopes(wolves, 5000);
 
-        Console.WriteLine($"Created {envelopes100m.Count} envelopes (100 m), {envelopes2000m.Count} envelopes (2000 m), {envelopes5000m.Count} envelopes (5000 m).");
+        Console.WriteLine($"Created {envelopes1000m.Count} envelopes (1000 m), {envelopes2000m.Count} envelopes (2000 m), {envelopes5000m.Count} envelopes (5000 m).");
 
         var fgdbPath = Path.Combine(AppContext.BaseDirectory, "WolfRegulierung.gdb");
-        CreateFgdbWithEnvelopes(fgdbPath, ("envelopes100m", envelopes100m), ("envelopes2000m", envelopes2000m), ("envelopes5000m", envelopes5000m));
+        CreateFgdbWithEnvelopes(fgdbPath, ("envelopes1000m", envelopes1000m), ("envelopes2000m", envelopes2000m), ("envelopes5000m", envelopes5000m));
         Console.WriteLine($"FileGDB written to {fgdbPath}");
     }
 
@@ -77,6 +73,7 @@ internal class Program
                 existingModel.Canton = AppendValue(existingModel.Canton, newModel.Canton);
                 existingModel.CompartmentMain = AppendValue(existingModel.CompartmentMain, newModel.CompartmentMain);
                 existingModel.ObservationDate = AppendValue(existingModel.ObservationDate, newModel.ObservationDate);
+                existingModel.IndividuumCount += 1;
             }
             else
             {
@@ -150,6 +147,7 @@ internal class Program
 
         var observationDateField = schema?.GetField("ObservationDate");
         var individualIdField = schema?.GetField("IndividualId");
+        var individuumCountField = schema?.GetField("IndividuumCount");
         var compartmentField = schema?.GetField("CompartmentMain");
         var cantonField = schema?.GetField("Canton");
         var xField = schema?.GetField("X");
@@ -159,7 +157,7 @@ internal class Program
         var upperRightXField = schema?.GetField("EnvelopeUpperRightX");
         var upperRightYField = schema?.GetField("EnvelopeUpperRightY");
 
-        if (observationDateField is null || individualIdField is null || compartmentField is null ||
+        if (observationDateField is null || individualIdField is null || individuumCountField is null || compartmentField is null ||
             cantonField is null || xField is null || yField is null || lowerLeftXField is null ||
             lowerLeftYField is null || upperRightXField is null || upperRightYField is null)
         {
@@ -182,8 +180,9 @@ internal class Program
             feature.SetGeometry(geometry);
 
 #pragma warning disable CS8604 // WriteValue accepts nulls for nullable fields
-            feature.WriteValue(observationDateField!, (object?)envelope.ObservationDate);
-            feature.WriteValue(individualIdField!, (object?)envelope.IndividualId);
+            feature.WriteValue(observationDateField!, envelope.ObservationDate);
+            feature.WriteValue(individualIdField!, envelope.IndividualId);
+            feature.WriteValue(individuumCountField!, envelope.IndividuumCount);
             feature.WriteValue(compartmentField!, (object?)envelope.CompartmentMain);
             feature.WriteValue(cantonField!, (object?)envelope.Canton);
             feature.WriteValue(xField!, envelope.X!.Value);
@@ -204,6 +203,7 @@ internal class Program
         {
             new FieldDefnInfo("ObservationDate", FieldType.OFTString, 20, isNullable: true, isUnique: false),
             new FieldDefnInfo("IndividualId", FieldType.OFTString, 50, isNullable: true, isUnique: false),
+            new FieldDefnInfo("IndividuumCount", FieldType.OFTInteger, 50, isNullable: false, isUnique: false),
             new FieldDefnInfo("CompartmentMain", FieldType.OFTString, 50, isNullable: true, isUnique: false),
             new FieldDefnInfo("Canton", FieldType.OFTString, 10, isNullable: true, isUnique: false),
             new FieldDefnInfo("X", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
