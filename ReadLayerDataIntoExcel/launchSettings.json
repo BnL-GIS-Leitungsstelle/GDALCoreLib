@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Bundesinventare\\Jagdbanngebiete\\Jagdbanngebiete.gdb"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\Analyse\\Intern\\2026_ThomasGerner_Wolfregulierung_20260113\\Wolfregulierung\\WolfRegulierung.gdb"
     }
   }
 }
