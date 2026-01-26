@@ -26,14 +26,13 @@ internal class Program
         Console.WriteLine($"Loaded {wolves.Count} wolf records.");
 
 
-        var envelopes1000m = CreateEnvelopes(wolves, 1000);
         var envelopes2000m = CreateEnvelopes(wolves, 2000);
-        var envelopes5000m = CreateEnvelopes(wolves, 5000);
+        //var envelopes5000m = CreateEnvelopes(wolves, 5000);
 
-        Console.WriteLine($"Created {envelopes1000m.Count} envelopes (1000 m), {envelopes2000m.Count} envelopes (2000 m), {envelopes5000m.Count} envelopes (5000 m).");
+        Console.WriteLine($"Created {envelopes2000m.Count} envelopes (2000 m).");
 
         var fgdbPath = Path.Combine(AppContext.BaseDirectory, "WolfRegulierung.gdb");
-        CreateFgdbWithEnvelopes(fgdbPath, ("envelopes1000m", envelopes1000m), ("envelopes2000m", envelopes2000m), ("envelopes5000m", envelopes5000m));
+        CreateFgdbWithEnvelopes(fgdbPath, ("envelopes2000m", envelopes2000m));
         Console.WriteLine($"FileGDB written to {fgdbPath}");
     }
 
@@ -57,7 +56,8 @@ internal class Program
             {
                 ObservationDate = wolf.ObservationDate?.ToString("yyyy-MM-dd"),
                 IndividualId = wolf.IndividualId,
-                CompartmentMain = wolf.CompartmentMain,
+                RegulationEvents = $"{wolf.IndividualId} ({wolf.ObservationDate.Value.ToShortDateString()})",
+                Compartment = wolf.CompartmentMain,
                 Canton = wolf.Canton,
                 X = wolf.X,
                 Y = wolf.Y,
@@ -71,16 +71,15 @@ internal class Program
             {
                 existingModel!.IndividualId = AppendValue(existingModel.IndividualId, newModel.IndividualId);
                 existingModel.Canton = AppendValue(existingModel.Canton, newModel.Canton);
-                existingModel.CompartmentMain = AppendValue(existingModel.CompartmentMain, newModel.CompartmentMain);
+                //existingModel.CompartmentMain = AppendValue(existingModel.CompartmentMain, newModel.CompartmentMain);
                 existingModel.ObservationDate = AppendValue(existingModel.ObservationDate, newModel.ObservationDate);
                 existingModel.IndividuumCount += 1;
+                existingModel.RegulationEvents += $", {newModel.RegulationEvents}";
             }
             else
             {
                 envelopes.Add(newModel);
             }
-
-
         }
 
         return envelopes;
@@ -90,6 +89,9 @@ internal class Program
     {
         if (string.IsNullOrWhiteSpace(existing)) return addition;
         if (string.IsNullOrWhiteSpace(addition)) return existing;
+
+        if (existing.Contains(addition)) return existing;
+
         return $"{existing}, {addition}";
     }
 
@@ -145,20 +147,27 @@ internal class Program
             throw new InvalidOperationException($"Schema could not be created for layer {layerName}.");
         }
 
-        var observationDateField = schema?.GetField("ObservationDate");
-        var individualIdField = schema?.GetField("IndividualId");
+        //var observationDateField = schema?.GetField("ObservationDate");
+        //var individualIdField = schema?.GetField("IndividualId");
         var individuumCountField = schema?.GetField("IndividuumCount");
-        var compartmentField = schema?.GetField("CompartmentMain");
+        var regulationEvents = schema?.GetField("RegulationEvents");
+        var compartmentField = schema?.GetField("Compartment");
         var cantonField = schema?.GetField("Canton");
-        var xField = schema?.GetField("X");
-        var yField = schema?.GetField("Y");
+        //var xField = schema?.GetField("X");
+        //var yField = schema?.GetField("Y");
         var lowerLeftXField = schema?.GetField("EnvelopeLowerLeftX");
         var lowerLeftYField = schema?.GetField("EnvelopeLowerLeftY");
         var upperRightXField = schema?.GetField("EnvelopeUpperRightX");
         var upperRightYField = schema?.GetField("EnvelopeUpperRightY");
 
-        if (observationDateField is null || individualIdField is null || individuumCountField is null || compartmentField is null ||
-            cantonField is null || xField is null || yField is null || lowerLeftXField is null ||
+        //if (observationDateField is null || individualIdField is null || individuumCountField is null || compartmentField is null ||
+        //    cantonField is null || xField is null || yField is null || lowerLeftXField is null ||
+        //    lowerLeftYField is null || upperRightXField is null || upperRightYField is null)
+        //{
+        //    throw new InvalidOperationException($"One or more required fields are missing on layer {layerName}.");
+        //}
+
+        if (individuumCountField is null || compartmentField is null || cantonField is null || lowerLeftXField is null ||
             lowerLeftYField is null || upperRightXField is null || upperRightYField is null)
         {
             throw new InvalidOperationException($"One or more required fields are missing on layer {layerName}.");
@@ -180,13 +189,14 @@ internal class Program
             feature.SetGeometry(geometry);
 
 #pragma warning disable CS8604 // WriteValue accepts nulls for nullable fields
-            feature.WriteValue(observationDateField!, envelope.ObservationDate);
-            feature.WriteValue(individualIdField!, envelope.IndividualId);
+            //feature.WriteValue(observationDateField!, envelope.ObservationDate);
+            //feature.WriteValue(individualIdField!, envelope.IndividualId);
             feature.WriteValue(individuumCountField!, envelope.IndividuumCount);
-            feature.WriteValue(compartmentField!, (object?)envelope.CompartmentMain);
-            feature.WriteValue(cantonField!, (object?)envelope.Canton);
-            feature.WriteValue(xField!, envelope.X!.Value);
-            feature.WriteValue(yField!, envelope.Y!.Value);
+            feature.WriteValue(regulationEvents!, envelope.RegulationEvents);
+            feature.WriteValue(compartmentField!, envelope.Compartment);
+            feature.WriteValue(cantonField!, envelope.Canton);
+            //feature.WriteValue(xField!, envelope.X!.Value);
+            //feature.WriteValue(yField!, envelope.Y!.Value);
             feature.WriteValue(lowerLeftXField!, envelope.EnvelopeLowerLeftX!.Value);
             feature.WriteValue(lowerLeftYField!, envelope.EnvelopeLowerLeftY!.Value);
             feature.WriteValue(upperRightXField!, envelope.EnvelopeUpperRightX!.Value);
@@ -201,13 +211,14 @@ internal class Program
     {
         return new List<FieldDefnInfo>
         {
-            new FieldDefnInfo("ObservationDate", FieldType.OFTString, 20, isNullable: true, isUnique: false),
-            new FieldDefnInfo("IndividualId", FieldType.OFTString, 50, isNullable: true, isUnique: false),
+            // new FieldDefnInfo("ObservationDate", FieldType.OFTString, 20, isNullable: true, isUnique: false),
+            // new FieldDefnInfo("IndividualId", FieldType.OFTString, 50, isNullable: true, isUnique: false),
             new FieldDefnInfo("IndividuumCount", FieldType.OFTInteger, 50, isNullable: false, isUnique: false),
-            new FieldDefnInfo("CompartmentMain", FieldType.OFTString, 50, isNullable: true, isUnique: false),
+            new FieldDefnInfo("RegulationEvents", FieldType.OFTString, 254, isNullable: true, isUnique: false),
+            new FieldDefnInfo("Compartment", FieldType.OFTString, 50, isNullable: true, isUnique: false),
             new FieldDefnInfo("Canton", FieldType.OFTString, 10, isNullable: true, isUnique: false),
-            new FieldDefnInfo("X", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
-            new FieldDefnInfo("Y", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
+            // new FieldDefnInfo("X", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
+            // new FieldDefnInfo("Y", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
             new FieldDefnInfo("EnvelopeLowerLeftX", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
             new FieldDefnInfo("EnvelopeLowerLeftY", FieldType.OFTReal, 24, isNullable: true, isUnique: false),
             new FieldDefnInfo("EnvelopeUpperRightX", FieldType.OFTReal, 24, isNullable: true, isUnique: false),

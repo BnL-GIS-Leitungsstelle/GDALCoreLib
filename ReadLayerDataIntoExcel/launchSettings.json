@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\DNL\\Schutzgebiete\\Wildruhezonen\\work\\2025_NOV\\20251110_wildruhezonen_delivery\\wildruhezonen_delivery\\data\\lv95\\gdb\\Wildruhezonen.gdb"
+      "commandLineArgs": "G:\\BnL\\Daten\\Ablage\\Analyse\\Intern\\2026_ThomasGerner_Wolfregulierung_20260113\\Wolfregulierung\\WolfRegulierung.gdb"
     }
   }
 }
