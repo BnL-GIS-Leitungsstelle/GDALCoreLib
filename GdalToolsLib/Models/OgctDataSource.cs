@@ -61,9 +61,18 @@ public class OgctDataSource : IOgctDataSource
 
                 var layerOptions = new List<string>()
                 {
-                    overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo,
-                    createAreaAndLengthFields ? OgcConstants.OptionCreateShapeAreaAndLengthFieldsYes : OgcConstants.OptionCreateShapeAreaAndLengthFieldsNo
+                    overwriteExisting ? OgcConstants.OptionOverwriteYes : OgcConstants.OptionOverwriteNo
                 };
+
+                if (supportedDatasource.Type == EDataSourceType.OpenFGDB)
+                {
+                    layerOptions.Add(
+                        createAreaAndLengthFields
+                            ? OgcConstants.OptionCreateShapeAreaAndLengthFieldsYes
+                            : OgcConstants.OptionCreateShapeAreaAndLengthFieldsNo);
+                }
+
+
                 if (!string.IsNullOrEmpty(documentation))
                     layerOptions.Add($"{OgcConstants.OptionDocumentationPrefix}{documentation}");
 
