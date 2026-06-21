@@ -9,6 +9,7 @@ public enum ECategory
     Flachmoor,
     Auengebiete,
     AmphiblaichgebietUndWanderobjekte,
+    AmphiblaichgebietUndWanderobjekteUnion,
     Trockenwiesenweiden,
     Wasserzugvogel,
     Jagdbann,
