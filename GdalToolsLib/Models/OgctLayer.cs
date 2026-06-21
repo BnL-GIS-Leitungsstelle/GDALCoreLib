@@ -383,7 +383,7 @@ public static bool IsSameGeometryDimension(wkbGeometryType sourceType, wkbGeomet
 
     public long CopyToLayer(IOgctDataSource targetDataSource, string? newLayerName, bool overwriteExisting = true)
     {
-        using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName ?? Name, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting);
+        using var targetLayer = targetDataSource.CreateAndOpenLayer(newLayerName ?? Name, GetSpatialRef(), _layer.GetGeomType(), null, overwriteExisting,true);
         CloneFieldSchema(targetLayer);
         return CopyFeatures(targetLayer);
     }
