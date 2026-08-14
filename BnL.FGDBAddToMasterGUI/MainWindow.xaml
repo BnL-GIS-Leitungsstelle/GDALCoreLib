@@ -1,0 +1,161 @@
+<Window x:Class="BnL.FGDBAddToMasterGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:BnL.FGDBAddToMasterGUI.ViewModels"
+        d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel}"
+        mc:Ignorable="d"
+        Title="MASTER-Layer: Felder und Werte übertragen"
+        Width="1040"
+        MinWidth="800"
+        Height="760"
+        MinHeight="600">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+            <TextBlock Text="{Binding ErrorText}"
+                       Foreground="Firebrick"
+                       TextWrapping="Wrap"
+                       Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <DockPanel Margin="0,8,0,0" LastChildFill="True">
+                <Button DockPanel.Dock="Right"
+                        Width="90"
+                        Height="30"
+                        Margin="8,0,0,0"
+                        Command="{Binding CloseCommand}"
+                        Content="Close" />
+                <Button DockPanel.Dock="Right"
+                        Width="150"
+                        Height="30"
+                        Command="{Binding TransferCommand}"
+                        Content="Werte übertragen" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding StatusText}" />
+            </DockPanel>
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Margin="0,0,0,12"
+                           Text="Fügt ausgewählte Attribute aus einem AddToMASTER-Layer zum MASTER-Layer hinzu und überträgt sie für übereinstimmende Schlüsselwerte."
+                           TextWrapping="Wrap" />
+
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Header="MASTER-FGDB" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="0,0,8,8" IsReadOnly="True" Text="{Binding MasterDatabasePath}" />
+                            <Button Grid.Column="1" Margin="0,0,0,8" Command="{Binding BrowseMasterDatabaseCommand}" Content="Durchsuchen…" />
+                            <ComboBox Grid.Row="1" Grid.ColumnSpan="2"
+                                      ItemsSource="{Binding MasterLayerNames}"
+                                      SelectedItem="{Binding SelectedMasterLayer}"
+                                      IsEnabled="{Binding HasMasterDatabase}"
+                                      DisplayMemberPath="." />
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Grid.Column="2" Header="AddToMASTER-FGDB" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="0,0,8,8" IsReadOnly="True" Text="{Binding AddDatabasePath}" />
+                            <Button Grid.Column="1" Margin="0,0,0,8" Command="{Binding BrowseAddDatabaseCommand}" Content="Durchsuchen…" />
+                            <ComboBox Grid.Row="1" Grid.ColumnSpan="2"
+                                      ItemsSource="{Binding AddLayerNames}"
+                                      SelectedItem="{Binding SelectedAddLayer}"
+                                      IsEnabled="{Binding HasAddDatabase}"
+                                      DisplayMemberPath="." />
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Header="Felder zum Hinzufügen" Padding="10">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" Text="Felder aus dem AddToMASTER-Layer auswählen:" />
+                            <ListBox ItemsSource="{Binding AddFields}" BorderThickness="1" MinHeight="240">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}" Padding="3">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Width="160" Text="{Binding Name}" />
+                                                <TextBlock Foreground="DimGray" Text="{Binding TypeDescription}" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </GroupBox>
+
+                    <GroupBox Grid.Column="2" Header="INNER JOIN" Padding="10">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Margin="0,0,0,8" Text="In beiden Layern vorhandene Join-Felder auswählen:" TextWrapping="Wrap" />
+                            <TextBlock DockPanel.Dock="Bottom" Margin="0,12,0,4" Text="SQL-JOIN-Bedingung:" />
+                            <TextBox DockPanel.Dock="Bottom"
+                                     Height="78"
+                                     IsReadOnly="True"
+                                     Text="{Binding JoinCondition}"
+                                     TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto" />
+                            <ListBox ItemsSource="{Binding JoinFields}" BorderThickness="1" MinHeight="150">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  IsEnabled="{Binding IsCompatible}"
+                                                  Padding="3">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" />
+                                                <StackPanel Visibility="{Binding HasValidationError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Width="130" Foreground="DimGray" Text="MASTER:" />
+                                                        <TextBlock Foreground="DimGray" Text="{Binding MasterTypeDescription}" />
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Width="130" Foreground="DimGray" Text="AddToMASTER:" />
+                                                        <TextBlock Foreground="DimGray" Text="{Binding AddTypeDescription}" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                                <TextBlock Foreground="Firebrick"
+                                                           Text="{Binding ValidationMessage}"
+                                                           TextWrapping="Wrap"
+                                                           Visibility="{Binding HasValidationError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </GroupBox>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
