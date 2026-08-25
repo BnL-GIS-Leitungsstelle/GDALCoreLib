@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.TextFieldUrlContentVali
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.ExcelXYPointDataToEnvelopeLayers", "BnL.ExcelXYPointDataToEnvelopeLayers\BnL.ExcelXYPointDataToEnvelopeLayers.csproj", "{A7D2E747-ADB6-4672-A937-194D7917ED0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.FGDBAddToMasterGUI", "BnL.FGDBAddToMasterGUI\BnL.FGDBAddToMasterGUI.csproj", "{469D7A26-2EDE-4220-8F83-85E342E61CA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7D2E747-ADB6-4672-A937-194D7917ED0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
