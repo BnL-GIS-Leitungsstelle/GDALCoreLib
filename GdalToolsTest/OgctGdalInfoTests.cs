@@ -4,7 +4,6 @@ using MaxRev.Gdal.Core;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace GdalToolsTest;
 

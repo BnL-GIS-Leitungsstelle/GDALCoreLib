@@ -31,7 +31,7 @@ namespace BnL.FGDBCopy
                 var results = CopyGeodatabases(geodatabases, options);
 
                 AnsiConsole.WriteLine();
-                var table = new Table().Border(TableBorder.Rounded).Centered();
+                var table = new Table().Border(TableBorder.Rounded);
                 table.AddColumn("[bold]Geodatabase[/]");
                 table.AddColumn("[bold]Destination[/]");
                 table.AddColumn("[bold]Status[/]");

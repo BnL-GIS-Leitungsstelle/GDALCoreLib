@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml.XPath;
-using GdalToolsLib.Common;
+﻿using GdalToolsLib.Common;
 using GdalToolsLib.DataAccess;
 using GdalToolsLib.Exceptions;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
 using MaxRev.Gdal.Core;
 using OSGeo.OGR;
-using OSGeo.OSR;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace GdalToolsTest;
 

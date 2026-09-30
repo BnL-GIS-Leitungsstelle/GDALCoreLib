@@ -12,7 +12,6 @@ using MaxRev.Gdal.Core;
 using OSGeo.OGR;
 using OSGeo.OSR;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace GdalToolsTest;
 

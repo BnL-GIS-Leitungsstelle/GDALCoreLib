@@ -7,7 +7,6 @@ using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
 using MaxRev.Gdal.Core;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace GdalCoreTest
 {

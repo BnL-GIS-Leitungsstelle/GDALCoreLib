@@ -13,7 +13,6 @@ using GdalToolsLib.Layer;
 using GdalToolsLib.Models;
 using GdalToolsTest.Helper;
 using Xunit;
-using Xunit.Abstractions;
 using MaxRev.Gdal.Core;
 
 namespace GdalCoreTest

@@ -3,7 +3,6 @@ using GdalToolsTest.Helper;
 using MaxRev.Gdal.Core;
 using OSGeo.OGR;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace GdalCoreTest
 {
