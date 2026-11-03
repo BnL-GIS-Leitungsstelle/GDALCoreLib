@@ -1,0 +1,32 @@
+<Window x:Class="BnL.JB_WTSCHG_MASTER_SeparateLayerBuilder.Gui.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="JBG- und WTSCHG-Layer aus MASTER erstellen" Width="850" Height="590" MinWidth="690" MinHeight="510">
+    <Window.Resources>
+        <Style TargetType="Button"><Setter Property="Padding" Value="10,5"/><Setter Property="Margin" Value="4"/></Style>
+        <Style TargetType="TextBox"><Setter Property="Padding" Value="5"/><Setter Property="Margin" Value="4"/></Style>
+        <Style TargetType="Label"><Setter Property="VerticalAlignment" Value="Center"/></Style>
+    </Window.Resources>
+    <DockPanel Margin="16">
+        <Grid DockPanel.Dock="Top" IsEnabled="{Binding Available}">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Content="MASTER-FGDB"/><TextBox Grid.Column="1" IsReadOnly="True" Text="{Binding Source}"/>
+            <Button Grid.Column="2" Command="{Binding ChooseSourceCommand}" Content="Auswählen …"/>
+            <Label Grid.Row="1" Content="MASTER-Featureclass"/>
+            <ComboBox Grid.Row="1" Grid.Column="1" Margin="4" Padding="5" ItemsSource="{Binding Layers}" SelectedItem="{Binding SelectedLayer}"/>
+            <Label Grid.Row="2" Content="Ziel-FGDB"/><TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding Target}"/>
+            <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+                <Button Command="{Binding ChooseTargetCommand}" Content="Bestehende …"/><Button Command="{Binding NewTargetCommand}" Content="Neue …"/>
+            </StackPanel>
+            <Label Grid.Row="3" Content="JBG-Layer"/><TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Jbg, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Grid.Row="4" Content="WTSCHG-Layer"/><TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Wildlife, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Content="Layernamen speichern" Command="{Binding SaveNamesCommand}"/>
+            <Button Grid.Row="6" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="4,12" Content="Separation der JB- und WTSCHG-Layer" Command="{Binding SeparateCommand}"/>
+        </Grid>
+        <Label DockPanel.Dock="Top" Content="Fortschritt und Fehler"/>
+        <TextBox Text="{Binding Log, Mode=OneWay}" TextChanged="LogChanged" IsReadOnly="True" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+    </DockPanel>
+</Window>

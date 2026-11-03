@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.ExcelXYPointDataToEnvel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.FGDBAddToMasterGUI", "BnL.FGDBAddToMasterGUI\BnL.FGDBAddToMasterGUI.csproj", "{469D7A26-2EDE-4220-8F83-85E342E61CA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BnL.JB_WTSCHG_MASTER_SeparateLayerBuilder.Gui", "BnL.JB_WTSCHG_MASTER_SeparateLayerBuilder.Gui\BnL.JB_WTSCHG_MASTER_SeparateLayerBuilder.Gui.csproj", "{90626240-DFD0-45DD-6038-1AA354E31C6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{469D7A26-2EDE-4220-8F83-85E342E61CA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90626240-DFD0-45DD-6038-1AA354E31C6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90626240-DFD0-45DD-6038-1AA354E31C6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90626240-DFD0-45DD-6038-1AA354E31C6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90626240-DFD0-45DD-6038-1AA354E31C6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
