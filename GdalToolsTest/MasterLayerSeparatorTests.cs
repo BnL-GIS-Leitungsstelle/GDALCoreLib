@@ -14,6 +14,8 @@ namespace GdalToolsTest;
 
 public sealed class MasterLayerSeparatorTests
 {
+    private static readonly string[] ExcludedWildlifeFields = ["DesignatType", "Inkraftsetzungsdatum", "IUCNCategory", "RefObjBlatt"];
+
     public static bool HasAcceptanceSample => File.Exists(Environment.GetEnvironmentVariable("JBG_MASTER_SAMPLE_ZIP"));
 
     [Fact(SkipUnless = nameof(HasAcceptanceSample), Skip = "JBG_MASTER_SAMPLE_ZIP muss auf das Referenzarchiv zeigen.")]
@@ -38,7 +40,9 @@ public sealed class MasterLayerSeparatorTests
             using var srs = wt.GetSpatialRef();
             srs.GetAuthorityCode(null).Should().Be("2056");
             using var schema = wt.GetLayerDefn();
-            schema.GetFieldCount().Should().Be(18);
+            schema.GetFieldCount().Should().Be(14);
+            foreach (var field in ExcludedWildlifeFields)
+                schema.GetFieldIndex(field).Should().Be(-1);
             Feature row;
             while ((row = wt.GetNextFeature()) != null)
             {
@@ -85,6 +89,13 @@ public sealed class MasterLayerSeparatorTests
             jbSchema.GetFieldIndex("JB_KAT").Should().BeGreaterThanOrEqualTo(0);
             using var wt = db.GetLayerByName("WTSCHG");
             wt.GetFeatureCount(1).Should().Be(1);
+            using var wtSchema = wt.GetLayerDefn();
+            wtSchema.GetFieldCount().Should().Be(14);
+            foreach (var field in ExcludedWildlifeFields)
+            {
+                wtSchema.GetFieldIndex(field).Should().Be(-1);
+                jbSchema.GetFieldIndex(field).Should().BeGreaterThanOrEqualTo(0);
+            }
             using var feature = wt.GetNextFeature();
             feature.GetFieldAsString("TeilObjNummer").Should().Be("00");
             using var geom = feature.GetGeometryRef();
@@ -94,6 +105,9 @@ public sealed class MasterLayerSeparatorTests
             {
                 using var json = JsonDocument.Parse(File.ReadAllText(Path.Combine(directory.FullName, role + ".json")));
                 json.RootElement.GetProperty("Fields").EnumerateArray().Select(f => f.GetProperty("Name").GetString()).Should().Contain("ObjNummer");
+                var fields = json.RootElement.GetProperty("Fields").EnumerateArray().Select(f => f.GetProperty("Name").GetString()).ToArray();
+                if (role == "WTSCHG") fields.Should().NotIntersectWith(ExcludedWildlifeFields);
+                else fields.Should().Contain(ExcludedWildlifeFields);
             }
         }
         finally { directory.Delete(true); }
@@ -121,6 +135,8 @@ public sealed class MasterLayerSeparatorTests
             feature.SetField("ObjNummer", "1");
             feature.SetField("Name", (conflict && offset == 1) || offset == 20 ? "Beta" : "Alpha");
             feature.SetField("JB_KAT", offset == 20 ? "III" : "II");
+            foreach (var field in ExcludedWildlifeFields)
+                feature.SetField(field, offset.ToString());
             feature.SetGeometry(geom);
             layer.CreateFeature(feature).Should().Be(0);
         }

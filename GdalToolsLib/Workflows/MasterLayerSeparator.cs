@@ -16,7 +16,7 @@ namespace GdalToolsLib.Workflows;
 public sealed class MasterLayerSeparator
 {
     private static readonly string[] WildlifeOnly = ["Kanton", "Schutzstatus", "Grundlage", "Beschlussjahr", "Bestimmungen", "Bestimmungen_Kt", "Zusatzinformation", "RefKanton", "Schutzzeit"];
-    private static readonly string[] WildlifeFields = ["ObjNummer", "Name", "RefObjBlatt", "DesignatType", "IUCNCategory", "Inkraftsetzungsdatum", "Mutationsdatum", "Mutationsgrund", "TeilObjNummer", .. WildlifeOnly];
+    private static readonly string[] WildlifeFields = ["ObjNummer", "Name", "Mutationsdatum", "Mutationsgrund", "TeilObjNummer", .. WildlifeOnly];
     private readonly OgctDataSourceAccessor _accessor = new();
 
     public string[] GetLayerNames(string path)
